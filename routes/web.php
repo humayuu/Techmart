@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\ProfileController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,6 +19,11 @@ Route::prefix('admin')->group(function () {
         Route::get('dashboard', 'AdminDashboard')->name('admin.dashboard')->middleware('admin-check');
 
         Route::post('login', 'Login')->name('admin.login');
+    });
+
+    Route::middleware('admin-check')->group(function () {
+        // Brands Routes
+        Route::resource('brand', BrandController::class);
     });
 });
 

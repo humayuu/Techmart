@@ -14,6 +14,8 @@
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
 
     <!-- loader-->
     <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet" />
@@ -184,7 +186,7 @@
             <!--navigation-->
             <ul class="metismenu" id="menu">
                 <li>
-                    <a href="javascript:;">
+                    <a href="{{ route('admin.dashboard') }}">
                         <div class="parent-icon"><i class="bi bi-house-fill"></i></div>
                         <div class="menu-title">Dashboard</div>
                     </a>
@@ -197,7 +199,7 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="#"><i class="bi bi-circle"></i>All Brands</a>
+                            <a href="{{ route('brand.index') }}"><i class="bi bi-circle"></i>All Brands</a>
                         </li>
                     </ul>
                 </li>
@@ -205,7 +207,22 @@
             <!--end navigation-->
         </aside>
         <!--end sidebar -->
-        @yield('main')
+        <main class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="breadcrumb-title pe-3">Tech<span class="text-primary">Mart</span></div>
+                <div class="ps-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item active" aria-current="page">@yield('page-title')</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            @yield('main')
+        </main>
+
         <!--start footer-->
         <footer class="footer">
             <div class="footer-text">Copyright © 2026. All right reserved.</div>
@@ -222,6 +239,40 @@
         <!--app-->
         <script src="{{ asset('assets/js/app.js') }}"></script>
         <script src="{{ asset('assets/js/index.js') }}"></script>
+
+        <!-- Toastr JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+
+
+        <!-- Toastr Notification Script -->
+        <script>
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "timeOut": "3500"
+            };
+
+            @if (Session::has('message'))
+                let type = "{{ Session::get('alert-type', 'info') }}"
+
+                switch (type) {
+                    case 'info':
+                        toastr.info(" {{ Session::get('message') }} ");
+                        break;
+                    case 'success':
+                        toastr.success("{{ Session::get('message') }}");
+                        break;
+                    case 'warning':
+                        toastr.success("{{ Session::get('message') }}");
+                        break;
+                    case 'error':
+                        toastr.success("{{ Session::get('message') }}");
+                        break;
+
+                }
+            @endif
+        </script>
 </body>
 
 </html>
