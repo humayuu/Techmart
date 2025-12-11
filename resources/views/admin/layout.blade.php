@@ -243,6 +243,9 @@
         <!-- Toastr JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
 
+        {{-- Sweet Alert CDN --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
         <!-- Toastr Notification Script -->
         <script>
@@ -264,10 +267,10 @@
                         toastr.success("{{ Session::get('message') }}");
                         break;
                     case 'warning':
-                        toastr.success("{{ Session::get('message') }}");
+                        toastr.warning("{{ Session::get('message') }}");
                         break;
                     case 'error':
-                        toastr.success("{{ Session::get('message') }}");
+                        toastr.error("{{ Session::get('message') }}");
                         break;
 
                 }

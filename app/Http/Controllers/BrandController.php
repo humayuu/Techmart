@@ -15,7 +15,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $brands = Brand::paginate(5);
+        $brands = Brand::orderBy('id', 'DESC')->paginate(5);
         return view('admin.brand.index', compact('brands'));
     }
 
@@ -73,7 +73,7 @@ class BrandController extends Controller
             Log::error('Brand creation failed ' . $e->getMessage());
 
             $notification = [
-                'message' => 'Brand created Successfully',
+                'message' => 'Brand creation failed ',
                 'alert-type' => 'error',
             ];
 
@@ -91,42 +91,48 @@ class BrandController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */
-    public function update(Request $request, Brand $brand)
+     */ public function update(Request $request, Brand $brand)
     {
         $request->validate([
             'name' => 'required|min:5',
             'description' => 'required',
-            'logo' => 'required|image|mimes:jpeg,jpg,png|max:2048', // 2MB max
+            'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048', //2MB
         ]);
 
         DB::beginTransaction();
 
-        $logo = null;
+        $logo = $brand->brand_logo;
         $fileName = null;
 
         try {
             if ($image = $request->file('logo')) {
                 $destinationPath = public_path('images/brands/');
 
-                // Create directory for Upload
+                // Create directory if it doesn't exist
                 if (!file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
                 }
 
                 $fileName = uniqid('brands_') . date('YmdHis') . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
-                $logo = 'images/brands/' . $fileName;
+                $newLogo = 'images/brands/' . $fileName;
+
+                // Delete old logo if it exists
+                if ($brand->brand_logo && file_exists(public_path($brand->brand_logo))) {
+                    unlink(public_path($brand->brand_logo));
+                }
+
+                $logo = $newLogo;
             }
 
-            Brand::create([
+            $brand->update([
                 'brand_name' => $request->name,
                 'brand_description' => $request->description,
                 'brand_logo' => $logo,
             ]);
 
             $notification = [
-                'message' => 'Brand created Successfully',
+                'message' => 'Brand Updated Successfully',
                 'alert-type' => 'success',
             ];
 
@@ -140,22 +146,51 @@ class BrandController extends Controller
                 unlink(public_path('images/brands/' . $fileName));
             }
 
-            Log::error('Brand creation failed ' . $e->getMessage());
+            Log::error('Brand Update Failed: ' . $e->getMessage());
 
             $notification = [
-                'message' => 'Brand created Successfully',
+                'message' => 'Brand update failed',
                 'alert-type' => 'error',
             ];
 
             return redirect()->back()->with($notification)->withInput();
         }
     }
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Brand $brand)
     {
-        //
+        DB::beginTransaction();
+
+        try {
+            // Delete the logo file if it exists
+            if ($brand->brand_logo && file_exists(public_path($brand->brand_logo))) {
+                unlink(public_path($brand->brand_logo));
+            }
+
+            $brand->delete();
+
+            DB::commit();
+
+            $notification = [
+                'message' => 'Brand Deleted Successfully',
+                'alert-type' => 'info',
+            ];
+
+            DB::commit();
+            return redirect()->route('brand.index')->with($notification);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            Log::error('Brand deletion failed: ' . $e->getMessage());
+
+            $notification = [
+                'message' => 'Brand deletion failed',
+                'alert-type' => 'error',
+            ];
+
+            return redirect()->back()->with($notification)->withInput();
+        }
     }
 }
