@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
 
 
@@ -22,8 +23,8 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware('admin-check')->group(function () {
-        // Brands Routes
         Route::resource('brand', BrandController::class);
+        Route::resource('category', CategoryController::class);
     });
 });
 

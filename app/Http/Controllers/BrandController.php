@@ -25,7 +25,7 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:5',
+            'name' => 'required|min:5|unique:brands,brand_name',
             'description' => 'required',
             'logo' => 'required|image|mimes:jpeg,jpg,png|max:2048', // 2MB max
         ]);
@@ -133,7 +133,7 @@ class BrandController extends Controller
 
             $notification = [
                 'message' => 'Brand Updated Successfully',
-                'alert-type' => 'success',
+                'alert-type' => 'info',
             ];
 
             DB::commit();
@@ -175,7 +175,7 @@ class BrandController extends Controller
 
             $notification = [
                 'message' => 'Brand Deleted Successfully',
-                'alert-type' => 'info',
+                'alert-type' => 'error',
             ];
 
             DB::commit();

@@ -78,7 +78,7 @@
                                                     <input type="email" name="email"
                                                         class="form-control radius-30 ps-5 @error('email') is-invalid @enderror"
                                                         id="inputEmailAddress" placeholder="Email Address"
-                                                        value="{{ old('email') }}">
+                                                        value="{{ old('email') }}" autofocus>
                                                 </div>
                                             </div>
                                             <div class="col-12">

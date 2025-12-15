@@ -20,6 +20,9 @@
     <!-- loader-->
     <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet" />
 
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
     <title>TechMart Admin Dashboard</title>
 </head>
 
@@ -203,6 +206,33 @@
                         </li>
                     </ul>
                 </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-grid-fill"></i></div>
+                        <div class="menu-title">Category Management</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="{{ route('category.index') }}"><i class="bi bi-circle"></i>All Category</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-cart-fill"></i></div>
+                        <div class="menu-title">Product Management</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All Products</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>Add Products</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!--end navigation-->
         </aside>
@@ -239,8 +269,14 @@
         <!--app-->
         <script src="{{ asset('assets/js/app.js') }}"></script>
         <script src="{{ asset('assets/js/index.js') }}"></script>
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-        <!-- Toastr JS -->
+        <!-- DataTables JS -->
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+        <!-- Toaster JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
 
         {{-- Sweet Alert CDN --}}
