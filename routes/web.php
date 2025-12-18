@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 
 
@@ -23,8 +24,19 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware('admin-check')->group(function () {
+        // Brand Routes
         Route::resource('brand', BrandController::class);
+
+        // Category Routes
         Route::resource('category', CategoryController::class);
+
+        // Product Routes
+        Route::controller(ProductController::class)->group(function () {
+            Route::get('product/create', 'ProductAddPage')->name('product.create');
+            Route::get('product', 'ProductPage')->name('product.page');
+
+            Route::post('product/store', 'ProductStore')->name('product.store');
+        });
     });
 });
 

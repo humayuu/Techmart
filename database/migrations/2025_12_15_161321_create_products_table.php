@@ -25,12 +25,12 @@ return new class extends Migration
             $table->decimal('selling_price', 10, 2);
             $table->decimal('discount_price', 10, 2)->nullable();
             $table->string('product_thumbnail');
-            $table->string('product_multiple_image')->nullable();
+            $table->text('product_multiple_image')->nullable();
             $table->boolean('featured')->default(false);
             $table->boolean('special_offer')->default(false);
             $table->string('product_weight')->nullable();
             $table->text('other_info')->nullable();
-            $table->boolean('status')->default(true);
+            $table->string('status')->default('active');
             $table->timestamps();
         });
     }

@@ -10,6 +10,7 @@
     <link href="{{ asset('assets/plugins/metismenu/css/metisMenu.min.css') }}" rel="stylesheet" />
     <!-- Bootstrap CSS -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/input-tags/css/tagsinput.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/bootstrap-extended.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
@@ -229,7 +230,7 @@
                             <a href="#"><i class="bi bi-circle"></i>All Products</a>
                         </li>
                         <li>
-                            <a href="#"><i class="bi bi-circle"></i>Add Products</a>
+                            <a href="{{ route('product.create') }}"><i class="bi bi-circle"></i>Add Products</a>
                         </li>
                     </ul>
                 </li>
@@ -265,6 +266,8 @@
         <!--plugins-->
         <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
         <script src="{{ asset('assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
+        <script src="{{ asset('assets/plugins/input-tags/js/tagsinput.js') }}"></script>
+
         <script src="{{ asset('assets/js/pace.min.js') }}"></script>
         <!--app-->
         <script src="{{ asset('assets/js/app.js') }}"></script>

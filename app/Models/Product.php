@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    // protected $guarded = [];
 
+    // In App\Models\Product.php
     protected $fillable = [
         'brand_id',
         'category_id',
@@ -26,6 +26,10 @@ class Product extends Model
         'special_offer',
         'product_weight',
         'other_info',
-        'status',
+        'status'
+    ];
+
+    protected  $casts = [
+        'product_multiple_image' => 'array',
     ];
 }

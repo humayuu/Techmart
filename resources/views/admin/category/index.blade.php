@@ -4,7 +4,7 @@
     Category
 @endsection
 <div class="card">
-    <div class="card-header py-3">
+    <div class="card-header py-3 bg-secondary text-white">
         <h6 class="mb-0">Add Product Category</h6>
     </div>
     <div class="card-body">
