@@ -6,8 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    // Relationship with brand table
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 
-    // In App\Models\Product.php
+    // Relationship with category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+
+
     protected $fillable = [
         'brand_id',
         'category_id',

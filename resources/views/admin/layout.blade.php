@@ -183,7 +183,7 @@
                 <div>
                 </div>
                 <div>
-                    <h4 class="logo-text fs-2 m-4">TechMart</h4>
+                    <h4 class="logo-text fs-2 m-4">Tech<span class="text-dark">Mart</span></h4>
                 </div>
                 <div class="toggle-icon ms-auto"><i class="bi bi-list"></i></div>
             </div>
@@ -227,7 +227,7 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="#"><i class="bi bi-circle"></i>All Products</a>
+                            <a href="{{ route('product.page') }}"><i class="bi bi-circle"></i>All Products</a>
                         </li>
                         <li>
                             <a href="{{ route('product.create') }}"><i class="bi bi-circle"></i>Add Products</a>
@@ -241,11 +241,11 @@
         <main class="page-content">
             <!--breadcrumb-->
             <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">Tech<span class="text-primary">Mart</span></div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item active" aria-current="page">@yield('page-title')</li>
+                            <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">@yield('page-title')
+                            </li>
                         </ol>
                     </nav>
                 </div>

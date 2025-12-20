@@ -1,7 +1,7 @@
 @extends('admin.layout');
 @section('main')
 @section('page-title')
-    Brands
+    Brands <span class="badge text-bg-dark">{{ $totalBrands }}</span>
 @endsection
 <div class="card">
     <div class="card-header py-3 bg-dark text-white">

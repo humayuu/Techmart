@@ -32,10 +32,16 @@ Route::prefix('admin')->group(function () {
 
         // Product Routes
         Route::controller(ProductController::class)->group(function () {
-            Route::get('product/create', 'ProductAddPage')->name('product.create');
-            Route::get('product', 'ProductPage')->name('product.page');
+            Route::name('product')->group(function () {
+                Route::get('product/create', 'ProductAddPage')->name('.create');
+                Route::get('products', 'ProductPage')->name('.page');
+                Route::get('product/view/{id}', 'ProductView')->name('.view');
+                Route::get('product/status/{id}', 'ProductStatus')->name('.status');
+                Route::get('product/edit/{id}', 'ProductEdit')->name('.edit');
 
-            Route::post('product/store', 'ProductStore')->name('product.store');
+                Route::post('product/store', 'ProductStore')->name('.store');
+                Route::post('product/delete', 'ProductDelete')->name('.delete');
+            });
         });
     });
 });

@@ -28,7 +28,11 @@ class ProductController extends Controller
      */
     public function ProductPage()
     {
-        return view('admin.product.index');
+        $products = Product::with('brand', 'category')
+            ->orderBy('id', 'DESC')
+            ->paginate(5);
+        $totalProducts = Product::count();
+        return view('admin.product.index', compact('products', 'totalProducts'));
     }
 
 
@@ -117,7 +121,7 @@ class ProductController extends Controller
                 'alert-type' => 'success'
             ];
             DB::commit();
-            return redirect()->back()->with($notification);
+            return redirect()->route('product.page')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -141,4 +145,10 @@ class ProductController extends Controller
             return redirect()->back()->with($notification)->withInput();
         }
     }
+
+    /**
+     * Function for Product View
+     */
+
+    public function ProductView($id) {}
 }
