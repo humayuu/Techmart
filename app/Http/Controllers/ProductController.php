@@ -14,19 +14,9 @@ use Illuminate\Support\Facades\Log;
 class ProductController extends Controller
 {
     /**
-     * Function for Redirect to Product Add page
+     * Display a listing of the resource.
      */
-    public function ProductAddPage()
-    {
-        $brands = Brand::orderBy('id', 'DESC')->get();
-        $categories = Category::orderBy('id', 'DESC')->get();
-        return view('admin.product.add', compact('brands', 'categories'));
-    }
-
-    /**
-     * Function for Redirect to All Product page
-     */
-    public function ProductPage()
+    public function index()
     {
         $products = Product::with('brand', 'category')
             ->orderBy('id', 'DESC')
@@ -35,11 +25,20 @@ class ProductController extends Controller
         return view('admin.product.index', compact('products', 'totalProducts'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $brands = Brand::orderBy('id', 'DESC')->get();
+        $categories = Category::orderBy('id', 'DESC')->get();
+        return view('admin.product.create', compact('brands', 'categories'));
+    }
 
     /**
-     * Function for Store new Product
+     * Store a newly created resource in storage.
      */
-    public function ProductStore(Request $request)
+    public function store(Request $request)
     {
         // Fields validations
         $request->validate([
@@ -121,7 +120,7 @@ class ProductController extends Controller
                 'alert-type' => 'success'
             ];
             DB::commit();
-            return redirect()->route('product.page')->with($notification);
+            return redirect()->route('product.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -147,8 +146,111 @@ class ProductController extends Controller
     }
 
     /**
-     * Function for Product View
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $brands = Brand::orderBy('id', 'DESC')->get();
+        $categories = Category::orderBy('id', 'DESC')->get();
+        $product = Product::find($id);
+        return view('admin.product.show', compact('product', 'brands', 'categories'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        try {
+            $product = Product::find($id);
+
+            $thumbnail = $product->product_thumbnail;
+            $additionalImage = json_decode($product->product_multiple_image);
+
+            DB::beginTransaction();
+
+            $product->delete();
+
+            DB::commit();
+
+            if (!empty($thumbnail) && file_exists($thumbnail)) {
+                unlink($thumbnail);
+            }
+
+            if (!empty($additionalImage)) {
+                foreach ($additionalImage as $img) {
+                    if (!empty($img) && file_exists($img)) {
+                        unlink($img);
+                    }
+                }
+            }
+
+            $notification = [
+                'message' => 'Product Deleted Successfully',
+                'alert-type' => 'success',
+            ];
+
+
+            return redirect()->back()->with($notification);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            Log::error('Product Deletion failed ' . $e->getMessage());
+            $notification = [
+                'message' => 'Product Deletion failed',
+                'alert-type' => 'error',
+            ];
+
+            return redirect()->back()->with($notification);
+        }
+    }
+
+
+    /**
+     *  Update Product Status
      */
 
-    public function ProductView($id) {}
+    public function ProductStatus($id)
+    {
+        try {
+            $product = Product::find($id);
+            $newStatus = ($product->status == 'active') ? 'inactive' : 'active';
+
+            $product->update([
+                'status' => $newStatus
+            ]);
+
+            $notification = [
+                'message' => 'Status Update Successfully',
+                'alert-type' => 'success',
+            ];
+
+            return redirect()->back()->with($notification);
+        } catch (Exception $e) {
+            Log::error('Status Update failed ' . $e->getMessage());
+
+            $notification = [
+                'message' => 'Status Update failed',
+                'alert-type' => 'error',
+            ];
+
+            return redirect()->back()->with($notification);
+        }
+    }
 }

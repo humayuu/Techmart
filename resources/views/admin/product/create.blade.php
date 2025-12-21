@@ -184,17 +184,17 @@
                                 <div class="col-12">
                                     <div class="border rounded p-3 bg-light">
                                         <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" role="switch"
+                                            <input class="form-check-input fs-6" type="checkbox" role="switch"
                                                 name="is_featured" value="1" id="featuredCheck">
                                             <label class="form-check-label" for="featuredCheck">
-                                                Featured Product
+                                                <span class="fw-bold fs-6">Featured Product</span>
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" role="switch"
+                                            <input class="form-check-input fs-6" type="checkbox" role="switch"
                                                 name="special_offer" value="1" id="specialOfferCheck">
                                             <label class="form-check-label" for="specialOfferCheck">
-                                                Special Offer
+                                                <span class="fw-bold fs-6">Special Offer</span>
                                             </label>
                                         </div>
                                     </div>
@@ -207,7 +207,7 @@
                 <!-- Action Buttons -->
                 <div class="col-12">
                     <div class="d-flex gap-2 justify-content-end border-top pt-3">
-                        <a class="btn btn-outline-secondary" href="{{ route('product.page') }}">Cancel</a>
+                        <a class="btn btn-outline-secondary" href="{{ route('product.index') }}">Cancel</a>
                         <button type="submit" class="btn btn-primary px-4">Add Product</button>
                     </div>
                 </div>

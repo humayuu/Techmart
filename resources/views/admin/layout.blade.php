@@ -183,7 +183,7 @@
                 <div>
                 </div>
                 <div>
-                    <h4 class="logo-text fs-2 m-4">Tech<span class="text-dark">Mart</span></h4>
+                    <h4 class="logo-text fs-2 m-4"><span class="text-dark">Tech</span>Mart</h4>
                 </div>
                 <div class="toggle-icon ms-auto"><i class="bi bi-list"></i></div>
             </div>
@@ -227,7 +227,7 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="{{ route('product.page') }}"><i class="bi bi-circle"></i>All Products</a>
+                            <a href="{{ route('product.index') }}"><i class="bi bi-circle"></i>All Products</a>
                         </li>
                         <li>
                             <a href="{{ route('product.create') }}"><i class="bi bi-circle"></i>Add Products</a>
@@ -291,7 +291,7 @@
             toastr.options = {
                 "closeButton": true,
                 "progressBar": true,
-                "positionClass": "toast-bottom-right",
+                "positionClass": "toast-bottom-left",
                 "timeOut": "3500"
             };
 

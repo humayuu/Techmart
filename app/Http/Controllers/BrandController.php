@@ -176,7 +176,7 @@ class BrandController extends Controller
 
             $notification = [
                 'message' => 'Brand Deleted Successfully',
-                'alert-type' => 'error',
+                'alert-type' => 'success',
             ];
 
             DB::commit();

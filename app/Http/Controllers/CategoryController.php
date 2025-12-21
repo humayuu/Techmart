@@ -130,7 +130,7 @@ class CategoryController extends Controller
 
             $notification = [
                 'message' => 'Category Deleted Successfully',
-                'alert-type' => 'error'
+                'alert-type' => 'success'
             ];
 
             DB::commit();
