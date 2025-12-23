@@ -21,8 +21,9 @@
             </div>
         @endif
 
-        <form>
+        <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
             <div class="row">
                 <!-- Basic Information -->
                 <div class="col-12 mb-3">
@@ -36,9 +37,11 @@
                                     <label class="form-label fw-bold">Product Brand <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select" name="brand">
-                                        <option value="">Select Brand</option>
+                                        <option selected disabled>Select Brand</option>
                                         @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                            <option value="{{ $brand->id }}"
+                                                {{ $product->brand_id == $brand->id ? 'selected' : null }}>
+                                                {{ $brand->brand_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -46,9 +49,11 @@
                                     <label class="form-label fw-bold">Product Category <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select" name="category">
-                                        <option value="">Select Category</option>
+                                        <option selected disabled>Select Category</option>
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                            <option value="{{ $category->id }}"
+                                                {{ $product->category_id == $category->id ? 'selected' : null }}>
+                                                {{ $category->category_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -56,13 +61,13 @@
                                     <label class="form-label fw-bold">Product Name <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="product_name"
-                                        placeholder="Enter product name" value="">
+                                        placeholder="Enter product name" value="{{ $product->product_name }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Product Code <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="product_code"
-                                        placeholder="Enter product code" value="">
+                                        placeholder="Enter product code" value="{{ $product->product_code }}">
                                 </div>
                             </div>
                         </div>
@@ -83,7 +88,7 @@
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" step="0.01" class="form-control" name="selling_price"
-                                            placeholder="0.00">
+                                            placeholder="0.00" value="{{ $product->selling_price }}">
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -91,7 +96,7 @@
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" step="0.01" class="form-control" name="discount_price"
-                                            placeholder="0.00">
+                                            placeholder="0.00" value="{{ $product->discount_price }}">
                                     </div>
                                     <small class="text-muted">Optional</small>
                                 </div>
@@ -99,12 +104,12 @@
                                     <label class="form-label fw-bold">Quantity <span
                                             class="text-danger">*</span></label>
                                     <input type="number" class="form-control" name="quantity"
-                                        placeholder="Enter quantity">
+                                        placeholder="Enter quantity" value="{{ $product->product_qty }}">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Weight</label>
                                     <input type="text" class="form-control" name="weight"
-                                        placeholder="e.g., 500g, 1kg">
+                                        placeholder="e.g., 500g, 1kg" value="{{ $product->product_weight }}">
                                 </div>
                             </div>
                         </div>
@@ -122,15 +127,16 @@
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Tags</label>
                                     <input type="text" class="form-control visually-hidden" name="tags"
-                                        data-role="tagsinput" placeholder="Enter Product Tags">
+                                        data-role="tagsinput" placeholder="Enter Product Tags"
+                                        value="{{ $product->product_tags }}">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Short Description</label>
-                                    <textarea class="form-control" name="short_description" rows="3" placeholder="Brief summary"></textarea>
+                                    <textarea class="form-control" name="short_description" rows="3" placeholder="Brief summary">{{ $product->short_description }}</textarea>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Long Description</label>
-                                    <textarea class="form-control" id="long_description" name="long_description" placeholder="Detailed information"></textarea>
+                                    <textarea class="form-control" id="long_description" name="long_description" placeholder="Detailed information">{{ $product->long_description }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -150,9 +156,9 @@
                                             class="text-danger">*</span></label>
                                     <input type="file" class="form-control" id="image_upload_input"
                                         name="thumbnail" accept="image/*">
-                                    <small class="text-muted">Main product image</small>
-                                    <img src="#" id="image_preview_tag" alt="Image Preview" width="150"
-                                        style="display: none;">
+                                    <img class="w-50 mt-2 img-thumbnail"
+                                        src="{{ asset($product->product_thumbnail) }}" id="image_preview_tag"
+                                        alt="{{ $product->product_thumbnail }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Additional Images</label>
@@ -160,6 +166,15 @@
                                         accept="image/*" multiple>
                                     <small class="text-muted">Select multiple images (Max 5)</small>
                                     <div id="multiplePreview" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        @php
+                                            $images = json_decode($product->product_multiple_image);
+                                        @endphp
+                                        @if ($images)
+                                            @foreach ($images as $img)
+                                                <img class="w-25 img-thumbnail" src="{{ asset($img) }}"
+                                                    alt="{{ $img }}">
+                                            @endforeach
+                                        @endif
                                     </div>
 
                                 </div>
@@ -179,20 +194,23 @@
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Other Information</label>
                                     <textarea class="form-control" id="other_info" name="other_info" rows="4"
-                                        placeholder="Additional details, specifications, warranty info"></textarea>
+                                        placeholder="Additional details, specifications, warranty info">{{ $product->other_info }}</textarea>
                                 </div>
                                 <div class="col-12">
                                     <div class="border rounded p-3 bg-light">
                                         <div class="form-check form-switch mb-2">
                                             <input class="form-check-input fs-6" type="checkbox" role="switch"
-                                                name="is_featured" value="1" id="featuredCheck">
+                                                name="is_featured" value="1"
+                                                {{ $product->featured == 1 ? 'checked' : '' }} id="featuredCheck">
                                             <label class="form-check-label" for="featuredCheck">
                                                 <span class="fw-bold fs-6">Featured Product</span>
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input fs-6" type="checkbox" role="switch"
-                                                name="special_offer" value="1" id="specialOfferCheck">
+                                                name="special_offer" value="1"
+                                                {{ $product->special_offer == 1 ? 'checked' : '' }}
+                                                id="specialOfferCheck">
                                             <label class="form-check-label" for="specialOfferCheck">
                                                 <span class="fw-bold fs-6">Special Offer</span>
                                             </label>
@@ -207,8 +225,8 @@
                 <!-- Action Buttons -->
                 <div class="col-12">
                     <div class="d-flex gap-2 justify-content-end border-top pt-3">
-                        <a class="btn btn-outline-secondary" href="{{ route('product.page') }}">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-4">Add Product</button>
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                        <a class="btn btn-outline-secondary" href="{{ route('product.index') }}">Cancel</a>
                     </div>
                 </div>
             </div>

@@ -36,7 +36,7 @@
                                     <label class="form-label fw-bold">Product Brand <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select" name="brand">
-                                        <option value="">Select Brand</option>
+                                        <option selected disabled>Select Brand</option>
                                         @foreach ($brands as $brand)
                                             <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                         @endforeach
@@ -46,7 +46,7 @@
                                     <label class="form-label fw-bold">Product Category <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select" name="category">
-                                        <option value="">Select Category</option>
+                                        <option selected disabled>Select Category</option>
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                                         @endforeach

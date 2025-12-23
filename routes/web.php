@@ -33,20 +33,6 @@ Route::prefix('admin')->group(function () {
         // Product Routes
         Route::resource('product', ProductController::class);
         Route::get('product/status/{id}',  [ProductController::class, 'ProductStatus'])->name('product.status');
-
-
-        // Route::controller(ProductController::class)->group(function () {
-        //     Route::name('product')->group(function () {
-        //         Route::get('product/create', 'ProductAddPage')->name('.create');
-        //         Route::get('products', 'ProductPage')->name('.page');
-        //         Route::get('product/view/{id}', 'ProductView')->name('.view');
-        //         Route::get('product/status/{id}', 'ProductStatus')->name('.status');
-        //         Route::get('product/edit/{id}', 'ProductEdit')->name('.edit');
-
-        //         Route::post('product/store', 'ProductStore')->name('.store');
-        //         Route::delete('product/delete/{id}', 'ProductDelete')->name('.delete');
-        //     });
-        // });
     });
 });
 

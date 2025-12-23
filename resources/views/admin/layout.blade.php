@@ -199,7 +199,7 @@
                 <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><i class="bi bi-briefcase-fill"></i></div>
-                        <div class="menu-title">Brand Management</div>
+                        <div class="menu-title">Manage Brands</div>
                     </a>
                     <ul>
                         <li>
@@ -211,11 +211,11 @@
                 <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><i class="bi bi-grid-fill"></i></div>
-                        <div class="menu-title">Category Management</div>
+                        <div class="menu-title">Manage Categories</div>
                     </a>
                     <ul>
                         <li>
-                            <a href="{{ route('category.index') }}"><i class="bi bi-circle"></i>All Category</a>
+                            <a href="{{ route('category.index') }}"><i class="bi bi-circle"></i>All Categories</a>
                         </li>
                     </ul>
                 </li>
@@ -223,7 +223,7 @@
                 <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><i class="bi bi-cart-fill"></i></div>
-                        <div class="menu-title">Product Management</div>
+                        <div class="menu-title">Manage Products</div>
                     </a>
                     <ul>
                         <li>
