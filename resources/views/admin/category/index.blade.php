@@ -60,7 +60,7 @@
                                             <td>{{ $category->category_name }}</td>
                                             <td>{{ $category->category_slug }}</td>
                                             <td>
-                                                <div class="d-flex align-items-center gap-3 fs-6">
+                                                <div class="d-flex align-items-center gap-3 fs-5">
                                                     <!-- Edit Button -->
                                                     <a href="{{ route('category.edit', $category->id) }}"
                                                         class="text-primary" data-bs-toggle="tooltip"

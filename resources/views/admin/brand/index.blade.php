@@ -72,7 +72,7 @@
                                                 <td><img class="w-50" src="{{ asset($brand->brand_logo) }}">
                                                 </td>
                                                 <td>
-                                                    <div class="d-flex align-items-center gap-3 fs-6">
+                                                    <div class="d-flex align-items-center gap-3 fs-5">
                                                         <!-- Edit Button -->
                                                         <a href="{{ route('brand.edit', $brand->id) }}"
                                                             class="text-primary" data-bs-toggle="tooltip"

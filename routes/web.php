@@ -6,7 +6,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\SliderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -33,6 +33,10 @@ Route::prefix('admin')->group(function () {
         // Product Routes
         Route::resource('product', ProductController::class);
         Route::get('product/status/{id}',  [ProductController::class, 'ProductStatus'])->name('product.status');
+
+        // Slider Routes
+        Route::resource('slider', SliderController::class);
+        Route::get('slider/status/{id}',  [SliderController::class, 'SliderStatus'])->name('slider.status');
     });
 });
 

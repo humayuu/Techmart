@@ -196,6 +196,7 @@
                     </a>
                 </li>
                 <li class="menu-label">Main Menu</li>
+
                 <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><i class="bi bi-briefcase-fill"></i></div>
@@ -231,6 +232,18 @@
                         </li>
                         <li>
                             <a href="{{ route('product.create') }}"><i class="bi bi-circle"></i>Add Products</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-badge-ad-fill"></i></div>
+                        <div class="menu-title">Manage Sliders</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="{{ route('slider.index') }}"><i class="bi bi-circle"></i>All Sliders</a>
                         </li>
                     </ul>
                 </li>
