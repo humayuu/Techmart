@@ -276,6 +276,7 @@
 
         <!-- Bootstrap bundle JS -->
         <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+
         <!--plugins-->
         <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
         <script src="{{ asset('assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
@@ -285,8 +286,6 @@
         <!--app-->
         <script src="{{ asset('assets/js/app.js') }}"></script>
         <script src="{{ asset('assets/js/index.js') }}"></script>
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
         <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
