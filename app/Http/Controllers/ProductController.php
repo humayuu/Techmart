@@ -141,7 +141,7 @@ class ProductController extends Controller
                 'alert-type' => 'error',
             ];
 
-            return redirect()->back()->with($notification)->withInput();
+            return redirect()->back()->with($notification);
         }
     }
 

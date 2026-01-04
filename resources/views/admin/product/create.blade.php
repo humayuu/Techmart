@@ -38,7 +38,9 @@
                                     <select class="form-select" name="brand">
                                         <option selected disabled>Select Brand</option>
                                         @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                            <option value="{{ $brand->id }}"
+                                                {{ old('brand') == $brand->id ? 'selected' : '' }}>
+                                                {{ $brand->brand_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -48,7 +50,9 @@
                                     <select class="form-select" name="category">
                                         <option selected disabled>Select Category</option>
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                            <option value="{{ $category->id }}"
+                                                {{ old('category') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->category_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -56,13 +60,13 @@
                                     <label class="form-label fw-bold">Product Name <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="product_name"
-                                        placeholder="Enter product name" value="">
+                                        placeholder="Enter product name" value="{{ old('product_name') }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Product Code <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="product_code"
-                                        placeholder="Enter product code" value="">
+                                        placeholder="Enter product code" value="{{ old('product_code') }}">
                                 </div>
                             </div>
                         </div>
@@ -83,7 +87,7 @@
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" step="0.01" class="form-control" name="selling_price"
-                                            placeholder="0.00">
+                                            placeholder="0.00" value="{{ old('selling_price') }}">
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -91,7 +95,7 @@
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" step="0.01" class="form-control" name="discount_price"
-                                            placeholder="0.00">
+                                            placeholder="0.00" value="{{ old('discount_price') }}">
                                     </div>
                                     <small class="text-muted">Optional</small>
                                 </div>
@@ -99,12 +103,12 @@
                                     <label class="form-label fw-bold">Quantity <span
                                             class="text-danger">*</span></label>
                                     <input type="number" class="form-control" name="quantity"
-                                        placeholder="Enter quantity">
+                                        placeholder="Enter quantity" value="{{ old('quantity') }}">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Weight</label>
                                     <input type="text" class="form-control" name="weight"
-                                        placeholder="e.g., 500g, 1kg">
+                                        placeholder="e.g., 500g, 1kg" value="{{ old('weight') }}">
                                 </div>
                             </div>
                         </div>
@@ -122,15 +126,16 @@
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Tags</label>
                                     <input type="text" class="form-control visually-hidden" name="tags"
-                                        data-role="tagsinput" placeholder="Enter Product Tags">
+                                        data-role="tagsinput" placeholder="Enter Product Tags"
+                                        value="{{ old('tags') }}">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Short Description</label>
-                                    <textarea class="form-control" name="short_description" rows="3" placeholder="Brief summary"></textarea>
+                                    <textarea class="form-control" name="short_description" rows="3" placeholder="Brief summary">{{ old('short_description') }}</textarea>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Long Description</label>
-                                    <textarea class="form-control" id="long_description" name="long_description" placeholder="Detailed information"></textarea>
+                                    <textarea class="form-control" id="long_description" name="long_description" placeholder="Detailed information">{{ old('long_description') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -153,6 +158,7 @@
                                     <small class="text-muted">Main product image</small>
                                     <img src="#" id="image_preview_tag" alt="Image Preview" width="150"
                                         style="display: none;">
+                                    <img src="" alt="">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Additional Images</label>
@@ -179,20 +185,22 @@
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Other Information</label>
                                     <textarea class="form-control" id="other_info" name="other_info" rows="4"
-                                        placeholder="Additional details, specifications, warranty info"></textarea>
+                                        placeholder="Additional details, specifications, warranty info">{{ old('other_info') }}</textarea>
                                 </div>
                                 <div class="col-12">
                                     <div class="border rounded p-3 bg-light">
                                         <div class="form-check form-switch mb-2">
                                             <input class="form-check-input fs-6" type="checkbox" role="switch"
-                                                name="is_featured" value="1" id="featuredCheck">
+                                                name="is_featured" value="1"
+                                                {{ old('is_featured') ? 'checked' : '' }} id="featuredCheck">
                                             <label class="form-check-label" for="featuredCheck">
                                                 <span class="fw-bold fs-6">Featured Product</span>
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input fs-6" type="checkbox" role="switch"
-                                                name="special_offer" value="1" id="specialOfferCheck">
+                                                name="special_offer" {{ old('special_offer') ? 'checked' : '' }}
+                                                value="1" id="specialOfferCheck">
                                             <label class="form-check-label" for="specialOfferCheck">
                                                 <span class="fw-bold fs-6">Special Offer</span>
                                             </label>

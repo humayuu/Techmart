@@ -22,7 +22,7 @@
     <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet" />
 
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
 
     <title>TechMart Admin Dashboard</title>
 </head>
@@ -278,7 +278,9 @@
         <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
 
         <!--plugins-->
-        <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+        {{-- jQuary CDN --}}
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="{{ asset('assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
         <script src="{{ asset('assets/plugins/input-tags/js/tagsinput.js') }}"></script>
 
@@ -287,15 +289,14 @@
         <script src="{{ asset('assets/js/app.js') }}"></script>
         <script src="{{ asset('assets/js/index.js') }}"></script>
 
-        <!-- DataTables JS -->
-        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
         <!-- Toaster JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
 
         {{-- Sweet Alert CDN --}}
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        {{-- Data table CDN --}}
+        <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 
 
         <!-- Toastr Notification Script -->

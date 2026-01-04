@@ -17,7 +17,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::orderBy('id', 'DESC')->paginate(5);
-        $totalCategories = Category::count();
+        $totalCategories = $categories->count();
         return view('admin.category.index', compact('categories', 'totalCategories'));
     }
 

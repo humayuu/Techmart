@@ -29,15 +29,18 @@
                             @csrf
                             <div class="col-12">
                                 <label class="form-label">Brand Name</label>
-                                <input type="text" class="form-control" name="name" placeholder="Brand name">
+                                <input type="text" class="form-control" name="name" placeholder="Brand name"
+                                    value="{{ old('name') }}">
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Description</label>
-                                <textarea class="form-control" rows="3" cols="3" name="description" placeholder="Brand Description"></textarea>
+                                <textarea class="form-control" rows="3" cols="3" name="description" placeholder="Brand Description">{{ old('description') }}</textarea>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Brand logo</label>
-                                <input type="file" name="logo" class="form-control">
+                                <input type="file" name="logo" class="form-control" id="image_upload_input">
+                                <img src="#" id="image_preview_tag" alt="Image Preview" width="150"
+                                    style="display: none;">
                             </div>
                             <div class="col-12">
                                 <div class="d-grid">
@@ -53,7 +56,7 @@
                     <div class="card-body">
                         <div class="table-responsive">
                             @if ($brands->count() > 0)
-                                <table class="table align-middle">
+                                <table class="table align-middle" id="brandTable">
                                     <thead class="table-light">
                                         <tr>
                                             <th style="width: 5%;">#</th>
@@ -66,7 +69,7 @@
                                     <tbody>
                                         @foreach ($brands as $brand)
                                             <tr>
-                                                <td>{{ $brands->firstItem() + $loop->index }}</td>
+                                                <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $brand->brand_name }}</td>
                                                 <td>{{ Str::substr($brand->brand_description, 0, 20) }}.....</td>
                                                 <td><img class="w-50" src="{{ asset($brand->brand_logo) }}">
@@ -99,9 +102,6 @@
                                     </tbody>
                                 </table>
                         </div>
-                        <nav class="float-end mt-0" aria-label="Page navigation">
-                            {{ $brands->links() }}
-                        </nav>
                     @else
                         <div class="alert alert-danger" role="alert">
                             No Brand Found!
@@ -113,4 +113,16 @@
         </div><!--end row-->
     </div>
 </div>
+
+<script>
+    document.getElementById('image_upload_input').onchange = function(e) {
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            let img = document.getElementById('image_preview_tag');
+            img.src = event.target.result;
+            img.style.display = 'block';
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+</script>
 @endsection
