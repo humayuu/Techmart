@@ -298,7 +298,6 @@
         {{-- Data table CDN --}}
         <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 
-
         <!-- Toastr Notification Script -->
         <script>
             toastr.options = {
@@ -327,7 +326,41 @@
 
                 }
             @endif
+
+            // Category DataTable Initialization
+            $(document).ready(function() {
+                $('#categoryTable').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: "{{ route('category.index') }}"
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'category_name',
+                            name: 'category_name'
+                        },
+                        {
+                            data: 'category_slug',
+                            name: 'category_slug'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+            });
         </script>
+
+
 </body>
 
 </html>

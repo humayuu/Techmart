@@ -1,7 +1,7 @@
 @extends('admin.layout');
 @section('main')
 @section('page-title')
-    Category <span class="badge text-bg-dark">{{ $totalCategories }}</span>
+    {{-- Category <span class="badge text-bg-dark">{{ $totalCategories }}</span> --}}
 @endsection
 <div class="card">
     <div class="card-header py-3 bg-secondary text-white">
@@ -44,7 +44,7 @@
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table align-middle">
+                            <table class="table align-middle" id="categoryTable">
                                 <thead class="table-light">
                                     <tr>
                                         <th style="width: 5%;">#</th>
@@ -53,50 +53,9 @@
                                         <th style="width: 25%;">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @forelse ($categories as $category)
-                                        <tr>
-                                            <td>{{ $categories->firstItem() + $loop->index }}</td>
-                                            <td>{{ $category->category_name }}</td>
-                                            <td>{{ $category->category_slug }}</td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-3 fs-5">
-                                                    <!-- Edit Button -->
-                                                    <a href="{{ route('category.edit', $category->id) }}"
-                                                        class="text-primary" data-bs-toggle="tooltip"
-                                                        data-bs-placement="bottom" title="Edit info">
-                                                        <i class="bi bi-pencil-fill"></i>
-                                                    </a>
-
-                                                    <!-- Delete Button -->
-                                                    <form method="POST"
-                                                        action="{{ route('category.destroy', $category->id) }}"
-                                                        class="d-inline m-0">
-                                                        @csrf
-                                                        @method('DELETE')
-
-                                                        <button id="delete" type="submit"
-                                                            class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center"
-                                                            data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                            title="Delete" style="cursor: pointer; line-height: 1;">
-                                                            <i class="bi bi-trash-fill"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <div class="alert alert-danger" role="alert">
-                                            No Brand Found!
-                                        </div>
-                                    @endforelse
-
-                                </tbody>
+                                <!-- DataTables will populate this -->
                             </table>
                         </div>
-                        <nav class="float-end mt-0" aria-label="Page navigation">
-                            {{ $categories->links() }}
-                        </nav>
                     </div>
                 </div>
             </div>

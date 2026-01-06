@@ -8,17 +8,45 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::orderBy('id', 'DESC')->paginate(5);
-        $totalCategories = $categories->count();
-        return view('admin.category.index', compact('categories', 'totalCategories'));
+        if ($request->ajax()) {
+            $data = Category::latest()->get();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('category.edit', $row->id);
+                    $deleteUrl = route('category.destroy', $row->id);
+
+                    $btn = '<div class="d-flex align-items-center gap-3 fs-5">
+                                <a href="' . $editUrl . '" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                
+                                <form method="POST" action="' . $deleteUrl . '" class="d-inline m-0 delete-form">
+                                    ' . csrf_field() . '
+                                    ' . method_field('DELETE') . '
+                                    <button type="submit" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </form>
+                            </div>';
+
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('admin.category.index');
     }
 
     /**
