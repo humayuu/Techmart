@@ -357,6 +357,43 @@
                         }
                     ]
                 });
+
+                $('#brandTable').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: "{{ route('brand.index') }}"
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'brand_name',
+                            name: 'brand_name'
+                        },
+                        {
+                            data: 'brand_description',
+                            name: 'brand_description'
+                        },
+                        {
+                            data: 'image',
+                            name: 'image',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+
+
             });
         </script>
 

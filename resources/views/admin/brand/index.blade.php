@@ -55,58 +55,19 @@
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
                         <div class="table-responsive">
-                            @if ($brands->count() > 0)
-                                <table class="table align-middle" id="brandTable">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 5%;">#</th>
-                                            <th style="width: 20%;">Name</th>
-                                            <th style="width: 25%;">Description</th>
-                                            <th style="width: 30%;">Brand Logo</th>
-                                            <th style="width: 25%;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($brands as $brand)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $brand->brand_name }}</td>
-                                                <td>{{ Str::substr($brand->brand_description, 0, 20) }}.....</td>
-                                                <td><img class="w-50" src="{{ asset($brand->brand_logo) }}">
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-3 fs-5">
-                                                        <!-- Edit Button -->
-                                                        <a href="{{ route('brand.edit', $brand->id) }}"
-                                                            class="text-primary" data-bs-toggle="tooltip"
-                                                            data-bs-placement="bottom" title="Edit info">
-                                                            <i class="bi bi-pencil-fill"></i>
-                                                        </a>
-
-                                                        <!-- Delete Button -->
-                                                        <form action="{{ route('brand.destroy', $brand->id) }}"
-                                                            method="POST" class="d-inline m-0">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button id="delete" type="submit"
-                                                                class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center"
-                                                                data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                                title="Delete" style="cursor: pointer; line-height: 1;">
-                                                                <i class="bi bi-trash-fill"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                            <table class="table align-middle" id="brandTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 5%;">#</th>
+                                        <th style="width: 20%;">Name</th>
+                                        <th style="width: 25%;">Description</th>
+                                        <th style="width: 30%;">Brand Logo</th>
+                                        <th style="width: 25%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <!-- DataTables will populate this -->
+                            </table>
                         </div>
-                    @else
-                        <div class="alert alert-danger" role="alert">
-                            No Brand Found!
-                        </div>
-                        @endif
                     </div>
                 </div>
             </div>

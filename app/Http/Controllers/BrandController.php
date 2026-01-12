@@ -7,19 +7,56 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class BrandController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::all();
-        $totalBrands = $brands->count();
-        return view('admin.brand.index', compact('brands', 'totalBrands'));
-    }
+        $brands = Brand::latest()->get();
+        if ($request->ajax()) {
 
+            return DataTables::of($brands)
+                ->addIndexColumn()
+                ->addColumn('image', function ($row) {
+                    if ($row->brand_logo) {
+                        $imageUrl = asset('images/brands/' . $row->brand_logo);
+
+                        return '<img src="' . $imageUrl . '" alt="Brand Image" width="100" height="100" class="rounded">';
+                    }
+                    return '<span class="text-muted">No Image</span>';
+                })
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('brand.edit', $row->id);
+                    $deleteUrl = route('brand.destroy', $row->id);
+
+                    $btn = '<div class="d-flex align-items-center gap-3 fs-5">
+                            <a href="' . $editUrl . '" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            
+                            <form method="POST" action="' . $deleteUrl . '" class="d-inline m-0 delete-form">
+                            ' . csrf_field() . '
+                                ' . method_field('DELETE') . '
+                                <button type="submit" id="delete" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>';
+
+                    return $btn;
+                })
+                ->rawColumns(['image', 'action'])
+                ->make(true);
+        }
+
+        $totalBrands = $brands->count();
+
+        return view('admin.brand.index', compact('totalBrands'));
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -28,7 +65,7 @@ class BrandController extends Controller
         $request->validate([
             'name' => 'required|min:5|unique:brands,brand_name',
             'description' => 'required',
-            'logo' => 'required|image|mimes:jpeg,jpg,png|max:2048', // 2MB max
+            'logo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         DB::beginTransaction();
@@ -40,14 +77,13 @@ class BrandController extends Controller
             if ($image = $request->file('logo')) {
                 $destinationPath = public_path('images/brands/');
 
-                // Create directory for Upload
                 if (!file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
                 }
 
                 $fileName = uniqid('brands_') . date('YmdHis') . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
-                $logo = 'images/brands/' . $fileName;
+                $logo = $fileName;
             }
 
             Brand::create([
@@ -66,7 +102,6 @@ class BrandController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            // Delete uploaded file if transaction failed
             if ($fileName && file_exists(public_path('images/brands/' . $fileName))) {
                 unlink(public_path('images/brands/' . $fileName));
             }
@@ -92,12 +127,13 @@ class BrandController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */ public function update(Request $request, Brand $brand)
+     */
+    public function update(Request $request, Brand $brand)
     {
         $request->validate([
             'name' => 'required|min:5',
             'description' => 'required',
-            'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048', //2MB
+            'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         DB::beginTransaction();
@@ -109,21 +145,19 @@ class BrandController extends Controller
             if ($image = $request->file('logo')) {
                 $destinationPath = public_path('images/brands/');
 
-                // Create directory if it doesn't exist
                 if (!file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
                 }
 
                 $fileName = uniqid('brands_') . date('YmdHis') . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
-                $newLogo = 'images/brands/' . $fileName;
 
                 // Delete old logo if it exists
-                if ($brand->brand_logo && file_exists(public_path($brand->brand_logo))) {
-                    unlink(public_path($brand->brand_logo));
+                if ($brand->brand_logo && file_exists(public_path('images/brands/' . $brand->brand_logo))) {
+                    unlink(public_path('images/brands/' . $brand->brand_logo));
                 }
 
-                $logo = $newLogo;
+                $logo = $fileName;
             }
 
             $brand->update([
@@ -142,7 +176,6 @@ class BrandController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            // Delete uploaded file if transaction failed
             if ($fileName && file_exists(public_path('images/brands/' . $fileName))) {
                 unlink(public_path('images/brands/' . $fileName));
             }
@@ -166,8 +199,8 @@ class BrandController extends Controller
 
         try {
             // Delete the logo file if it exists
-            if ($brand->brand_logo && file_exists(public_path($brand->brand_logo))) {
-                unlink(public_path($brand->brand_logo));
+            if ($brand->brand_logo && file_exists(public_path('images/brands/' . $brand->brand_logo))) {
+                unlink(public_path('images/brands/' . $brand->brand_logo));
             }
 
             $brand->delete();
@@ -179,7 +212,6 @@ class BrandController extends Controller
                 'alert-type' => 'success',
             ];
 
-            DB::commit();
             return redirect()->route('brand.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
@@ -191,7 +223,7 @@ class BrandController extends Controller
                 'alert-type' => 'error',
             ];
 
-            return redirect()->back()->with($notification)->withInput();
+            return redirect()->back()->with($notification);
         }
     }
 }

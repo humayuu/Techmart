@@ -35,7 +35,7 @@
                                     <tr>
                                         <td>
                                             <img class="w-50 img-thumbnail rounded"
-                                                src="{{ asset($product->product_thumbnail) }}"
+                                                src="{{ asset('images/products/' . $product->product_thumbnail) }}"
                                                 alt="{{ $product->product_thumbnail }}">
                                         </td>
                                         <td class="fw-semibold">{{ $product->product_name }}</td>

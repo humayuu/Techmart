@@ -80,7 +80,7 @@ class ProductController extends Controller
             if ($image = $request->file('thumbnail')) {
                 $fileName = uniqid('product_') . time() . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
-                $thumbnail = 'images/products/' . $fileName;
+                $thumbnail = $fileName;
             }
 
 
@@ -90,7 +90,7 @@ class ProductController extends Controller
                 foreach ($multipleImages as $index => $img) {
                     $additionalFilename = uniqid('product_') . '_' . $index . '_' . time() . '.' . $img->getClientOriginalExtension();
                     $img->move($destinationPath, $additionalFilename);
-                    $additionalImages[] = 'images/products/' . $additionalFilename;
+                    $additionalImages[] = $additionalFilename;
                 }
             }
 
@@ -213,7 +213,7 @@ class ProductController extends Controller
             if ($image = $request->file('thumbnail')) {
                 $fileName = uniqid('product_') . time() . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
-                $newThumbnail = 'images/products/' . $fileName;
+                $newThumbnail = $fileName;
             } else {
                 $newThumbnail = $oldThumbnail;
             }
@@ -223,7 +223,7 @@ class ProductController extends Controller
                 foreach ($multipleImages as $index => $img) {
                     $additionalFilename = uniqid('product_') . '_' . $index . '_' . time() . '.' . $img->getClientOriginalExtension();
                     $img->move($destinationPath, $additionalFilename);
-                    $newAdditionalImages[] = 'images/products/' . $additionalFilename;
+                    $newAdditionalImages[] = $additionalFilename;
                 }
             } else {
                 $newAdditionalImages = $oldAdditionalImages;

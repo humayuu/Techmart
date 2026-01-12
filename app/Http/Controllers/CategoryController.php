@@ -17,10 +17,10 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
+        $categories = Category::latest()->get();
         if ($request->ajax()) {
-            $data = Category::latest()->get();
 
-            return DataTables::of($data)
+            return DataTables::of($categories)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $editUrl = route('category.edit', $row->id);
@@ -32,9 +32,9 @@ class CategoryController extends Controller
                                 </a>
                                 
                                 <form method="POST" action="' . $deleteUrl . '" class="d-inline m-0 delete-form">
-                                    ' . csrf_field() . '
+                                ' . csrf_field() . '
                                     ' . method_field('DELETE') . '
-                                    <button type="submit" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
+                                    <button type="submit" id="delete" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </form>
@@ -45,8 +45,9 @@ class CategoryController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
+        $totalCategories = $categories->count();
 
-        return view('admin.category.index');
+        return view('admin.category.index', compact('totalCategories'));
     }
 
     /**
