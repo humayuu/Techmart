@@ -2,27 +2,110 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Models\Brand;
-use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Support\Str;
+use App\Models\Product;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $products = Product::with('brand', 'category')
-            ->orderBy('id', 'DESC')
-            ->paginate(5);
-        $totalProducts = Product::count();
-        return view('admin.product.index', compact('products', 'totalProducts'));
+            ->latest()
+            ->get();
+        if ($request->ajax()) {
+
+            return DataTables::of($products)
+                ->addIndexColumn()
+                ->addColumn('image', function ($row) {
+                    if ($row->product_thumbnail) {
+                        $imageUrl = asset('images/products/'.$row->product_thumbnail);
+
+                        return '<img src="'.$imageUrl.'" alt="Product Image" class="img-thumbnail w-75 rounded">';
+                    }
+
+                    return '<span class="text-muted">No Image</span>';
+                })
+                ->addColumn('brand', function ($row) {
+                    if ($row->brand) {
+                        return '<span class="text-dark fw-semibold fs-6">'.$row->brand->brand_name.'</span>';
+                    }
+
+                    return '<span class="text-muted fst-italic">No Brand</span>';
+                })
+                ->addColumn('category', function ($row) {
+                    if ($row->category) {
+                        return '<span class="text-dark fw-semibold fs-6">'.$row->category->category_name.'</span>';
+                    }
+
+                    return '<span class="text-muted fst-italic fs-6">No Category</span>';
+                })
+                ->addColumn('selling_price', function ($row) {
+                    if ($row->selling_price) {
+                        return '<span class="text-dark fw-semibold fs-5">$'.$row->selling_price.'</span>';
+                    }
+
+                    return '<span class="text-muted fst-italic fs-6">No Category</span>';
+                })
+                ->addColumn('status', function ($row) {
+                    if ($row->status == 'active') {
+                        return '<span class="badge bg-primary fs-6">Active</span>';
+                    } else {
+                        return '<span class="badge bg-secondary fs-6">Inactive</span>';
+                    }
+                })
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('product.edit', $row->id);
+                    $deleteUrl = route('product.destroy', $row->id);
+                    $statusUrl = route('product.status', $row->id);
+                    $detailUrl = route('product.show', $row->id);
+                    $class = $row->status == 'active' ? 'success' : 'dark';
+                    $icon = $row->status == 'active' ? 'thumbs-up' : 'thumbs-down';
+
+                    $btn = '<div class="d-flex align-items-center gap-3 fs-5">
+
+                      <a href="'.$detailUrl.'"
+                      class="text-secondary fs-4 " data-bs-toggle="tooltip"
+                      data-bs-placement="bottom" title="View Info">
+                      <i class="bi bi-eye-fill"></i>
+                      </a>
+                            <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="'.$statusUrl.'"
+                            class="text-'.$class.'" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" title="Edit info">
+                            <i class="bi bi-hand-'.$icon.'-fill"></i>
+                            </a>
+                            
+                            
+                            <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
+                            '.csrf_field().'
+                                '.method_field('DELETE').'
+                                <button type="submit" id="delete" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>';
+
+                    return $btn;
+                })
+                ->rawColumns(['selling_price', 'brand', 'category', 'image', 'status', 'action'])
+                ->make(true);
+        }
+
+        $totalProducts = $products->count();
+
+        return view('admin.product.index', compact('totalProducts'));
     }
 
     /**
@@ -32,6 +115,7 @@ class ProductController extends Controller
     {
         $brands = Brand::orderBy('id', 'DESC')->get();
         $categories = Category::orderBy('id', 'DESC')->get();
+
         return view('admin.product.create', compact('brands', 'categories'));
     }
 
@@ -61,12 +145,11 @@ class ProductController extends Controller
         // Create upload Directory
         $destinationPath = public_path('images/products/');
 
-        if (!file_exists($destinationPath)) {
+        if (! file_exists($destinationPath)) {
             mkdir($destinationPath, 0755, true);
         }
 
-
-        // Create Product Slug & status 
+        // Create Product Slug & status
         $slug = Str::slug($request->product_name);
         $status = 'active';
 
@@ -78,17 +161,16 @@ class ProductController extends Controller
             $fileName = null;
 
             if ($image = $request->file('thumbnail')) {
-                $fileName = uniqid('product_') . time() . '.' . $image->getClientOriginalExtension();
+                $fileName = uniqid('product_').time().'.'.$image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
                 $thumbnail = $fileName;
             }
-
 
             // Upload Additional Images
             $additionalImages = [];
             if ($multipleImages = $request->file('images')) {
                 foreach ($multipleImages as $index => $img) {
-                    $additionalFilename = uniqid('product_') . '_' . $index . '_' . time() . '.' . $img->getClientOriginalExtension();
+                    $additionalFilename = uniqid('product_').'_'.$index.'_'.time().'.'.$img->getClientOriginalExtension();
                     $img->move($destinationPath, $additionalFilename);
                     $additionalImages[] = $additionalFilename;
                 }
@@ -101,7 +183,7 @@ class ProductController extends Controller
                 'product_slug' => $slug,
                 'product_code' => $request->product_code,
                 'product_qty' => $request->quantity,
-                'product_tags' =>  $request->tags,
+                'product_tags' => $request->tags,
                 'short_description' => $request->short_description,
                 'long_description' => $request->long_description,
                 'selling_price' => $request->selling_price,
@@ -109,17 +191,18 @@ class ProductController extends Controller
                 'product_thumbnail' => $thumbnail,
                 'product_multiple_image' => json_encode($additionalImages),
                 'featured' => $request->is_featured ?? 0,
-                'special_offer' =>  $request->special_offer ?? 0,
+                'special_offer' => $request->special_offer ?? 0,
                 'product_weight' => $request->weight,
-                'other_info' =>  $request->other_info,
-                'status' => $status
+                'other_info' => $request->other_info,
+                'status' => $status,
             ]);
 
             $notification = [
                 'message' => 'Product created Successfully',
-                'alert-type' => 'success'
+                'alert-type' => 'success',
             ];
             DB::commit();
+
             return redirect()->route('product.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
@@ -134,7 +217,7 @@ class ProductController extends Controller
                 }
             }
 
-            Log::error('Product creation failed ' . $e->getMessage());
+            Log::error('Product creation failed '.$e->getMessage());
 
             $notification = [
                 'message' => 'Product creation failed ',
@@ -153,6 +236,7 @@ class ProductController extends Controller
         $brands = Brand::orderBy('id', 'DESC')->get();
         $categories = Category::orderBy('id', 'DESC')->get();
         $product = Product::findOrFail($id);
+
         return view('admin.product.show', compact('product', 'brands', 'categories'));
     }
 
@@ -164,6 +248,7 @@ class ProductController extends Controller
         $brands = Brand::orderBy('id', 'DESC')->get();
         $categories = Category::orderBy('id', 'DESC')->get();
         $product = Product::findOrFail($id);
+
         return view('admin.product.edit', compact('product', 'brands', 'categories'));
     }
 
@@ -181,7 +266,7 @@ class ProductController extends Controller
         $request->validate([
             'brand' => 'required',
             'category' => 'required',
-            'product_name' => 'required|unique:products,product_name,' . $id . '|min:5|max:100',
+            'product_name' => 'required|unique:products,product_name,'.$id.'|min:5|max:100',
             'product_code' => 'required',
             'selling_price' => 'required|numeric|min:0',
             'discount_price' => 'required|numeric|min:0',
@@ -197,7 +282,7 @@ class ProductController extends Controller
 
         // Create upload Directory
         $destinationPath = public_path('images/products/');
-        if (!file_exists($destinationPath)) {
+        if (! file_exists($destinationPath)) {
             mkdir($destinationPath, 0755, true);
         }
 
@@ -211,7 +296,7 @@ class ProductController extends Controller
         try {
             // Upload Product Thumbnail
             if ($image = $request->file('thumbnail')) {
-                $fileName = uniqid('product_') . time() . '.' . $image->getClientOriginalExtension();
+                $fileName = uniqid('product_').time().'.'.$image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
                 $newThumbnail = $fileName;
             } else {
@@ -221,7 +306,7 @@ class ProductController extends Controller
             // Upload Additional Images
             if ($multipleImages = $request->file('images')) {
                 foreach ($multipleImages as $index => $img) {
-                    $additionalFilename = uniqid('product_') . '_' . $index . '_' . time() . '.' . $img->getClientOriginalExtension();
+                    $additionalFilename = uniqid('product_').'_'.$index.'_'.time().'.'.$img->getClientOriginalExtension();
                     $img->move($destinationPath, $additionalFilename);
                     $newAdditionalImages[] = $additionalFilename;
                 }
@@ -252,42 +337,42 @@ class ProductController extends Controller
 
             DB::commit();
 
-            // Delete old files 
-            if ($request->hasFile('thumbnail') && !empty($oldThumbnail) && file_exists(public_path($oldThumbnail))) {
-                unlink(public_path($oldThumbnail));
+            // ✅ Delete OLD files after successful update
+            if ($request->hasFile('thumbnail') && ! empty($oldThumbnail) && file_exists(public_path('images/products/'.$oldThumbnail))) {
+                unlink(public_path('images/products/'.$oldThumbnail));
             }
 
-            if ($request->hasFile('images') && !empty($oldAdditionalImages)) {
+            if ($request->hasFile('images') && ! empty($oldAdditionalImages)) {
                 foreach ($oldAdditionalImages as $img) {
-                    if (!empty($img) && file_exists(public_path($img))) {
-                        unlink(public_path($img));
+                    if (! empty($img) && file_exists(public_path('images/products/'.$img))) {
+                        unlink(public_path('images/products/'.$img));
                     }
                 }
             }
 
             $notification = [
                 'message' => 'Product Updated Successfully',
-                'alert-type' => 'success'
+                'alert-type' => 'success',
             ];
 
             return redirect()->route('product.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
-            // Clean up newly uploaded files on error
-            if (isset($newThumbnail) && $newThumbnail !== $oldThumbnail && file_exists(public_path($newThumbnail))) {
-                unlink($newThumbnail);
+            // ✅ Delete NEW files on error (cleanup failed upload)
+            if (isset($newThumbnail) && $newThumbnail !== $oldThumbnail && file_exists(public_path('images/products/'.$newThumbnail))) {
+                unlink(public_path('images/products/'.$newThumbnail));
             }
 
-            if (!empty($newAdditionalImages) && $newAdditionalImages !== $oldAdditionalImages) {
+            if (! empty($newAdditionalImages) && $newAdditionalImages !== $oldAdditionalImages) {
                 foreach ($newAdditionalImages as $img) {
-                    if ($img) {
-                        unlink($img);
+                    if ($img && file_exists(public_path('images/products/'.$img))) {
+                        unlink(public_path('images/products/'.$img));
                     }
                 }
             }
 
-            Log::error('Product Update failed: ' . $e->getMessage());
+            Log::error('Product Update failed: '.$e->getMessage());
 
             $notification = [
                 'message' => 'Product Update failed',
@@ -315,14 +400,15 @@ class ProductController extends Controller
 
             DB::commit();
 
-            if (!empty($thumbnail) && file_exists($thumbnail)) {
-                unlink($thumbnail);
+            // Delete old slider image
+            if ($thumbnail && file_exists(public_path('images/products/'.$thumbnail))) {
+                unlink(public_path('images/products/'.$thumbnail));
             }
 
-            if (!empty($additionalImage)) {
+            if (! empty($additionalImage)) {
                 foreach ($additionalImage as $img) {
-                    if (!empty($img) && file_exists($img)) {
-                        unlink($img);
+                    if (! empty($img) && file_exists(public_path('images/products/'.$img))) {
+                        unlink(public_path('images/products/'.$img)); // ← Fixed
                     }
                 }
             }
@@ -332,12 +418,11 @@ class ProductController extends Controller
                 'alert-type' => 'success',
             ];
 
-
             return redirect()->back()->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
-            Log::error('Product Deletion failed ' . $e->getMessage());
+            Log::error('Product Deletion failed '.$e->getMessage());
             $notification = [
                 'message' => 'Product Deletion failed',
                 'alert-type' => 'error',
@@ -347,11 +432,9 @@ class ProductController extends Controller
         }
     }
 
-
     /**
      *  Update Product Status
      */
-
     public function ProductStatus($id)
     {
         try {
@@ -359,7 +442,7 @@ class ProductController extends Controller
             $newStatus = ($product->status == 'active') ? 'inactive' : 'active';
 
             $product->update([
-                'status' => $newStatus
+                'status' => $newStatus,
             ]);
 
             $notification = [
@@ -369,7 +452,7 @@ class ProductController extends Controller
 
             return redirect()->back()->with($notification);
         } catch (Exception $e) {
-            Log::error('Status Update failed ' . $e->getMessage());
+            Log::error('Status Update failed '.$e->getMessage());
 
             $notification = [
                 'message' => 'Status Update failed',

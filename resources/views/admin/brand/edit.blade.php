@@ -42,8 +42,8 @@
                             <div class="col-12">
                                 <label class="form-label">Brand logo</label>
                                 <input type="file" name="logo" class="form-control">
-                                <img class="w-50 mt-2 img-thumbnail" src="{{ asset($brand->brand_logo) }}"
-                                    alt="">
+                                <img class="w-25 mt-2 img-thumbnail"
+                                    src="{{ asset('images/brands/' . $brand->brand_logo) }}" alt="">
                             </div>
 
                             <div class="col-12">

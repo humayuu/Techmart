@@ -3,23 +3,76 @@
 namespace App\Http\Controllers;
 
 use App\Models\Slider;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
+use Yajra\DataTables\Facades\DataTables;
 
 class SliderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $sliders = Slider::orderBy('id', 'DESC')
-            ->paginate(5);
-        $totalSlider = Slider::count();
+        $sliders = Slider::latest()->get();
+        if ($request->ajax()) {
 
-        return view('admin.slider.index', compact('sliders', 'totalSlider'));
+            return DataTables::of($sliders)
+                ->addIndexColumn()
+                ->addColumn('image', function ($row) {
+                    if ($row->slider_image) {
+                        $imageUrl = asset('images/slider/'.$row->slider_image);
+
+                        return '<img src="'.$imageUrl.'" alt="slider Image" class="img-thumbnail w-75 rounded">';
+                    }
+
+                    return '<span class="text-muted">No Image</span>';
+                })
+                ->addColumn('status', function ($row) {
+                    if ($row->status == 'active') {
+                        return '<span class="badge bg-primary fs-6">Active</span>';
+                    } else {
+                        return '<span class="badge bg-secondary fs-6">Inactive</span>';
+                    }
+                })
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('slider.edit', $row->id);
+                    $deleteUrl = route('slider.destroy', $row->id);
+                    $statusUrl = route('slider.status', $row->id);
+                    $class = $row->status == 'active' ? 'success' : 'dark';
+                    $icon = $row->status == 'active' ? 'thumbs-up' : 'thumbs-down';
+
+                    $btn = '<div class="d-flex align-items-center gap-3 fs-5">
+                            <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="'.$statusUrl.'"
+                            class="text-'.$class.'" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" title="Edit info">
+                            <i class="bi bi-hand-'.$icon.'-fill"></i>
+                            </a>
+                            
+                            
+                            <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
+                            '.csrf_field().'
+                                '.method_field('DELETE').'
+                                <button type="submit" id="delete" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>';
+
+                    return $btn;
+                })
+                ->rawColumns(['image', 'status', 'action'])
+                ->make(true);
+        }
+
+        $totalSliders = $sliders->count();
+
+        return view('admin.slider.index', compact('totalSliders'));
     }
 
     /**
@@ -47,9 +100,9 @@ class SliderController extends Controller
             $fileName = null;
 
             if ($file = $request->file('slider')) {
-                $fileName = uniqid('slider_') . time() . '.' . $file->getClientOriginalExtension();
+                $fileName = uniqid('slider_').time().'.'.$file->getClientOriginalExtension();
                 $file->move($destinationPath, $fileName);
-                $slider = 'images/slider/' . $fileName;
+                $slider = $fileName;
             }
 
             Slider::create([
@@ -73,7 +126,7 @@ class SliderController extends Controller
                 unlink(public_path($slider));
             }
 
-            Log::error('Slider creation failed' . $e->getMessage());
+            Log::error('Slider creation failed'.$e->getMessage());
 
             $notification = [
                 'message' => 'Slider creation failed',
@@ -118,9 +171,9 @@ class SliderController extends Controller
                     mkdir($destinationPath, 0755, true);
                 }
 
-                $fileName = uniqid('slider_') . time() . '.' . $file->getClientOriginalExtension();
+                $fileName = uniqid('slider_').time().'.'.$file->getClientOriginalExtension();
                 $file->move($destinationPath, $fileName);
-                $img = 'images/slider/' . $fileName;
+                $img = $fileName;
 
                 // Delete old slider image
                 if ($slider->slider_image && file_exists(public_path($slider->slider_image))) {
@@ -145,11 +198,11 @@ class SliderController extends Controller
             DB::rollBack();
 
             // Delete the NEW uploaded file if it exists
-            if ($fileName && file_exists($destinationPath . $fileName)) {
-                unlink($destinationPath . $fileName);
+            if ($fileName && file_exists($destinationPath.$fileName)) {
+                unlink($destinationPath.$fileName);
             }
 
-            Log::error('Slider Update Failed: ' . $e->getMessage());
+            Log::error('Slider Update Failed: '.$e->getMessage());
 
             $notification = [
                 'message' => 'Slider Update Failed',
@@ -168,8 +221,8 @@ class SliderController extends Controller
         DB::beginTransaction();
         try {
             // Delete old slider image
-            if ($slider->slider_image && file_exists(public_path($slider->slider_image))) {
-                unlink(public_path($slider->slider_image));
+            if ($slider->slider_image && file_exists(public_path('images/slider/'.$slider->slider_image))) {
+                unlink(public_path('images/slider/'.$slider->slider_image));
             }
 
             $slider->delete();
@@ -185,7 +238,7 @@ class SliderController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            Log::error('Slider deletion Failed: ' . $e->getMessage());
+            Log::error('Slider deletion Failed: '.$e->getMessage());
 
             $notification = [
                 'message' => 'Slider deletion failed',
@@ -197,7 +250,7 @@ class SliderController extends Controller
     }
 
     /**
-     * Update slider status 
+     * Update slider status
      */
     public function SliderStatus($id)
     {
@@ -218,7 +271,7 @@ class SliderController extends Controller
             return redirect()->back()->with($notification);
         } catch (Exception $e) {
 
-            Log::error('Status update failed : ' . $e->getMessage());
+            Log::error('Status update failed : '.$e->getMessage());
 
             $notification = [
                 'message' => 'Status update failed',

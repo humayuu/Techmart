@@ -1,7 +1,7 @@
 @extends('admin.layout');
 @section('main')
 @section('page-title')
-    Sliders <span class="badge text-bg-dark">{{ $totalSlider }}</span>
+    Sliders <span class="badge text-bg-dark">{{ $totalSliders }}</span>
 @endsection
 <div class="card">
     <div class="card-header py-3 bg-dark text-white">
@@ -51,78 +51,20 @@
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
                         <div class="table-responsive">
-                            @if ($sliders->count() > 0)
-                                <table class="table align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 7%;">#</th>
-                                            <th style="width: 25%;">Title</th>
-                                            <th style="width: 35%;">Slider Image</th>
-                                            <th style="width: 20%;">Status</th>
-                                            <th style="width: 25%;">Action</th>
-                                        </tr>
-                                    </thead>
-                            @endif
-                            <tbody>
-                                @forelse ($sliders as $slider)
+                            <table class="table align-middle" id="sliderTable">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ $sliders->firstItem() + $loop->index }}</td>
-                                        <td>{{ $slider->title }}</td>
-                                        <td><img class="w-75 img-thumbnail" src="{{ asset($slider->slider_image) }}"
-                                                alt=""></td>
-                                        <td>
-                                            @php
-                                                $status = $slider->status == 'active' ? 'Active' : 'Inactive';
-                                                $class = $slider->status == 'active' ? 'success' : 'dark';
-                                                $icon = $slider->status == 'active' ? 'thumbs-up' : 'thumbs-down';
-                                            @endphp
-                                            <span
-                                                class="badge text-bg-{{ $class }} fs-6">{{ $status }}</span>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-3 fs-5">
-
-                                                <!-- Edit Button -->
-                                                <a href="{{ route('slider.edit', $slider->id) }}" class="text-primary"
-                                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                    title="Edit info">
-                                                    <i class="bi bi-pencil-fill"></i>
-                                                </a>
-
-                                                <!-- Update Status -->
-                                                <a href="{{ route('slider.status', $slider->id) }}"
-                                                    class="text-{{ $class }}" data-bs-toggle="tooltip"
-                                                    data-bs-placement="bottom" title="Edit info">
-                                                    <i class="bi bi-hand-{{ $icon }}-fill"></i>
-                                                </a>
-
-                                                <!-- Delete Button -->
-                                                <form action="{{ route('slider.destroy', $slider->id) }}"
-                                                    method="POST" class="d-inline m-0">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button id="delete" type="submit"
-                                                        class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center"
-                                                        data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                        title="Delete" style="cursor: pointer; line-height: 1;">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
-                                                </form>
-
-                                            </div>
-                                        </td>
+                                        <th style="width: 7%;">#</th>
+                                        <th style="width: 25%;">Title</th>
+                                        <th style="width: 35%;">Slider Image</th>
+                                        <th style="width: 20%;">Status</th>
+                                        <th style="width: 25%;">Action</th>
                                     </tr>
-                                @empty
-                                    <div class="alert alert-danger" role="alert">
-                                        No Slider Found!
-                                    </div>
-                                @endforelse
-                            </tbody>
+                                </thead>
+                                <tbody>
+                                    <!-- DataTables will populate this -->
+                                </tbody>
                             </table>
-                            {{-- Pagination --}}
-                            <nav class="float-end mt-0" aria-label="Page navigation">
-                                {{ $sliders->links() }}
-                            </nav>
                         </div>
                     </div>
                 </div>

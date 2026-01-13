@@ -142,7 +142,8 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Thumbnail <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control mb-2" disabled>
-                                <img class="w-25 img-thumbnail" src="{{ asset($product->product_thumbnail) }}"
+                                <img class="w-25 img-thumbnail"
+                                    src="{{ asset('images/products/' . $product->product_thumbnail) }}"
                                     alt="{{ $product->product_thumbnail }}">
                             </div>
                             <div class="col-md-6">
@@ -153,7 +154,7 @@
                                 @endphp
                                 @if ($images)
                                     @foreach ($images as $img)
-                                        <img class="w-25 img-thumbnail" src="{{ asset($img) }}"
+                                        <img class="w-25 img-thumbnail" src="{{ asset('images/products/' . $img) }}"
                                             alt="{{ $img }}">
                                     @endforeach
                                 @endif

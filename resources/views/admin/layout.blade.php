@@ -393,6 +393,86 @@
                     ]
                 });
 
+                $('#sliderTable').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: "{{ route('slider.index') }}"
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'title',
+                            name: 'title'
+                        },
+                        {
+                            data: 'image',
+                            name: 'image',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'status',
+                            name: 'status',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+
+                $('#productTable').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: "{{ route('product.index') }}"
+                    },
+                    columns: [{
+                            data: 'image',
+                            name: 'image',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'product_name',
+                            name: 'product_name'
+                        },
+                        {
+                            data: 'brand',
+                            name: 'brand'
+                        },
+                        {
+                            data: 'category',
+                            name: 'category'
+                        },
+                        {
+                            data: 'selling_price',
+                            name: 'selling_price'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+
 
             });
         </script>

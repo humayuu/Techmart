@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Models\Brand;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -23,10 +23,11 @@ class BrandController extends Controller
                 ->addIndexColumn()
                 ->addColumn('image', function ($row) {
                     if ($row->brand_logo) {
-                        $imageUrl = asset('images/brands/' . $row->brand_logo);
+                        $imageUrl = asset('images/brands/'.$row->brand_logo);
 
-                        return '<img src="' . $imageUrl . '" alt="Brand Image" width="100" height="100" class="rounded">';
+                        return '<img src="'.$imageUrl.'" alt="Brand Image"  class="img-thumbnail w-75 rounded">';
                     }
+
                     return '<span class="text-muted">No Image</span>';
                 })
                 ->addColumn('action', function ($row) {
@@ -34,13 +35,13 @@ class BrandController extends Controller
                     $deleteUrl = route('brand.destroy', $row->id);
 
                     $btn = '<div class="d-flex align-items-center gap-3 fs-5">
-                            <a href="' . $editUrl . '" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
+                            <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
                             
-                            <form method="POST" action="' . $deleteUrl . '" class="d-inline m-0 delete-form">
-                            ' . csrf_field() . '
-                                ' . method_field('DELETE') . '
+                            <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
+                            '.csrf_field().'
+                                '.method_field('DELETE').'
                                 <button type="submit" id="delete" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
@@ -57,6 +58,7 @@ class BrandController extends Controller
 
         return view('admin.brand.index', compact('totalBrands'));
     }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -77,11 +79,11 @@ class BrandController extends Controller
             if ($image = $request->file('logo')) {
                 $destinationPath = public_path('images/brands/');
 
-                if (!file_exists($destinationPath)) {
+                if (! file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
                 }
 
-                $fileName = uniqid('brands_') . date('YmdHis') . '.' . $image->getClientOriginalExtension();
+                $fileName = uniqid('brands_').date('YmdHis').'.'.$image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
                 $logo = $fileName;
             }
@@ -98,15 +100,16 @@ class BrandController extends Controller
             ];
 
             DB::commit();
+
             return redirect()->route('brand.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
-            if ($fileName && file_exists(public_path('images/brands/' . $fileName))) {
-                unlink(public_path('images/brands/' . $fileName));
+            if ($fileName && file_exists(public_path('images/brands/'.$fileName))) {
+                unlink(public_path('images/brands/'.$fileName));
             }
 
-            Log::error('Brand creation failed ' . $e->getMessage());
+            Log::error('Brand creation failed '.$e->getMessage());
 
             $notification = [
                 'message' => 'Brand creation failed ',
@@ -145,16 +148,16 @@ class BrandController extends Controller
             if ($image = $request->file('logo')) {
                 $destinationPath = public_path('images/brands/');
 
-                if (!file_exists($destinationPath)) {
+                if (! file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
                 }
 
-                $fileName = uniqid('brands_') . date('YmdHis') . '.' . $image->getClientOriginalExtension();
+                $fileName = uniqid('brands_').date('YmdHis').'.'.$image->getClientOriginalExtension();
                 $image->move($destinationPath, $fileName);
 
                 // Delete old logo if it exists
-                if ($brand->brand_logo && file_exists(public_path('images/brands/' . $brand->brand_logo))) {
-                    unlink(public_path('images/brands/' . $brand->brand_logo));
+                if ($brand->brand_logo && file_exists(public_path('images/brands/'.$brand->brand_logo))) {
+                    unlink(public_path('images/brands/'.$brand->brand_logo));
                 }
 
                 $logo = $fileName;
@@ -172,15 +175,16 @@ class BrandController extends Controller
             ];
 
             DB::commit();
+
             return redirect()->route('brand.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
-            if ($fileName && file_exists(public_path('images/brands/' . $fileName))) {
-                unlink(public_path('images/brands/' . $fileName));
+            if ($fileName && file_exists(public_path('images/brands/'.$fileName))) {
+                unlink(public_path('images/brands/'.$fileName));
             }
 
-            Log::error('Brand Update Failed: ' . $e->getMessage());
+            Log::error('Brand Update Failed: '.$e->getMessage());
 
             $notification = [
                 'message' => 'Brand update failed',
@@ -190,6 +194,7 @@ class BrandController extends Controller
             return redirect()->back()->with($notification)->withInput();
         }
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -199,8 +204,8 @@ class BrandController extends Controller
 
         try {
             // Delete the logo file if it exists
-            if ($brand->brand_logo && file_exists(public_path('images/brands/' . $brand->brand_logo))) {
-                unlink(public_path('images/brands/' . $brand->brand_logo));
+            if ($brand->brand_logo && file_exists(public_path('images/brands/'.$brand->brand_logo))) {
+                unlink(public_path('images/brands/'.$brand->brand_logo));
             }
 
             $brand->delete();
@@ -216,7 +221,7 @@ class BrandController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            Log::error('Brand deletion failed: ' . $e->getMessage());
+            Log::error('Brand deletion failed: '.$e->getMessage());
 
             $notification = [
                 'message' => 'Brand deletion failed',

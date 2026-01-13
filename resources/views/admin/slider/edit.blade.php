@@ -36,8 +36,8 @@
                             <div class="col-12">
                                 <label class="form-label">Slider image</label>
                                 <input type="file" name="slider" class="form-control">
-                                <img class="w-25 mt-3 img-thumbnail" src="{{ asset($slider->slider_image) }}"
-                                    alt="">
+                                <img class="w-25 mt-3 img-thumbnail"
+                                    src="{{ asset('images/slider/' . $slider->slider_image) }}" alt="">
 
                             </div>
 
