@@ -12,29 +12,24 @@
             <div class="col-12 col-lg-4 d-flex">
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-
                         <form method="POST" action="{{ route('slider.store') }}" enctype="multipart/form-data"
                             class="row g-3">
                             @csrf
                             <div class="col-12">
                                 <label class="form-label">Title</label>
-                                <input type="text" class="form-control" name="title" placeholder="Enter Title"
-                                    value="{{ old('title') }}">
+                                <input type="text" class="form-control @error('title') is-invalid @enderror"
+                                    name="title" placeholder="Enter Title" value="{{ old('title') }}">
+                                @error('title')
+                                    <span class="text-danger fs-6">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Slider image</label>
-                                <input type="file" name="slider" class="form-control">
+                                <input type="file" name="slider"
+                                    class="form-control @error('slider') is-invalid @enderror">
+                                @error('slider')
+                                    <span class="text-danger fs-6">{{ $message }}</span>
+                                @enderror
 
                             </div>
                             <div class="col-12">

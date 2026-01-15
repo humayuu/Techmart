@@ -9,35 +9,33 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-12 col-lg-6 d-flex">
+            <div class="col-12 col-lg-6 d-flex mx-auto">
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-
                         <form method="POST" action="{{ route('slider.update', $slider->id) }}"
                             enctype="multipart/form-data" class="row g-3">
                             @csrf
                             @method('PUT')
                             <div class="col-12">
                                 <label class="form-label">Title</label>
-                                <input type="text" class="form-control" name="title" placeholder="Enter Title"
-                                    value="{{ $slider->title }}">
+                                <input type="text" class="form-control @error('title') is-invalid @enderror"
+                                    name="title" placeholder="Enter Title" value="{{ $slider->title }}">
+                                @error('title')
+                                    <span class="text-danger fs-6">{{ $message }}</span>
+                                @enderror
+
+
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Slider image</label>
-                                <input type="file" name="slider" class="form-control">
+                                <input type="file" name="slider"
+                                    class="form-control @error('slider') is-invalid @enderror">
                                 <img class="w-25 mt-3 img-thumbnail"
                                     src="{{ asset('images/slider/' . $slider->slider_image) }}" alt="">
+                                @error('slider')
+                                    <span class="text-danger fs-6">{{ $message }}</span>
+                                @enderror
+
 
                             </div>
 

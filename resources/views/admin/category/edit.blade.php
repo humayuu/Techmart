@@ -9,28 +9,21 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-12 col-lg-8 d-flex">
+            <div class="col-12 col-lg-8 d-flex mx-auto">
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
                         <form method="POST" action="{{ route('category.update', $category->id) }}" class="row g-3">
                             @csrf
                             @method('PUT')
 
                             <div class="col-12">
                                 <label class="form-label">Category Name</label>
-                                <input type="text" class="form-control" name="category_name"
-                                    placeholder="Category name" value="{{ $category->category_name }}">
+                                <input type="text" class="form-control @error('category_name') is-invalid @enderror"
+                                    name="category_name" placeholder="Category name"
+                                    value="{{ $category->category_name }}">
+                                @error('category_name')
+                                    <span class="text-danger fs-6">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <div class="">

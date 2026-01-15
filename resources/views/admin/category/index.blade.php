@@ -12,24 +12,16 @@
             <div class="col-12 col-lg-4 d-flex">
                 <div class="card border shadow-none w-100">
                     <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
 
                         <form method="POST" action="{{ route('category.store') }}" class="row g-3">
                             @csrf
                             <div class="col-12">
                                 <label class="form-label">Category Name</label>
-                                <input type="text" class="form-control" name="category_name"
-                                    placeholder="Category name">
+                                <input type="text" class="form-control @error('category_name') is-invalid @enderror"
+                                    name="category_name" placeholder="Category name">
+                                @error('category_name')
+                                    <span class="text-danger fs-6">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <div class="d-grid">
