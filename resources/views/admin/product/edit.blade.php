@@ -1,280 +1,355 @@
 @extends('admin.layout')
-@section('main')
 @section('page-title')
     Products
 @endsection
+@section('main')
 
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white py-3">
-        <h6 class="mb-0">Edit Product</h6>
-    </div>
-    <div class="card-body">
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Please fix the following errors:</strong>
-                <ul class="mb-0 mt-2">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white py-3">
+            <h6 class="mb-0">Edit Product</h6>
+        </div>
+        <div class="card-body">
 
-        <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <div class="row">
-                <!-- Basic Information -->
-                <div class="col-12 mb-3">
-                    <div class="card border">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Basic Information</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Product Brand <span
-                                            class="text-danger">*</span></label>
-                                    <select class="form-select" name="brand">
-                                        <option selected disabled>Select Brand</option>
-                                        @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}"
-                                                {{ $product->brand_id == $brand->id ? 'selected' : null }}>
-                                                {{ $brand->brand_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Product Category <span
-                                            class="text-danger">*</span></label>
-                                    <select class="form-select" name="category">
-                                        <option selected disabled>Select Category</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}"
-                                                {{ $product->category_id == $category->id ? 'selected' : null }}>
-                                                {{ $category->category_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Product Name <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="product_name"
-                                        placeholder="Enter product name" value="{{ $product->product_name }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Product Code <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="product_code"
-                                        placeholder="Enter product code" value="{{ $product->product_code }}">
-                                </div>
+            <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="row">
+                    <!-- Basic Information -->
+                    <div class="col-12 mb-3">
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Basic Information</h6>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pricing & Inventory -->
-                <div class="col-12 col-lg-6 mb-3">
-                    <div class="card border h-100">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Pricing & Inventory</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Selling Price <span
-                                            class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" step="0.01" class="form-control" name="selling_price"
-                                            placeholder="0.00" value="{{ $product->selling_price }}">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Discount Price</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" step="0.01" class="form-control" name="discount_price"
-                                            placeholder="0.00" value="{{ $product->discount_price }}">
-                                    </div>
-                                    <small class="text-muted">Optional</small>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Quantity <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" name="quantity"
-                                        placeholder="Enter quantity" value="{{ $product->product_qty }}">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Weight</label>
-                                    <input type="text" class="form-control" name="weight"
-                                        placeholder="e.g., 500g, 1kg" value="{{ $product->product_weight }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Description & Tags -->
-                <div class="col-12 col-lg-6 mb-3">
-                    <div class="card border h-100">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Description & Tags</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Tags</label>
-                                    <input type="text" class="form-control visually-hidden" name="tags"
-                                        data-role="tagsinput" placeholder="Enter Product Tags"
-                                        value="{{ $product->product_tags }}">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Short Description</label>
-                                    <textarea class="form-control" name="short_description" rows="3" placeholder="Brief summary">{{ $product->short_description }}</textarea>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Long Description</label>
-                                    <textarea class="form-control" id="long_description" name="long_description" placeholder="Detailed information">{{ $product->long_description }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Images Upload -->
-                <div class="col-12 mb-3">
-                    <div class="card border">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Product Images</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Thumbnail <span
-                                            class="text-danger">*</span></label>
-                                    <input type="file" class="form-control" id="image_upload_input"
-                                        name="thumbnail" accept="image/*">
-                                    <img class="w-25 mt-2 img-thumbnail"
-                                        src="{{ asset('images/products/' . $product->product_thumbnail) }}"
-                                        id="image_preview_tag" alt="{{ $product->product_thumbnail }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Additional Images</label>
-                                    <input type="file" class="form-control" id="imageInput" name="images[]"
-                                        accept="image/*" multiple>
-                                    <small class="text-muted">Select multiple images (Max 5)</small>
-                                    <div id="multiplePreview" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        @php
-                                            $images = json_decode($product->product_multiple_image);
-                                        @endphp
-                                        @if ($images)
-                                            @foreach ($images as $img)
-                                                <img class="w-25 img-thumbnail"
-                                                    src="{{ asset('images/products/' . $img) }}"
-                                                    alt="{{ $img }}">
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Product Brand <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select @error('brand') is-invalid @enderror" name="brand">
+                                            <option selected disabled>Select Brand</option>
+                                            @foreach ($brands as $brand)
+                                                <option value="{{ $brand->id }}"
+                                                    {{ old('brand', $product->brand_id) == $brand->id ? 'selected' : '' }}>
+                                                    {{ $brand->brand_name }}</option>
                                             @endforeach
+                                        </select>
+                                        @error('brand')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Product Category <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select @error('category') is-invalid @enderror" name="category">
+                                            <option selected disabled>Select Category</option>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->id }}"
+                                                    {{ old('category', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                                    {{ $category->category_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('category')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Product Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text"
+                                            class="form-control @error('product_name') is-invalid @enderror"
+                                            name="product_name" placeholder="Enter product name"
+                                            value="{{ old('product_name', $product->product_name) }}">
+                                        @error('product_name')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Product Code <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text"
+                                            class="form-control @error('product_code') is-invalid @enderror"
+                                            name="product_code" placeholder="Enter product code"
+                                            value="{{ old('product_code', $product->product_code) }}">
+                                        @error('product_code')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Inventory -->
+                    <div class="col-12 col-lg-6 mb-3">
+                        <div class="card border h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Pricing & Inventory</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Selling Price <span
+                                                class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" step="0.01"
+                                                class="form-control @error('selling_price') is-invalid @enderror"
+                                                name="selling_price" placeholder="0.00"
+                                                value="{{ old('selling_price', $product->selling_price) }}">
+                                        </div>
+                                        @error('selling_price')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Discount Price</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" step="0.01"
+                                                class="form-control @error('discount_price') is-invalid @enderror"
+                                                name="discount_price" placeholder="0.00"
+                                                value="{{ old('discount_price', $product->discount_price) }}">
+                                        </div>
+                                        <small class="text-muted">Optional</small>
+                                        @error('discount_price')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Quantity <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control @error('quantity') is-invalid @enderror"
+                                            name="quantity" placeholder="Enter quantity"
+                                            value="{{ old('quantity', $product->product_qty) }}">
+                                        @error('quantity')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Weight</label>
+                                        <input type="text" class="form-control @error('weight') is-invalid @enderror"
+                                            name="weight" placeholder="e.g., 500g, 1kg"
+                                            value="{{ old('weight', $product->product_weight) }}">
+                                        @error('weight')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description & Tags -->
+                    <div class="col-12 col-lg-6 mb-3">
+                        <div class="card border h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Description & Tags</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Tags</label>
+                                        <input type="text"
+                                            class="form-control visually-hidden @error('tags') is-invalid @enderror"
+                                            name="tags" data-role="tagsinput" placeholder="Enter Product Tags"
+                                            value="{{ old('tags', $product->product_tags) }}">
+                                        @error('tags')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Short Description</label>
+                                        <textarea class="form-control @error('short_description') is-invalid @enderror" name="short_description"
+                                            rows="3" placeholder="Brief summary">{{ old('short_description', $product->short_description) }}</textarea>
+                                        @error('short_description')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Long Description</label>
+                                        <textarea class="form-control @error('long_description') is-invalid @enderror" id="long_description"
+                                            name="long_description" placeholder="Detailed information">{{ old('long_description', $product->long_description) }}</textarea>
+                                        @error('long_description')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Images Upload -->
+                    <div class="col-12 mb-3">
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Product Images</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Thumbnail <span
+                                                class="text-danger">*</span></label>
+                                        <input type="file"
+                                            class="form-control @error('thumbnail') is-invalid @enderror"
+                                            id="image_upload_input" name="thumbnail" accept="image/*">
+                                        <small class="text-muted">Main product image (leave empty to keep current)</small>
+                                        <div class="mt-2">
+                                            <img class="img-thumbnail" width="150"
+                                                src="{{ asset('images/products/' . $product->product_thumbnail) }}"
+                                                id="image_preview_tag" alt="{{ $product->product_thumbnail }}">
+                                        </div>
+                                        @error('thumbnail')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Additional Images</label>
+                                        <input type="file" class="form-control @error('images') is-invalid @enderror"
+                                            id="imageInput" name="images[]" accept="image/*" multiple>
+                                        <small class="text-muted">Select multiple images (Max 5, leave empty to keep
+                                            current)</small>
+                                        <div id="multiplePreview" class="mt-2"
+                                            style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                            @php
+                                                $images = json_decode($product->product_multiple_image);
+                                            @endphp
+                                            @if ($images)
+                                                @foreach ($images as $img)
+                                                    <img class="img-thumbnail" width="120" height="120"
+                                                        style="object-fit: cover;"
+                                                        src="{{ asset('images/products/' . $img) }}"
+                                                        alt="{{ $img }}">
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                        @if ($errors->has('images'))
+                                            <span class="text-danger fs-6 d-block">{{ $errors->first('images') }}</span>
                                         @endif
-                                    </div>
 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Additional Settings -->
-                <div class="col-12 mb-3">
-                    <div class="card border">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Additional Information</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Other Information</label>
-                                    <textarea class="form-control" id="other_info" name="other_info" rows="4"
-                                        placeholder="Additional details, specifications, warranty info">{{ $product->other_info }}</textarea>
-                                </div>
-                                <div class="col-12">
-                                    <div class="border rounded p-3 bg-light">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input fs-6" type="checkbox" role="switch"
-                                                name="is_featured" value="1"
-                                                {{ $product->featured == 1 ? 'checked' : '' }} id="featuredCheck">
-                                            <label class="form-check-label" for="featuredCheck">
-                                                <span class="fw-bold fs-6">Featured Product</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input fs-6" type="checkbox" role="switch"
-                                                name="special_offer" value="1"
-                                                {{ $product->special_offer == 1 ? 'checked' : '' }}
-                                                id="specialOfferCheck">
-                                            <label class="form-check-label" for="specialOfferCheck">
-                                                <span class="fw-bold fs-6">Special Offer</span>
-                                            </label>
-                                        </div>
+                                        @for ($i = 0; $i < 5; $i++)
+                                            @error("images.{$i}")
+                                                <span class="text-danger fs-6 d-block">{{ $message }}</span>
+                                            @enderror
+                                        @endfor
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="col-12">
-                    <div class="d-flex gap-2 justify-content-end border-top pt-3">
-                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                        <a class="btn btn-outline-secondary" href="{{ route('product.index') }}">Cancel</a>
+                    <!-- Additional Settings -->
+                    <div class="col-12 mb-3">
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Additional Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Other Information</label>
+                                        <textarea class="form-control @error('other_info') is-invalid @enderror" id="other_info" name="other_info"
+                                            rows="4" placeholder="Additional details, specifications, warranty info">{{ old('other_info', $product->other_info) }}</textarea>
+                                        @error('other_info')
+                                            <span class="text-danger fs-6">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="border rounded p-3 bg-light">
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input fs-6" type="checkbox" role="switch"
+                                                    name="is_featured" value="1"
+                                                    {{ old('is_featured', $product->featured) == 1 ? 'checked' : '' }}
+                                                    id="featuredCheck">
+                                                <label class="form-check-label" for="featuredCheck">
+                                                    <span class="fw-bold fs-6">Featured Product</span>
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input fs-6" type="checkbox" role="switch"
+                                                    name="special_offer" value="1"
+                                                    {{ old('special_offer', $product->special_offer) == 1 ? 'checked' : '' }}
+                                                    id="specialOfferCheck">
+                                                <label class="form-check-label" for="specialOfferCheck">
+                                                    <span class="fw-bold fs-6">Special Offer</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="col-12">
+                        <div class="d-flex gap-2 justify-content-end border-top pt-3">
+                            <a class="btn btn-outline-secondary" href="{{ route('product.index') }}">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
-{{-- TinyMCE Editor --}}
-<script src="https://cdn.tiny.cloud/1/ipecvicv0hfws0f638gkuupueg2moq5pzadav0h1edc0g2dq/tinymce/7/tinymce.min.js"
-    referrerpolicy="origin"></script>
-<script>
-    tinymce.init({
-        selector: '#long_description',
-        height: 300,
-        plugins: ['lists', 'link', 'image', 'table', 'code', 'wordcount', 'preview'],
-        toolbar: 'undo redo | formatselect | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code preview',
-        menubar: false,
-        branding: false,
-        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
-    });
+    {{-- TinyMCE Editor --}}
+    <script src="https://cdn.tiny.cloud/1/ipecvicv0hfws0f638gkuupueg2moq5pzadav0h1edc0g2dq/tinymce/7/tinymce.min.js"
+        referrerpolicy="origin"></script>
+    <script>
+        // Initialize TinyMCE for rich text editors
+        tinymce.init({
+            selector: '#long_description, #other_info',
+            height: 300,
+            plugins: ['lists', 'link', 'image', 'table', 'code', 'wordcount', 'preview'],
+            toolbar: 'undo redo | formatselect | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code preview',
+            menubar: false,
+            branding: false,
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+        });
 
-    // Thumbnail & multiple image preview
+        // Thumbnail image preview
+        document.getElementById('image_upload_input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.getElementById('image_preview_tag');
+                    img.src = event.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-    document.getElementById('image_upload_input').onchange = function(e) {
-        let reader = new FileReader();
-        reader.onload = function(event) {
-            let img = document.getElementById('image_preview_tag');
-            img.src = event.target.result;
-            img.style.display = 'block';
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    }
+        // Multiple images preview with validation
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('multiplePreview');
 
-    document.getElementById('imageInput').onchange = function(e) {
-        let files = e.target.files;
-        let previewContainer = document.getElementById('multiplePreview');
-        previewContainer.innerHTML = '';
-        for (let i = 0; i < files.length; i++) {
-            let reader = new FileReader();
-            reader.onload = function(event) {
-                let img = document.createElement('img');
-                img.src = event.target.result;
-                img.style.width = '120px';
-                previewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(files[i]);
-        }
-    }
-</script>
+            // Validate max 5 images
+            if (files.length > 5) {
+                alert('You can only upload a maximum of 5 images');
+                this.value = ''; // Clear the input
+                return;
+            }
+
+            // Clear previous previews and show new ones
+            previewContainer.innerHTML = '';
+
+            // Generate previews for each file
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'img-thumbnail';
+                    img.style.width = '120px';
+                    img.style.height = '120px';
+                    img.style.objectFit = 'cover';
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
 @endsection

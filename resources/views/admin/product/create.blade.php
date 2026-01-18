@@ -53,8 +53,10 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Product Name <span
                                                 class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="product_name"
-                                            placeholder="Enter product name" value="{{ old('product_name') }}">
+                                        <input type="text"
+                                            class="form-control @error('product_name') is-invalid @enderror"
+                                            name="product_name" placeholder="Enter product name"
+                                            value="{{ old('product_name') }}">
                                         @error('product_name')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
@@ -62,8 +64,10 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Product Code <span
                                                 class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="product_code"
-                                            placeholder="Enter product code" value="{{ old('product_code') }}">
+                                        <input type="text"
+                                            class="form-control @error('product_code') is-invalid @enderror"
+                                            name="product_code" placeholder="Enter product code"
+                                            value="{{ old('product_code') }}">
                                         @error('product_code')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
@@ -86,8 +90,9 @@
                                                 class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text">$</span>
-                                            <input type="number" step="0.01" class="form-control" name="selling_price"
-                                                placeholder="0.00" value="{{ old('selling_price') }}">
+                                            <input type="number" step="0.01"
+                                                class="form-control @error('selling_price') is-invalid @enderror"
+                                                name="selling_price" placeholder="0.00" value="{{ old('selling_price') }}">
                                         </div>
                                         @error('selling_price')
                                             <span class="text-danger fs-6">{{ $message }}</span>
@@ -97,8 +102,10 @@
                                         <label class="form-label fw-bold">Discount Price</label>
                                         <div class="input-group">
                                             <span class="input-group-text">$</span>
-                                            <input type="number" step="0.01" class="form-control" name="discount_price"
-                                                placeholder="0.00" value="{{ old('discount_price') }}">
+                                            <input type="number" step="0.01"
+                                                class="form-control @error('discount_price') is-invalid @enderror"
+                                                name="discount_price" placeholder="0.00"
+                                                value="{{ old('discount_price') }}">
                                         </div>
                                         <small class="text-muted">Optional</small>
                                         @error('discount_price')
@@ -108,16 +115,16 @@
                                     <div class="col-12">
                                         <label class="form-label fw-bold">Quantity <span
                                                 class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" name="quantity"
-                                            placeholder="Enter quantity" value="{{ old('quantity') }}">
+                                        <input type="number" class="form-control @error('quantity') is-invalid @enderror"
+                                            name="quantity" placeholder="Enter quantity" value="{{ old('quantity') }}">
                                         @error('quantity')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label fw-bold">Weight</label>
-                                        <input type="text" class="form-control" name="weight"
-                                            placeholder="e.g., 500g, 1kg" value="{{ old('weight') }}">
+                                        <input type="text" class="form-control @error('weight') is-invalid @enderror"
+                                            name="weight" placeholder="e.g., 500g, 1kg" value="{{ old('weight') }}">
                                         @error('weight')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
@@ -137,8 +144,9 @@
                                 <div class="row g-2">
                                     <div class="col-12">
                                         <label class="form-label fw-bold">Tags</label>
-                                        <input type="text" class="form-control visually-hidden" name="tags"
-                                            data-role="tagsinput" placeholder="Enter Product Tags"
+                                        <input type="text"
+                                            class="form-control visually-hidden @error('tags') is-invalid @enderror"
+                                            name="tags" data-role="tagsinput" placeholder="Enter Product Tags"
                                             value="{{ old('tags') }}">
                                         @error('tags')
                                             <span class="text-danger fs-6">{{ $message }}</span>
@@ -146,14 +154,16 @@
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label fw-bold">Short Description</label>
-                                        <textarea class="form-control" name="short_description" rows="3" placeholder="Brief summary">{{ old('short_description') }}</textarea>
+                                        <textarea class="form-control @error('short_description') is-invalid @enderror" name="short_description"
+                                            rows="3" placeholder="Brief summary">{{ old('short_description') }}</textarea>
                                         @error('short_description')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label fw-bold">Long Description</label>
-                                        <textarea class="form-control" id="long_description" name="long_description" placeholder="Detailed information">{{ old('long_description') }}</textarea>
+                                        <textarea class="form-control @error('long_description') is-invalid @enderror" id="long_description"
+                                            name="long_description" placeholder="Detailed information">{{ old('long_description') }}</textarea>
                                         @error('long_description')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
@@ -178,19 +188,21 @@
                                             class="form-control @error('thumbnail') is-invalid @enderror"
                                             id="image_upload_input" name="thumbnail" accept="image/*">
                                         <small class="text-muted">Main product image</small>
-                                        <img src="#" id="image_preview_tag" alt="Image Preview" width="150"
-                                            style="display: none;">
-                                        <img src="" alt="">
+                                        <div class="mt-2">
+                                            <img src="#" id="image_preview_tag" alt="Image Preview"
+                                                class="img-thumbnail" width="150" style="display: none;">
+                                        </div>
                                         @error('thumbnail')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Additional Images</label>
-                                        <input type="file" class="form-control" id="imageInput" name="images[]"
-                                            accept="image/*" multiple>
+                                        <input type="file" class="form-control @error('images') is-invalid @enderror"
+                                            id="imageInput" name="images[]" accept="image/*" multiple>
                                         <small class="text-muted">Select multiple images (Max 5)</small>
-                                        <div id="multiplePreview" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        <div id="multiplePreview" class="mt-2"
+                                            style="display: flex; gap: 10px; flex-wrap: wrap;">
                                         </div>
 
                                         @if ($errors->has('images'))
@@ -218,8 +230,8 @@
                                 <div class="row g-2">
                                     <div class="col-12">
                                         <label class="form-label fw-bold">Other Information</label>
-                                        <textarea class="form-control" id="other_info" name="other_info" rows="4"
-                                            placeholder="Additional details, specifications, warranty info">{{ old('other_info') }}</textarea>
+                                        <textarea class="form-control @error('other_info') is-invalid @enderror" id="other_info" name="other_info"
+                                            rows="4" placeholder="Additional details, specifications, warranty info">{{ old('other_info') }}</textarea>
                                         @error('other_info')
                                             <span class="text-danger fs-6">{{ $message }}</span>
                                         @enderror
@@ -265,8 +277,9 @@
     <script src="https://cdn.tiny.cloud/1/ipecvicv0hfws0f638gkuupueg2moq5pzadav0h1edc0g2dq/tinymce/7/tinymce.min.js"
         referrerpolicy="origin"></script>
     <script>
+        // Initialize TinyMCE for rich text editors
         tinymce.init({
-            selector: '#long_description',
+            selector: '#long_description, #other_info',
             height: 300,
             plugins: ['lists', 'link', 'image', 'table', 'code', 'wordcount', 'preview'],
             toolbar: 'undo redo | formatselect | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code preview',
@@ -275,32 +288,50 @@
             content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
         });
 
-        // Thumbnail & multiple image preview
-
-        document.getElementById('image_upload_input').onchange = function(e) {
-            let reader = new FileReader();
-            reader.onload = function(event) {
-                let img = document.getElementById('image_preview_tag');
-                img.src = event.target.result;
-                img.style.display = 'block';
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        }
-
-        document.getElementById('imageInput').onchange = function(e) {
-            let files = e.target.files;
-            let previewContainer = document.getElementById('multiplePreview');
-            previewContainer.innerHTML = '';
-            for (let i = 0; i < files.length; i++) {
-                let reader = new FileReader();
+        // Thumbnail image preview
+        document.getElementById('image_upload_input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
                 reader.onload = function(event) {
-                    let img = document.createElement('img');
+                    const img = document.getElementById('image_preview_tag');
                     img.src = event.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Multiple images preview with validation
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('multiplePreview');
+
+            // Validate max 5 images
+            if (files.length > 5) {
+                alert('You can only upload a maximum of 5 images');
+                this.value = ''; // Clear the input
+                previewContainer.innerHTML = '';
+                return;
+            }
+
+            // Clear previous previews
+            previewContainer.innerHTML = '';
+
+            // Generate previews for each file
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'img-thumbnail';
                     img.style.width = '120px';
+                    img.style.height = '120px';
+                    img.style.objectFit = 'cover';
                     previewContainer.appendChild(img);
                 };
-                reader.readAsDataURL(files[i]);
-            }
-        }
+                reader.readAsDataURL(file);
+            });
+        });
     </script>
 @endsection
