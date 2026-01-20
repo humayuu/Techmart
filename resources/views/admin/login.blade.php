@@ -5,19 +5,19 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{{ asset('assets/images/favicon-32x32.png') }}" type="image/png" />
+    <link rel="icon" href="{{ asset('backend/assets/images/favicon-32x32.png') }}" type="image/png" />
     <!-- Bootstrap CSS -->
-    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/bootstrap-extended.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('backend/assets/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/bootstrap-extended.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/style.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/icons.css') }}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
 
     <!-- loader-->
-    <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/pace.min.css') }}" rel="stylesheet" />
 
     <title>TechMart - Admin login</title>
 </head>
@@ -34,7 +34,7 @@
                     <div class="card shadow rounded-0 overflow-hidden">
                         <div class="row g-0">
                             <div class="col-lg-6 bg-login d-flex align-items-center justify-content-center">
-                                <img src="{{ asset('assets/images/error/login-img.jpg') }}" class="img-fluid"
+                                <img src="{{ asset('backend/assets/images/error/login-img.jpg') }}" class="img-fluid"
                                     alt="">
                             </div>
                             <div class="col-lg-6">
@@ -117,8 +117,8 @@
 
 
     <!--plugins-->
-    <script src="{{ asset('assets/js/pace.min.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/js/jquery.min.js') }}"></script>
     <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 

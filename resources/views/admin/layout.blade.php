@@ -5,21 +5,21 @@
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="{{ asset('assets/images/favicon-32x32.png') }}" type="image/png" />
+    <link rel="icon" href="{{ asset('backend/assets/images/favicon-32x32.png') }}" type="image/png" />
     <!--plugins-->
-    <link href="{{ asset('assets/plugins/metismenu/css/metisMenu.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/plugins/metismenu/css/metisMenu.min.css') }}" rel="stylesheet" />
     <!-- Bootstrap CSS -->
-    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/plugins/input-tags/css/tagsinput.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/bootstrap-extended.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/plugins/input-tags/css/tagsinput.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/bootstrap-extended.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/style.css') }}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
 
     <!-- loader-->
-    <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/pace.min.css') }}" rel="stylesheet" />
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
@@ -135,7 +135,7 @@
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
-                            <img src="{{ asset('assets/images/avatars/avatar-1.png') }}" class="user-img"
+                            <img src="{{ asset('backend/assets/images/avatars/avatar-1.png') }}" class="user-img"
                                 alt="" />
                             <div class="d-none d-sm-block">
                                 <p class="user-name mb-0">Humayun</p>
@@ -275,19 +275,19 @@
 
 
         <!-- Bootstrap bundle JS -->
-        <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
 
         <!--plugins-->
         {{-- jQuary CDN --}}
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-        <script src="{{ asset('assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
-        <script src="{{ asset('assets/plugins/input-tags/js/tagsinput.js') }}"></script>
+        <script src="{{ asset('backend/assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
+        <script src="{{ asset('backend/assets/plugins/input-tags/js/tagsinput.js') }}"></script>
 
-        <script src="{{ asset('assets/js/pace.min.js') }}"></script>
+        <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
         <!--app-->
-        <script src="{{ asset('assets/js/app.js') }}"></script>
-        <script src="{{ asset('assets/js/index.js') }}"></script>
+        <script src="{{ asset('backend/assets/js/app.js') }}"></script>
+        <script src="{{ asset('backend/assets/js/index.js') }}"></script>
 
         <!-- Toaster JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>

@@ -30,6 +30,9 @@ class BrandController extends Controller
 
                     return '<span class="text-muted">No Image</span>';
                 })
+                ->addColumn('brand_description', function ($row) {
+                    return substr($row->brand_description, 0, 25).'...';
+                })
                 ->addColumn('action', function ($row) {
                     $editUrl = route('brand.edit', $row->id);
                     $deleteUrl = route('brand.destroy', $row->id);
@@ -65,7 +68,7 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:5|unique:brands,brand_name',
+            'name' => 'required|unique:brands,brand_name',
             'description' => 'required',
             'logo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ]);

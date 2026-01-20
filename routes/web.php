@@ -1,19 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SliderController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
-
-// Admin Auth Routes 
+// Admin Auth Routes
 Route::prefix('admin')->group(function () {
     Route::controller(AdminController::class)->group(function () {
         Route::get('/', 'AdminLogin')->name('admin.login.page')->middleware('is-LoggedIn');
@@ -32,15 +31,15 @@ Route::prefix('admin')->group(function () {
 
         // Product Routes
         Route::resource('product', ProductController::class);
-        Route::get('product/status/{id}',  [ProductController::class, 'ProductStatus'])->name('product.status');
+        Route::get('product/status/{id}', [ProductController::class, 'ProductStatus'])->name('product.status');
 
         // Slider Routes
         Route::resource('slider', SliderController::class);
-        Route::get('slider/status/{id}',  [SliderController::class, 'SliderStatus'])->name('slider.status');
+        Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
     });
 });
 
-
+// Frontend All Routes
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -52,4 +51,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
