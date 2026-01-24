@@ -18,8 +18,6 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-
-
     protected $fillable = [
         'brand_id',
         'category_id',
@@ -38,10 +36,52 @@ class Product extends Model
         'special_offer',
         'product_weight',
         'other_info',
-        'status'
+        'status',
     ];
 
-    protected  $casts = [
+    protected $casts = [
         'product_multiple_image' => 'array',
     ];
+
+    // Update this line - add 'category_display'
+    protected $appends = ['image_url', 'price', 'category_display'];
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->product_thumbnail) {
+            return asset('images/products/'.$this->product_thumbnail);
+        }
+
+        return asset('frontend/assets/images/product-image/1.webp');
+    }
+
+    public function getPriceAttribute()
+    {
+        return $this->discount_price ?? $this->selling_price;
+    }
+
+    // Add this new accessor
+    public function getCategoryDisplayAttribute()
+    {
+        return $this->category ? $this->category->category_name : 'Uncategorized';
+    }
+
+    public function getAllImagesAttribute()
+    {
+        $images = [];
+
+        // Add thumbnail
+        if ($this->product_thumbnail) {
+            $images[] = asset('images/products/'.$this->product_thumbnail);
+        }
+
+        // Add additional images
+        if ($this->product_multiple_image && is_array($this->product_multiple_image)) {
+            foreach ($this->product_multiple_image as $image) {
+                $images[] = asset('images/products/'.$image);
+            }
+        }
+
+        return $images;
+    }
 }
