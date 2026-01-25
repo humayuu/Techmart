@@ -105,7 +105,7 @@
         return `<div class="col-lg-4 col-xl-3 col-md-6 col-sm-6 col-xs-6 mb-30px">
         <div class="product h-100 d-flex flex-column">
             <div class="thumb position-relative overflow-hidden d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
-                <a href="single-product.html" class="image">
+                <a href="/product/detail/${product.id}" class="image">
                     <img src="${imagePath}" 
                          alt="${product.product_name}" 
                          class="img-fluid" 

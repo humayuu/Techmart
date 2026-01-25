@@ -41,8 +41,11 @@ Route::prefix('admin')->group(function () {
 });
 
 // Frontend All Routes
-Route::controller(ProductDetailController::class)->group(function () {
-    Route::get('product', 'ProductFilter');
+Route::prefix('product')->group(function () {
+    Route::controller(ProductDetailController::class)->group(function () {
+        Route::get('/', 'ProductFilter');
+        Route::get('detail/{id}', 'ProductDetails')->name('product.detail');
+    });
 });
 
 Route::get('/dashboard', function () {

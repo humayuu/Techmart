@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class ProductDetailController extends Controller
 {
@@ -47,6 +48,24 @@ class ProductDetailController extends Controller
                 'message' => 'Product fetch error',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Function for Show Single Product Details
+     */
+    public function ProductDetails($id)
+    {
+        try {
+            $product = Product::with(['category', 'brand'])
+                ->find($id);
+
+            return view('product_detail', compact('product'));
+
+        } catch (Exception $e) {
+            Log::error('Error in Fetch Single Product ', $e->getMessage());
+
+            return redirect()->back();
         }
     }
 }
