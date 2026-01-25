@@ -43,13 +43,22 @@
                     <div class="product-details-content quickview-content ml-25px">
                         <h2>{{ $product->product_name }}</h2>
                         @php
-                            $finalPrice = $product->selling_price - $product->discount_price;
+                            $sellingPrice = $product->selling_price ?? 0;
+                            $discountPrice = $product->discount_price ?? 0;
+                            $finalPrice = max(0, $sellingPrice - $discountPrice);
+                            $hasDiscount = $discountPrice > 0 && $finalPrice < $sellingPrice;
                         @endphp
+
                         <div class="pricing-meta">
-                            <span class="price mt-auto">
-                                <span
-                                    class="old text-muted text-decoration-line-through me-2">${{ $product->selling_price }}</span>
-                                <span class="new fw-bold">${{ $finalPrice }}</span>
+                            <span class="price mt-auto d-flex flex-column gap-1">
+                                @if ($hasDiscount)
+                                    <span class="old text-muted text-decoration-line-through fs-5">
+                                        ${{ number_format($sellingPrice, 2) }}
+                                    </span>
+                                @endif
+                                <span class="new fw-bold text-danger fs-2">
+                                    ${{ number_format($finalPrice, 2) }}
+                                </span>
                             </span>
                         </div>
                         <div class="pro-details-rating-wrap">
@@ -63,10 +72,7 @@
                             <span class="read-review"><a class="reviews" href="#">(5 Customer
                                     Review)</a></span>
                         </div>
-                        <p class="mt-30px">Lorem ipsum dolor sit amet, consecte adipisicing elit, sed do eiusmll
-                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mill veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut aliquip exet commodo consequat. Duis aute irure
-                            dolor</p>
+                        <p class="mt-30px">{{ $product->short_description }}</p>
                         <div class="pro-details-categories-info pro-details-same-style d-flex m-0">
                             <span>Product Code:</span>
                             <ul class="d-flex">
@@ -95,7 +101,8 @@
                             <span>Tags: </span>
                             <ul class="d-flex">
                                 <li>
-                                    <span class="text-dark">{{ Str::replaceFirst(' ', ',', $product->product_tags) }}</span>
+                                    <span
+                                        class="text-dark">{{ Str::replaceFirst(' ', ',', $product->product_tags) }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -123,23 +130,15 @@
                             <div id="des-details2" class="tab-pane active">
                                 <div class="product-anotherinfo-wrapper text-start">
                                     <ul>
-                                        <li><span>Weight</span> 400 g</li>
-                                        <li><span>Dimensions</span>10 x 10 x 15 cm</li>
-                                        <li><span>Materials</span> 60% cotton, 40% polyester</li>
-                                        <li><span>Other Info</span> American heirloom jean shorts pug seitan
-                                            letterpress</li>
+                                        <li><span>Weight</span> {{ $product->product_weight }} g</li>
+                                        <li><span>Other Info</span> {{ strip_tags($product->other_info) }}</li>
                                     </ul>
                                 </div>
                             </div>
                             <div id="des-details1" class="tab-pane ">
                                 <div class="product-description-wrapper">
                                     <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eius tempor
-                                        incidid ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-                                        nostrud exercitation ullamco laboris nisi ut aliquip efgx ea co consequat.
-                                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
-                                        eu fugiat nulla pariatur. Excepteur sint occae cupidatat non proident, sunt
-                                        in culpa qui
+                                        {{ strip_tags($product->long_description) }}
                                     </p>
                                 </div>
                             </div>
@@ -273,56 +272,91 @@
                 </div>
             </div>
             <!-- Section Title & Tab End -->
-            <div class="row">
-                <div class="col">
-                    <div class="new-product-slider swiper-container slider-nav-style-1">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <!-- Single Prodect -->
-                                <div class="product">
-                                    <span class="badges">
-                                        <span class="new">New</span>
-                                    </span>
-                                    <div class="thumb">
-                                        <a href="single-product.html" class="image">
-                                            <img src="assets/images/product-image/1.webp" alt="Product" />
-                                            <img class="hover-image" src="assets/images/product-image/1.webp"
-                                                alt="Product" />
-                                        </a>
+
+            @if ($relatedProducts->count() > 3)
+                <div class="row">
+                    <div class="col">
+                        <div class="new-product-slider swiper-container slider-nav-style-1">
+                            <div class="swiper-wrapper">
+                                @foreach ($relatedProducts as $item)
+                                    <div class="swiper-slide">
+                                        <!-- Single Product -->
+                                        <div class="product">
+                                            <div class="thumb">
+                                                <a href="{{ route('product.detail', $item->id) }}" class="image">
+                                                    <img src="{{ asset('images/products/' . $item->product_thumbnail) }}"
+                                                        alt="Product" />
+                                                    <img class="hover-image"
+                                                        src="{{ asset('images/products/' . $item->product_thumbnail) }}"
+                                                        alt="Product" />
+                                                </a>
+                                            </div>
+                                            <div class="content">
+                                                <span class="category">
+                                                    <a href="#">{{ $item->category->category_name }}</a>
+                                                </span>
+                                                <h5 class="title">
+                                                    <a href="{{ route('product.detail', $item->id) }}">
+                                                        {{ $item->product_name }}
+                                                    </a>
+                                                </h5>
+                                                @php
+                                                    $sellingPrice = $item->selling_price ?? 0;
+                                                    $discountPrice = $item->discount_price ?? 0;
+                                                    $finalPrice = max(0, $sellingPrice - $discountPrice);
+                                                    $hasDiscount = $discountPrice > 0 && $finalPrice < $sellingPrice;
+                                                @endphp
+                                                <span class="price">
+                                                    @if ($hasDiscount)
+                                                        <span class="old text-muted text-decoration-line-through me-2">
+                                                            ${{ number_format($sellingPrice, 2) }}
+                                                        </span>
+                                                    @endif
+                                                    <span class="new fw-bold text-danger">
+                                                        ${{ number_format($finalPrice, 2) }}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            <div class="actions">
+                                                <button title="Add To Cart" class="action add-to-cart"
+                                                    data-bs-toggle="modal" data-bs-target="#exampleModal-Cart">
+                                                    <i class="pe-7s-shopbag"></i>
+                                                </button>
+                                                <button class="action wishlist" title="Wishlist" data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal-Wishlist">
+                                                    <i class="pe-7s-like"></i>
+                                                </button>
+                                                <button class="action quickview" data-link-action="quickview"
+                                                    title="Quick view" data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal">
+                                                    <i class="pe-7s-look"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="content">
-                                        <span class="category"><a href="#">Accessories</a></span>
-                                        <h5 class="title"><a href="single-product.html">Modern Smart Phone
-                                            </a>
-                                        </h5>
-                                        <span class="price">
-                                            <span class="new">$38.50</span>
-                                        </span>
-                                    </div>
-                                    <div class="actions">
-                                        <button title="Add To Cart" class="action add-to-cart" data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal-Cart"><i class="pe-7s-shopbag"></i></button>
-                                        <button class="action wishlist" title="Wishlist" data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal-Wishlist"><i class="pe-7s-like"></i></button>
-                                        <button class="action quickview" data-link-action="quickview" title="Quick view"
-                                            data-bs-toggle="modal" data-bs-target="#exampleModal"><i
-                                                class="pe-7s-look"></i></button>
-                                        <button class="action compare" title="Compare" data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal-Compare"><i
-                                                class="pe-7s-refresh-2"></i></button>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
-                        </div>
-                        <!-- Add Arrows -->
-                        <div class="swiper-buttons">
-                            <div class="swiper-button-next"></div>
-                            <div class="swiper-button-prev"></div>
+                            <!-- Add Arrows -->
+                            <div class="swiper-buttons">
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-button-prev"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @else
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-info text-center py-5" role="alert">
+                            <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+                            <h5>No Related Products Available</h5>
+                            <p class="mb-0">Check back soon for our latest offers!</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
     <!-- Product Area End -->
+
 @endsection

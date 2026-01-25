@@ -58,14 +58,20 @@ class ProductDetailController extends Controller
     {
         try {
             $product = Product::with(['category', 'brand'])
-                ->find($id);
+                ->findOrFail($id);
 
-            return view('product_detail', compact('product'));
+            $relatedProducts = Product::where('category_id', $product->category_id)
+                ->where('id', '!=', $product->id)
+                ->where('status', 'active')
+                ->take(4)
+                ->get();
+
+            return view('product_detail', compact('product', 'relatedProducts'));
 
         } catch (Exception $e) {
-            Log::error('Error in Fetch Single Product ', $e->getMessage());
+            Log::error('Error in Fetch Single Product: '.$e->getMessage());
 
-            return redirect()->back();
+            return redirect()->back()->with('error', 'Something went wrong');
         }
     }
 }

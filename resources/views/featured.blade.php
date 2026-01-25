@@ -34,7 +34,8 @@
                         </div>
                         <div class="card-body d-flex flex-column bg-dark text-white p-4">
                             <h5 class="card-title mb-3 fw-bold">
-                                <a href="single-product.html" class="text-white text-decoration-none stretched-link">
+                                <a href="{{ route('product.detail', $product->id) }}"
+                                    class="text-white text-decoration-none stretched-link">
                                     {{ Str::limit($product->product_name, 50) }}
                                 </a>
                             </h5>
@@ -60,8 +61,8 @@
                                     </span>
                                 @endif
                             </div>
-                            <a href="single-product-variable.html" class="btn btn-primary w-100 py-2 position-relative"
-                                style="z-index: 2;">
+                            <a href="{{ route('product.detail', $product->id) }}"
+                                class="btn btn-primary w-100 py-2 position-relative" style="z-index: 2;">
                                 <i class="bi bi-cart-plus me-2"></i>Shop Now
                             </a>
                         </div>
