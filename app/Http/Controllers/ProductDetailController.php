@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -72,6 +74,45 @@ class ProductDetailController extends Controller
             Log::error('Error in Fetch Single Product: '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Something went wrong');
+        }
+    }
+
+    /**
+     * Function for Show Category wise product
+     */
+    public function CategoryWiseProduct($id)
+    {
+        try {
+            $category = Category::findOrFail($id);
+            $products = Product::with(['brand', 'category'])
+                ->where('category_id', $id)
+                ->paginate(10);
+
+            return view('category_wise', compact('products', 'category'));
+        } catch (Exception $e) {
+            Log::error('Error in Fetch Category wise product: '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'Error in Fetch Category wise product');
+        }
+    }
+
+    /**
+     * Function for Show brand Wise Product
+     */
+    public function BrandWiseProduct($id)
+    {
+        try {
+            $brand = Brand::findOrFail($id);
+            $products = Product::with(['category', 'brand'])
+                ->where('brand_id', $id)
+                ->paginate(10);
+
+            return view('brand_wise', compact('products', 'brand'));
+
+        } catch (Exception $e) {
+            Log::error('Error in fetch Brand Wise Product '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'Error in fetch Brand Wise Product');
         }
     }
 }

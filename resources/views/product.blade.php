@@ -121,7 +121,7 @@
                     <a href="#">${categoryName}</a>
                 </span>
                 <h5 class="title" style="min-height: 3rem;">
-                    <a href="single-product.html" class="d-block" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal;">${productName}</a>
+                    <a href="/product/detail/${product.id}" class="d-block" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal;">${productName}</a>
                 </h5>
                 <span class="price mt-auto">
                     ${hasDiscount ? `<span class="old text-muted text-decoration-line-through me-2">$${sellingPrice.toFixed(2)}</span>` : ''}
