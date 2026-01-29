@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProductDetailController extends Controller
@@ -62,6 +63,7 @@ class ProductDetailController extends Controller
             $product = Product::with(['category', 'brand'])
                 ->findOrFail($id);
 
+            // For Show Related products
             $relatedProducts = Product::where('category_id', $product->category_id)
                 ->where('id', '!=', $product->id)
                 ->where('status', 'active')
@@ -113,6 +115,116 @@ class ProductDetailController extends Controller
             Log::error('Error in fetch Brand Wise Product '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Error in fetch Brand Wise Product');
+        }
+    }
+
+    /**
+     * Function for Show Category Wise Product Sorting
+     */
+    public function CategoryWiseSorting($id)
+    {
+        try {
+            $baseQuery = Product::with(['brand', 'category'])
+                ->where('category_id', $id);
+
+            $ascOrder = (clone $baseQuery)
+                ->orderBy('product_name', 'ASC')
+                ->get();
+
+            $descOrder = (clone $baseQuery)
+                ->orderBy('product_name', 'DESC')
+                ->get();
+
+            $ascPrice = (clone $baseQuery)
+                ->orderBy(DB::raw('(selling_price - discount_price)'), 'ASC')
+                ->get();
+
+            $descPrice = (clone $baseQuery)
+                ->orderBy(DB::raw('(selling_price - discount_price)'), 'DESC')
+                ->get();
+
+            $latest = (clone $baseQuery)
+                ->latest()
+                ->get();
+
+            $oldest = (clone $baseQuery)
+                ->oldest()
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully Fetch Category Wise Product',
+                'asc' => $ascOrder,
+                'desc' => $descOrder,
+                'ascPrice' => $ascPrice,
+                'descPrice' => $descPrice,
+                'latest' => $latest,
+                'oldest' => $oldest,
+            ], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error in Fetch Product '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error in Fetch Product',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Function for Show Category Wise Product Sorting
+     */
+    public function BrandWiseSorting($id)
+    {
+        try {
+            $baseQuery = Product::with(['brand', 'category'])
+                ->where('brand_id', $id);
+
+            $ascOrder = (clone $baseQuery)
+                ->orderBy('product_name', 'ASC')
+                ->get();
+
+            $descOrder = (clone $baseQuery)
+                ->orderBy('product_name', 'DESC')
+                ->get();
+
+            $ascPrice = (clone $baseQuery)
+                ->orderBy(DB::raw('(selling_price - discount_price)'), 'ASC')
+                ->get();
+
+            $descPrice = (clone $baseQuery)
+                ->orderBy(DB::raw('(selling_price - discount_price)'), 'DESC')
+                ->get();
+
+            $latest = (clone $baseQuery)
+                ->latest()
+                ->get();
+
+            $oldest = (clone $baseQuery)
+                ->oldest()
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully Fetch Brand Wise Product',
+                'asc' => $ascOrder,
+                'desc' => $descOrder,
+                'ascPrice' => $ascPrice,
+                'descPrice' => $descPrice,
+                'latest' => $latest,
+                'oldest' => $oldest,
+            ], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error in Fetch Product '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error in Fetch Product',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }

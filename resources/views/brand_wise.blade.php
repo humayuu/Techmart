@@ -33,12 +33,14 @@
                                     <button class="dropdown-toggle header-action-btn" data-bs-toggle="dropdown">Default <i
                                             class="fa fa-angle-down"></i></button>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a class="dropdown-item" href="#">Name, A to Z</a></li>
-                                        <li><a class="dropdown-item" href="#">Name, Z to A</a></li>
-                                        <li><a class="dropdown-item" href="#">Price, low to high</a></li>
-                                        <li><a class="dropdown-item" href="#">Price, high to low</a></li>
-                                        <li><a class="dropdown-item" href="#">Sort By new</a></li>
-                                        <li><a class="dropdown-item" href="#">Sort By old</a></li>
+                                        <li><button onclick="SortByASC()" class="dropdown-item">Name, A to Z</button></li>
+                                        <li><button onclick="SortByDESC()" class="dropdown-item">Name, Z to A</button></li>
+                                        <li><button onclick="SortByPriceASC()" class="dropdown-item">Price, low to
+                                                high</button></li>
+                                        <li><button onclick="SortByPriceDESC()" class="dropdown-item">Price, high to
+                                                low</button></li>
+                                        <li><button onclick="SortByLatest()" class="dropdown-item">Sort By new</button></li>
+                                        <li><button onclick="SortByOldest()" class="dropdown-item">Sort By old</button></li>
                                     </ul>
                                 </div>
                                 <!-- Single Wedge Start -->
@@ -59,7 +61,8 @@
                                                         <!-- Single Prodect -->
                                                         <div class="product">
                                                             <div class="thumb">
-                                                                <a href="single-product.html" class="image">
+                                                                <a href="{{ route('product.detail', $item->id) }}"
+                                                                    class="image">
                                                                     <img src="{{ asset('images/products/' . $item->product_thumbnail) }}"
                                                                         alt="Product" />
                                                                     <img class="hover-image"
@@ -117,7 +120,8 @@
                                                         <div class="col-md-5 col-lg-5 col-xl-4 mb-lm-30px">
                                                             <div class="product">
                                                                 <div class="thumb">
-                                                                    <a href="single-product.html" class="image">
+                                                                    <a href="{{ route('product.detail', $tabProduct->id) }}"
+                                                                        class="image">
                                                                         <img src="{{ asset('images/products/' . $tabProduct->product_thumbnail) }}"
                                                                             alt="Product" />
                                                                         <img class="hover-image"
@@ -133,7 +137,7 @@
                                                                     <span class="category"><a
                                                                             href="#">{{ $tabProduct->category->category_name }}</a></span>
                                                                     <h5 class="title"><a
-                                                                            href="single-product.html">{{ $tabProduct->product_name }}</a>
+                                                                            href="{{ route('product.detail', $tabProduct->id) }}">{{ $tabProduct->product_name }}</a>
                                                                     </h5>
                                                                     <p>{{ $tabProduct->short_description }}</p>
                                                                 </div>
@@ -197,4 +201,156 @@
         </div>
         <!-- Shop Page End  -->
     </div>
+
+    <script>
+        const id = {{ Js::from($brand->id) }};
+
+        // Function to render products in grid view
+        const renderGridProducts = (products) => {
+            let html = '';
+            products.forEach(item => {
+                const finalPrice = item.discount_price > 0 ?
+                    item.selling_price - item.discount_price :
+                    item.selling_price;
+
+                html += `
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-6 mb-30px">
+                    <div class="product">
+                        <div class="thumb">
+                            <a href="/product/detail/${item.id}" class="image">
+                                <img src="/images/products/${item.product_thumbnail}" alt="Product" />
+                                <img class="hover-image" src="/images/products/${item.product_thumbnail}" alt="Product" />
+                            </a>
+                        </div>
+                        <div class="content">
+                            <span class="category"><a href="#"> ${item.category.category_name}</a></span>
+                            <h5 class="title"><a href="/product/detail/${item.id}">${item.product_name}</a></h5>
+                            <span class="price">
+                                ${item.discount_price > 0 ? `<span class="old">$${item.selling_price}</span>` : ''}
+                                <span class="new">$${finalPrice}</span>
+                            </span>
+                        </div>
+                        <div class="actions">
+                            <button title="Add To Cart" class="action add-to-cart" data-bs-toggle="modal" data-bs-target="#exampleModal-Cart">
+                                <i class="pe-7s-shopbag"></i>
+                            </button>
+                            <button class="action wishlist" title="Wishlist" data-bs-toggle="modal" data-bs-target="#exampleModal-Wishlist">
+                                <i class="pe-7s-like"></i>
+                            </button>
+                            <button class="action quickview" data-link-action="quickview" title="Quick view" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <i class="pe-7s-look"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+            return html;
+        };
+
+        // Function to render products in list view
+        const renderListProducts = (products) => {
+            let html = '';
+            products.forEach(item => {
+                const finalPrice = item.discount_price > 0 ?
+                    item.selling_price - item.discount_price :
+                    item.selling_price;
+
+                html += `
+                <div class="row">
+                    <div class="col-md-5 col-lg-5 col-xl-4 mb-lm-30px">
+                        <div class="product">
+                            <div class="thumb">
+                                <a href="/product/detail/${item.id}" class="image">
+                                    <img src="/images/products/${item.product_thumbnail}" alt="Product" />
+                                    <img class="hover-image" src="/images/products/${item.product_thumbnail}" alt="Product" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-lg-7 col-xl-8">
+                        <div class="content-desc-wrap">
+                            <div class="content">
+                                <span class="category"><a href="#">${item.category.category_name}</a></span>
+                                <h5 class="title"><a href="/product/detail/${item.id}">${item.product_name}</a></h5>
+                                <p>${item.short_description || ''}</p>
+                            </div>
+                            <div class="box-inner">
+                                <span class="price">
+                                    ${item.discount_price > 0 ? `<span class="old">$${item.selling_price}</span>` : ''}
+                                    <span class="new">$${finalPrice}</span>
+                                </span>
+                                <div class="actions">
+                                    <button title="Add To Cart" class="action add-to-cart" data-bs-toggle="modal" data-bs-target="#exampleModal-Cart">
+                                        <i class="pe-7s-shopbag"></i>
+                                    </button>
+                                    <button class="action wishlist" title="Wishlist" data-bs-toggle="modal" data-bs-target="#exampleModal-Wishlist">
+                                        <i class="pe-7s-like"></i>
+                                    </button>
+                                    <button class="action quickview" data-link-action="quickview" title="Quick view" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        <i class="pe-7s-look"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+            return html;
+        };
+
+        // Main sorting function
+        const sortProducts = async (sortType) => {
+            try {
+                const response = await fetch(`/product/brand/${id}/sorting`);
+                const data = await response.json();
+
+                if (!data.status) {
+                    console.error('Error:', data.message);
+                    return;
+                }
+
+                // Get the products based on sort type
+                let products;
+                switch (sortType) {
+                    case 'asc':
+                        products = data.asc;
+                        break;
+                    case 'desc':
+                        products = data.desc;
+                        break;
+                    case 'price_asc':
+                        products = data.ascPrice;
+                        break;
+                    case 'price_desc':
+                        products = data.descPrice;
+                        break;
+                    case 'latest':
+                        products = data.latest;
+                        break;
+                    case 'oldest':
+                        products = data.oldest;
+                        break;
+                    default:
+                        products = data.latest;
+                }
+
+                // Update both grid and list views
+                document.querySelector('#shop-grid .row').innerHTML = renderGridProducts(products);
+                document.querySelector('#shop-list .shop-list-wrapper').innerHTML = renderListProducts(products);
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        // Individual sort functions
+        const SortByASC = () => sortProducts('asc');
+        const SortByDESC = () => sortProducts('desc');
+        const SortByPriceASC = () => sortProducts('price_asc');
+        const SortByPriceDESC = () => sortProducts('price_desc');
+        const SortByLatest = () => sortProducts('latest');
+        const SortByOldest = () => sortProducts('oldest');
+    </script>
 @endsection

@@ -268,7 +268,9 @@
                             <ul>
                                 <ul>
                                     @forelse ($categories as $category)
-                                        <li><a href="">{{ $category->category_name }}</a></li>
+                                        <li><a
+                                                href="{{ route('category.wise.product', $category->id) }}">{{ $category->category_name }}</a>
+                                        </li>
                                     @empty
                                         <span class="text-center text-danger">No Category Found!</span>
                                     @endforelse
