@@ -40,13 +40,18 @@
                                     <li>
                                         <a href="my-account.html"><i class="fa fa-envelope"></i> Contact us</a>
                                     </li>
-                                    <li>
-                                        <a href="my-account.html"><i class="fa fa-user"></i> My Account</a>
-                                    </li>
+                                    @if (Auth::check())
+                                        <li>
+                                            <a href="{{ route('profile.edit') }}"><i class="fa fa-user"></i> My
+                                                Account</a>
+                                        </li>
+                                    @endif
+                                    @if (!Auth::check())
+                                        <li>
+                                            <a href="{{ route('login') }}"><i class="fa fa-sign-in"></i> Sign In</a>
+                                        </li>
+                                    @endif
 
-                                    <li>
-                                        <a href="login.html"><i class="fa fa-sign-in"></i> Sign In</a>
-                                    </li>
 
 
                                 </ul>
