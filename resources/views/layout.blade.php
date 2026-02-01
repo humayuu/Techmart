@@ -48,7 +48,8 @@
                                     @endif
                                     @if (!Auth::check())
                                         <li>
-                                            <a href="{{ route('login') }}"><i class="fa fa-sign-in"></i> Sign In</a>
+                                            <a href="{{ route('login') }}"><i class="fa fa-sign-in"></i> Sign In Or
+                                                Register</a>
                                         </li>
                                     @endif
 

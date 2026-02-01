@@ -113,6 +113,8 @@
                                                 value="{{ old('name') }}" autofocus />
                                             <input type="email" name="email" placeholder="Email"
                                                 value="{{ old('email') }}" />
+                                            <input type="text" name="phone" placeholder="Phone"
+                                                value="{{ old('phone') }}" />
                                             <input type="password" name="password" placeholder="Password" />
                                             <input type="password" name="password_confirmation"
                                                 placeholder="Confirm Password" />

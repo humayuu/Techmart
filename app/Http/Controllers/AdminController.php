@@ -15,20 +15,19 @@ class AdminController extends Controller
         return view('admin.login');
     }
 
-
     /**
-     * Admin Logged In 
-     * 
+     * Admin Logged In
      */
     public function Login(Request $request)
     {
         $request->validate([
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
             $request->session()->regenerate();
+
             return redirect()->route('admin.dashboard');
         }
 
@@ -47,13 +46,12 @@ class AdminController extends Controller
 
     /**
      * Function Admin logout
-     * 
      */
     public function AdminLogout(Request $request)
     {
         Auth::guard('admin')->logout();
 
-        $request->session()->invalidate();
+        // $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         $notification = [

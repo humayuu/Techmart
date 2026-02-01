@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SliderController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -37,6 +38,9 @@ Route::prefix('admin')->group(function () {
         // Slider Routes
         Route::resource('slider', SliderController::class);
         Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
+
+        // User Routes
+        Route::resource('user', UserController::class);
     });
 });
 

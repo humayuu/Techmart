@@ -247,6 +247,18 @@
                         </li>
                     </ul>
                 </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Users</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="{{ route('user.index') }}"><i class="bi bi-circle"></i>All Users</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!--end navigation-->
         </aside>
@@ -327,7 +339,7 @@
                 }
             @endif
 
-            // Category DataTable Initialization
+            // DataTable Initialization
             $(document).ready(function() {
                 $('#categoryTable').DataTable({
                     serverSide: true,
@@ -472,8 +484,44 @@
                         }
                     ]
                 });
+                $(document).ready(function() {
+                    $('#userTable').DataTable({
+                        serverSide: true,
+                        processing: true,
+                        ajax: {
+                            url: "{{ route('user.index') }}"
+                        },
+                        columns: [{
+                                data: 'DT_RowIndex',
+                                name: 'DT_RowIndex',
+                                orderable: false,
+                                searchable: false
+                            },
+                            {
+                                data: 'name',
+                                name: 'name'
+                            },
+                            {
+                                data: 'email',
+                                name: 'email'
+                            },
+                            {
+                                data: 'phone',
+                                name: 'phone'
+                            },
+                            {
+                                data: 'last_seen',
+                                name: 'last_seen'
+                            },
+                            {
+                                data: 'status',
+                                name: 'status'
+                            },
+                        ]
+                    });
 
 
+                });
             });
         </script>
 
