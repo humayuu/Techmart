@@ -20,8 +20,12 @@ Route::prefix('admin')->group(function () {
         Route::get('/', 'AdminLogin')->name('admin.login.page')->middleware('is-LoggedIn');
         Route::get('logout', 'AdminLogout')->name('admin.logout');
         Route::get('dashboard', 'AdminDashboard')->name('admin.dashboard')->middleware('admin-check');
+        Route::get('profile/detail', 'AdminProfileDetail')->name('admin.profile.detail');
+        Route::get('profile/change/password', 'AdminChangePassword')->name('admin.change.password');
 
         Route::post('login', 'Login')->name('admin.login');
+        Route::put('profile/detail/update', 'AdminProfileUpdate')->name('admin.profile.update');
+        Route::put('profile/password/update', 'AdminPasswordUpdate')->name('admin.password.update');
     });
 
     Route::middleware('admin-check')->group(function () {

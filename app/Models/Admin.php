@@ -10,6 +10,8 @@ class Admin extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
+    protected $table = 'admins';
+
     /**
      * The attributes that are mass assignable.
      *

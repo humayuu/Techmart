@@ -145,7 +145,8 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="pages-user-profile.html">
+                            <a href="{{ route('admin.profile.detail') }}" class="dropdown-item"
+                                href="pages-user-profile.html">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-person-fill"></i></div>
                                     <div class="ms-3"><span>Profile</span></div>
@@ -153,7 +154,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a href="{{ route('admin.change.password') }}" class="dropdown-item" href="#">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-gear-fill"></i></div>
                                     <div class="ms-3"><span>Change Password</span></div>
