@@ -23,6 +23,9 @@
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
+    {{-- font-awesome icon --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 
     <title>TechMart Admin Dashboard</title>
 </head>
@@ -179,7 +182,7 @@
         <!--end top header-->
 
         <!--start sidebar -->
-        <aside class="sidebar-wrapper" data-simplebar="true">
+        <aside class="sidebar-wrapper">
             <div class="sidebar-header">
                 <div>
                 </div>
@@ -189,158 +192,165 @@
                 <div class="toggle-icon ms-auto"><i class="bi bi-list"></i></div>
             </div>
             <!--navigation-->
-            <ul class="metismenu" id="menu">
-                <li>
-                    <a href="{{ route('admin.dashboard') }}">
-                        <div class="parent-icon"><i class="bi bi-house-fill"></i></div>
-                        <div class="menu-title">Dashboard</div>
-                    </a>
-                </li>
-                <li class="menu-label">Main Menu</li>
+            <div class="overflow-auto" style="height: calc(100vh - 80px);">
+                <ul class="metismenu" id="menu">
+                    <li>
+                        <a href="{{ route('admin.dashboard') }}">
+                            <div class="parent-icon"><i class="fas fa-home"></i></div>
+                            <div class="menu-title">Dashboard</div>
+                        </a>
+                    </li>
+                    <li class="menu-label">Main Menu</li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-briefcase-fill"></i></div>
-                        <div class="menu-title">Manage Brands</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="{{ route('brand.index') }}"><i class="bi bi-circle"></i>All Brands</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-tag"></i></div>
+                            <div class="menu-title">Manage Brands</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('brand.index') }}"><i class="far fa-circle"></i>All Brands</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-grid-fill"></i></div>
-                        <div class="menu-title">Manage Categories</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="{{ route('category.index') }}"><i class="bi bi-circle"></i>All Categories</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-th-large"></i></div>
+                            <div class="menu-title">Manage Categories</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('category.index') }}"><i class="far fa-circle"></i>All
+                                    Categories</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-cart-fill"></i></div>
-                        <div class="menu-title">Manage Products</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="{{ route('product.index') }}"><i class="bi bi-circle"></i>All Products</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('product.create') }}"><i class="bi bi-circle"></i>Add Products</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="menu-title">Manage Products</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('product.index') }}"><i class="far fa-circle"></i>All Products</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('product.create') }}"><i class="far fa-circle"></i>Add Products</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-badge-ad-fill"></i></div>
-                        <div class="menu-title">Manage Sliders</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="{{ route('slider.index') }}"><i class="bi bi-circle"></i>All Sliders</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-images"></i></div>
+                            <div class="menu-title">Manage Sliders</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('slider.index') }}"><i class="far fa-circle"></i>All Sliders</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Users</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="{{ route('user.index') }}"><i class="bi bi-circle"></i>All Users</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-users"></i></div>
+                            <div class="menu-title">Manage Users</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('user.index') }}"><i class="far fa-circle"></i>All Users</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Coupons</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-ticket-alt"></i></div>
+                            <div class="menu-title">Manage Coupons</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Coupons</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Shipping Area</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Orders</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Stock</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Return Orders</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Reviews</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-shipping-fast"></i></div>
+                            <div class="menu-title">Shipping Area</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Shipping Areas</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <li>
-                    <a href="javascript:;" class="has-arrow">
-                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
-                        <div class="menu-title">Manage Settings</div>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-circle"></i>All</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-shopping-bag"></i></div>
+                            <div class="menu-title">Manage Orders</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Orders</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-boxes"></i></div>
+                            <div class="menu-title">Manage Stock</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Stock</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-undo-alt"></i></div>
+                            <div class="menu-title">Manage Return Orders</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Return Orders</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-star"></i></div>
+                            <div class="menu-title">Manage Reviews</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Reviews</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-cog"></i></div>
+                            <div class="menu-title">Manage Settings</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Settings</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
             <!--end navigation-->
         </aside>
         <!--end sidebar -->
