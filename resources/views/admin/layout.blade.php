@@ -345,7 +345,9 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="#"><i class="far fa-circle"></i>All Settings</a>
+                                <a href="{{ route('settings.index') }}"><i class="far fa-circle"></i>Site
+                                    Settings</a>
+                                <a href="#"><i class="far fa-circle"></i>Seo Settings</a>
                             </li>
                         </ul>
                     </li>

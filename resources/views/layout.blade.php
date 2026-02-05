@@ -12,7 +12,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend/assets/images/favicon.ico') }}" />
     <!-- CSS ============================================ -->
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('frontend/assets/css/font.awesome.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/pe-icon-7-stroke.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/animate.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/swiper-bundle.min.css') }}" />
@@ -20,6 +19,10 @@
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/jquery-ui.min.css') }}" />
     <!-- Style CSS -->
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/style.css') }}" />
+    {{-- Font awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -64,13 +67,16 @@
             </div>
             <!-- Header top area end -->
             <!-- Header action area start -->
+            @php
+                $setting = \App\Models\Setting::findOrFail(1);
+            @endphp
             <div class="header-bottom d-none d-lg-block">
                 <div class="container">
                     <div class="row justify-content-between align-items-center">
                         <div class="col-lg-3 col">
                             <div class="header-logo">
                                 <a href="{{ url('/') }}" class="text-decoration-none fw-bold display-5">
-                                    Tech<span class="fw-normal">Mart</span>
+                                    {{ $setting->company_name }}
                                 </a>
                             </div>
                         </div>
@@ -113,7 +119,7 @@
                         <div class="col-lg-3 col">
                             <div class="header-logo">
                                 <a href="{{ url('/') }}" class="text-decoration-none fw-bold display-5">
-                                    Tech<span class="fw-normal">Mart</span>
+                                    {{ $setting->company_name }}
                                 </a>
                             </div>
                         </div>
@@ -320,35 +326,30 @@
                             <!-- About Section -->
                             <div class="col-md-6 col-lg-5 mb-4 mb-lg-0 text-center">
                                 <div class="single-wedge">
-                                    <h4 class="footer-herading mb-3">About TechMart</h4>
+                                    <h4 class="footer-herading mb-3">About {{ $setting->company_name }}</h4>
                                     <p>
-                                        Lorem ipsum dolor sit amet consl adipisi elit, sed do
-                                        eiusmod templ incididunt ut labore
+                                        {{ $setting->description }}
                                     </p>
                                     <ul class="link-follow list-unstyled d-flex justify-content-center gap-3 mb-0">
                                         <li>
                                             <a class="d-inline-block" title="Facebook" target="_blank"
-                                                rel="noopener noreferrer" href="#">
-                                                <i class="fa fa-facebook" aria-hidden="true"></i>
-                                            </a>
+                                                rel="noopener noreferrer" href="{{ $setting->facebook }}">
+                                                <i class="fa-brands fa-facebook-f"></i> </a>
                                         </li>
                                         <li>
                                             <a class="d-inline-block" title="Twitter" target="_blank"
-                                                rel="noopener noreferrer" href="#">
-                                                <i class="fa fa-twitter" aria-hidden="true"></i>
-                                            </a>
+                                                rel="noopener noreferrer" href="{{ $setting->x }}">
+                                                <i class="fa-brands fa-x-twitter"></i> </a>
                                         </li>
                                         <li>
-                                            <a class="d-inline-block" title="Tumblr" target="_blank"
-                                                rel="noopener noreferrer" href="#">
-                                                <i class="fa fa-tumblr" aria-hidden="true"></i>
-                                            </a>
+                                            <a class="d-inline-block" title="Linkedin" target="_blank"
+                                                rel="noopener noreferrer" href="{{ $setting->linkedin }}">
+                                                <i class="fa-brands fa-linkedin"></i> </a>
                                         </li>
                                         <li>
-                                            <a class="d-inline-block" title="Instagram" target="_blank"
-                                                rel="noopener noreferrer" href="#">
-                                                <i class="fa fa-instagram" aria-hidden="true"></i>
-                                            </a>
+                                            <a class="d-inline-block" title="Youtube" target="_blank"
+                                                rel="noopener noreferrer" href="{{ $setting->youtube }}">
+                                                <i class="fa-brands fa-youtube"></i> </a>
                                         </li>
                                     </ul>
                                 </div>
@@ -361,16 +362,16 @@
                                     <div class="footer-links">
                                         <p class="address mb-2">
                                             <i class="fa fa-map-marker me-2"></i>
-                                            <strong>Address:</strong> Your Address Goes Here
+                                            <strong>Address:</strong> {{ $setting->company_address }}
                                         </p>
                                         <p class="phone mb-2">
                                             <i class="fa fa-phone me-2"></i>
-                                            <strong>Phone:</strong> <a href="tel:0123456789">0123456789</a>
+                                            <strong>Phone:</strong> <a href="tel:0123456789">{{ $setting->phone }}</a>
                                         </p>
                                         <p class="mail mb-2">
                                             <i class="fa fa-envelope me-2"></i>
                                             <strong>Email:</strong> <a
-                                                href="mailto:demo@example.com">demo@example.com</a>
+                                                href="mailto:{{ $setting->email }}">{{ $setting->email }}</a>
                                         </p>
                                     </div>
                                 </div>

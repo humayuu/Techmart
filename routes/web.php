@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\UserController;
@@ -46,6 +47,9 @@ Route::prefix('admin')->group(function () {
 
         // User Routes
         Route::resource('user', UserController::class);
+
+        // Setting Routes
+        Route::resource('settings', SettingController::class);
     });
 });
 
