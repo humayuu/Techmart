@@ -260,6 +260,86 @@
                         </li>
                     </ul>
                 </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Coupons</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Shipping Area</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Orders</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Stock</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Return Orders</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Reviews</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bi bi-people-fill"></i></div>
+                        <div class="menu-title">Manage Settings</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="bi bi-circle"></i>All</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!--end navigation-->
         </aside>
