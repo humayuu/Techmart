@@ -16,7 +16,7 @@ Route::get('/', function () {
     return view('index');
 });
 
-// Admin Auth Routes
+// Admin All Routes
 Route::prefix('admin')->group(function () {
     Route::controller(AdminController::class)->group(function () {
         Route::get('/', 'AdminLogin')->name('admin.login.page')->middleware('is-LoggedIn');
@@ -31,25 +31,17 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware('admin-check')->group(function () {
-        // Brand Routes
         Route::resource('brand', BrandController::class);
-
-        // Category Routes
         Route::resource('category', CategoryController::class);
+        Route::resource('user', UserController::class);
+        Route::resource('settings', SettingController::class);
 
-        // Product Routes
         Route::resource('product', ProductController::class);
         Route::get('product/status/{id}', [ProductController::class, 'ProductStatus'])->name('product.status');
 
-        // Slider Routes
         Route::resource('slider', SliderController::class);
         Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
 
-        // User Routes
-        Route::resource('user', UserController::class);
-
-        // Setting Routes
-        Route::resource('settings', SettingController::class);
     });
 });
 
@@ -64,7 +56,7 @@ Route::prefix('product')->group(function () {
 
         Route::get('brand/{id}', 'BrandWiseProduct')->name('brand.wise.product');
         Route::get('brand/{id}/sorting', 'BrandWiseSorting');
-
+        Route::get('/quick/{id}', 'QuickShow');
     });
 });
 
@@ -84,6 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// 404 Page
 Route::fallback(function () {
     return view('errors.404');
 });

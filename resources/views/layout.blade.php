@@ -386,7 +386,10 @@
                         <div class="row align-items-center py-3">
                             <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                                 <p class="copy-text mb-0">
-                                    © 2026 <strong>TechMart</strong>. All Rights Reserved.
+                                    © {{ now()->format('Y') }}
+                                    <strong>{{ $setting->company_name }}</strong>. All
+                                    Rights
+                                    Reserved.
                                 </p>
                             </div>
                             <div class="col-md-6 text-center text-md-end">

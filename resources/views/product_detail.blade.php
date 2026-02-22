@@ -74,14 +74,6 @@
                         </div>
                         <p class="mt-30px">{{ $product->short_description }}</p>
                         <div class="pro-details-categories-info pro-details-same-style d-flex m-0">
-                            <span>Product Code:</span>
-                            <ul class="d-flex">
-                                <li>
-                                    <a href="#">{{ $product->product_code }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="pro-details-categories-info pro-details-same-style d-flex m-0">
                             <span>Category: </span>
                             <ul class="d-flex">
                                 <li>
@@ -101,8 +93,7 @@
                             <span>Tags: </span>
                             <ul class="d-flex">
                                 <li>
-                                    <span
-                                        class="text-dark">{{ Str::replaceFirst(' ', ',', $product->product_tags) }}</span>
+                                    <span class="text-dark">{{ Str::replaceFirst(' ', ',', $product->product_tags) }}</span>
                                 </li>
                             </ul>
                         </div>

@@ -102,7 +102,7 @@
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#exampleModal-Wishlist"><i
                                                                         class="pe-7s-like"></i></button>
-                                                                <button class="action quickview"
+                                                                <button onclick="QuickView()" class="action quickview"
                                                                     data-link-action="quickview" title="Quick view"
                                                                     data-bs-toggle="modal" data-bs-target="#exampleModal"><i
                                                                         class="pe-7s-look"></i></button>

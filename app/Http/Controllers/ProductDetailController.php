@@ -227,4 +227,14 @@ class ProductDetailController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * For Quick Show
+     */
+    public function QuickShow($id)
+    {
+        $product = Product::with(['brand', 'category'])->findOrFail($id);
+
+        return response()->json($product);
+    }
 }

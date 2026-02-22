@@ -60,49 +60,6 @@
                         <li class="nav-item dropdown dropdown-large">
                             <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
                                 data-bs-toggle="dropdown">
-                                <div class="projects">
-                                    <i class="bi bi-grid-3x3-gap-fill"></i>
-                                </div>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <div class="row row-cols-3 gx-2">
-                                    <div class="col">
-                                        <a href="ecommerce-orders.html">
-                                            <div class="apps p-2 radius-10 text-center">
-                                                <div class="apps-icon-box mb-1 text-white bg-gradient-purple">
-                                                    <i class="bi bi-basket2-fill"></i>
-                                                </div>
-                                                <p class="mb-0 apps-name">Orders</p>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col">
-                                        <a href="javascript:;">
-                                            <div class="apps p-2 radius-10 text-center">
-                                                <div class="apps-icon-box mb-1 text-white bg-gradient-info">
-                                                    <i class="bi bi-people-fill"></i>
-                                                </div>
-                                                <p class="mb-0 apps-name">Users</p>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col">
-                                        <a href="ecommerce-products-grid.html">
-                                            <div class="apps p-2 radius-10 text-center">
-                                                <div class="apps-icon-box mb-1 text-white bg-gradient-success">
-                                                    <i class="bi bi-trophy-fill"></i>
-                                                </div>
-                                                <p class="mb-0 apps-name">Products</p>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                                <!--end row-->
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown dropdown-large">
-                            <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
-                                data-bs-toggle="dropdown">
                                 <div class="notifications">
                                     <span class="notify-badge">8</span>
                                     <i class="bi bi-bell-fill"></i>
@@ -265,6 +222,17 @@
                             </li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="javascript:;" class="has-arrow">
+                            <div class="parent-icon"><i class="fas fa-user"></i></div>
+                            <div class="menu-title">Manage Admin Users</div>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Users</a>
+                            </li>
+                        </ul>
+                    </li>
 
                     <li>
                         <a href="javascript:;" class="has-arrow">
@@ -317,7 +285,7 @@
                     <li>
                         <a href="javascript:;" class="has-arrow">
                             <div class="parent-icon"><i class="fas fa-undo-alt"></i></div>
-                            <div class="menu-title">Manage Return Orders</div>
+                            <div class="menu-title">Return Orders</div>
                         </a>
                         <ul>
                             <li>

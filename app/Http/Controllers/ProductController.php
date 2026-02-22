@@ -86,8 +86,8 @@ class ProductController extends Controller
                             data-bs-placement="bottom" title="Edit info">
                             <i class="bi bi-hand-'.$icon.'-fill"></i>
                             </a>
-                            
-                            
+
+
                             <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
                             '.csrf_field().'
                                 '.method_field('DELETE').'

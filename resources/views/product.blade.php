@@ -106,12 +106,12 @@
         <div class="product h-100 d-flex flex-column">
             <div class="thumb position-relative overflow-hidden d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
                 <a href="/product/detail/${product.id}" class="image">
-                    <img src="${imagePath}" 
-                         alt="${product.product_name}" 
-                         class="img-fluid" 
+                    <img src="${imagePath}"
+                         alt="${product.product_name}"
+                         class="img-fluid"
                          style="max-height: 250px; object-fit: contain;" />
-                    <img class="hover-image img-fluid" 
-                         src="${imagePath}" 
+                    <img class="hover-image img-fluid"
+                         src="${imagePath}"
                          alt="${product.product_name}"
                          style="max-height: 250px; object-fit: contain;" />
                 </a>
@@ -137,7 +137,7 @@
                     data-bs-target="#exampleModal-Wishlist">
                     <i class="pe-7s-like"></i>
                 </button>
-                <button class="action quickview btn btn-sm" data-link-action="quickview" title="Quick view"
+                <button onclick="QuickView(${product.id})" class="action quickview btn btn-sm" data-link-action="quickview" title="Quick view"
                     data-bs-toggle="modal" data-bs-target="#exampleModal">
                     <i class="pe-7s-look"></i>
                 </button>
