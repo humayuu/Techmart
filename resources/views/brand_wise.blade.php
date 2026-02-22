@@ -94,7 +94,8 @@
                                                                 </span>
                                                             </div>
                                                             <div class="actions">
-                                                                <button title="Add To Cart" class="action add-to-cart"
+                                                                <button onclick="AddToCart({{ $item->id }})"
+                                                                    title="Add To Cart" class="action add-to-cart"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#exampleModal-Cart"><i
                                                                         class="pe-7s-shopbag"></i></button>
@@ -160,8 +161,8 @@
                                                                         @endif
                                                                     </span>
                                                                     <div class="actions">
-                                                                        <button title="Add To Cart"
-                                                                            class="action add-to-cart"
+                                                                        <button onclick="AddToCart({{ $tabProduct->id }})"
+                                                                            title="Add To Cart" class="action add-to-cart"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#exampleModal-Cart"><i
                                                                                 class="pe-7s-shopbag"></i></button>
@@ -204,6 +205,9 @@
         <!-- Shop Page End  -->
         {{-- For Product Quick Show --}}
         @include('product_quick_view')
+
+        {{-- For Add To Cart --}}
+        @include('add-to-cart')
     </div>
 
     <script>

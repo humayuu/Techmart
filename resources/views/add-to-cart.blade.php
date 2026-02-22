@@ -1,18 +1,5 @@
-@extends('layout')
-@section('main')
-    @include('slider')
-    @include('product')
-
-    @include('featured')
-
-    @include('brand')
-
-    @include('product_quick_view')
-
-    @include('add-to-cart')
-
-    <!-- Modal wishlist -->
-    <div class="modal customize-class fade" id="exampleModal-Wishlist" tabindex="-1" aria-hidden="true">
+    <!-- Modal Cart -->
+    <div class="modal customize-class fade" id="exampleModal-Cart" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body text-center">
@@ -20,7 +7,7 @@
                         <i class="pe-7s-close"></i>
                     </button>
                     <div class="tt-modal-messages">
-                        <i class="pe-7s-check"></i> Added to Wishlist successfully!
+                        <i class="pe-7s-check"></i> Added to cart successfully!
                     </div>
                     <div class="tt-modal-product">
                         <div class="tt-img">
@@ -33,4 +20,9 @@
             </div>
         </div>
     </div>
-@endsection
+
+    <script>
+        const AddToCart = () => {
+            console.log('ehllo');
+        }
+    </script>

@@ -129,7 +129,7 @@
                 </span>
             </div>
             <div class="actions d-flex justify-content-center gap-2 mt-3">
-                <button title="Add To Cart" class="action add-to-cart btn btn-sm" data-bs-toggle="modal"
+                <button onclick="AddToCart(${product.id})" title="Add To Cart" class="action add-to-cart btn btn-sm" data-bs-toggle="modal"
                     data-bs-target="#exampleModal-Cart">
                     <i class="pe-7s-shopbag"></i>
                 </button>

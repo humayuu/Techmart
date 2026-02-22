@@ -102,7 +102,7 @@
                                 <input class="cart-plus-minus-box" type="text" name="qtybutton" value="1" />
                             </div>
                             <div class="pro-details-cart">
-                                <button class="add-cart"> Add To
+                                <button onclick="AddToCart({{ $product->id }})" class="add-cart"> Add To
                                     Cart</button>
                             </div>
                             <div class="pro-details-compare-wishlist pro-details-wishlist ">
@@ -348,6 +348,7 @@
             @endif
         </div>
     </div>
+    @include('add-to-cart')
     <!-- Product Area End -->
 
 @endsection
