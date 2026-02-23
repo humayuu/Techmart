@@ -102,7 +102,9 @@
                                 <input class="cart-plus-minus-box" type="text" name="qtybutton" value="1" />
                             </div>
                             <div class="pro-details-cart">
-                                <button onclick="AddToCart({{ $product->id }})" class="add-cart"> Add To
+                                <button onclick="AddToCart({{ $product->id }})" title="Add To Cart" class="add-cart"
+                                    data-bs-toggle="modal" data-bs-target="#exampleModal-Cart">
+                                    Add To
                                     Cart</button>
                             </div>
                             <div class="pro-details-compare-wishlist pro-details-wishlist ">

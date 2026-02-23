@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
@@ -47,6 +48,7 @@ Route::prefix('admin')->group(function () {
 
 // Frontend All Routes
 Route::prefix('product')->group(function () {
+    // Product Details
     Route::controller(ProductDetailController::class)->group(function () {
         Route::get('/', 'ProductFilter');
         Route::get('detail/{id}', 'ProductDetails')->name('product.detail');
@@ -57,6 +59,14 @@ Route::prefix('product')->group(function () {
         Route::get('brand/{id}', 'BrandWiseProduct')->name('brand.wise.product');
         Route::get('brand/{id}/sorting', 'BrandWiseSorting');
         Route::get('/quick/{id}', 'QuickShow');
+    });
+
+    // Add to Cart
+    Route::controller(CartController::class)->group(function () {
+        Route::get('add/to/cart/{id}', 'AddToCart');
+        Route::get('cart/remove/{id}', 'CartRemove');
+
+        Route::get('all/carts', 'ViewAllCart');
     });
 });
 

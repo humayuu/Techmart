@@ -96,11 +96,12 @@
                                     <i class="pe-7s-like"></i>
                                 </a>
                                 <!-- Single Wedge End -->
-                                <a href="#offcanvas-cart"
+                                <a onclick="AllCarts()" href="#offcanvas-cart"
                                     class="header-action-btn header-action-btn-cart offcanvas-toggle pr-0">
                                     <i class="pe-7s-shopbag"></i>
-                                    <span class="header-action-num">01</span>
-                                    <!-- <span class="cart-amount">€30.00</span> -->
+                                    <span class="header-action-num" id="count">
+                                        {{ count(session('cart', [])) }}
+                                    </span>
                                 </a>
                                 <a href="#offcanvas-mobile-menu"
                                     class="header-action-btn header-action-btn-menu offcanvas-toggle d-lg-none">
@@ -141,8 +142,8 @@
                                 <a href="#offcanvas-cart"
                                     class="header-action-btn header-action-btn-cart offcanvas-toggle pr-0">
                                     <i class="pe-7s-shopbag"></i>
-                                    <span class="header-action-num">01</span>
-                                    <!-- <span class="cart-amount">€30.00</span> -->
+                                    <span class="header-action-num" id="count-mobile"> {{ count(session('cart', [])) }}
+                                    </span>
                                 </a>
                                 <a href="#offcanvas-mobile-menu"
                                     class="header-action-btn header-action-btn-menu offcanvas-toggle d-lg-none">
@@ -222,8 +223,8 @@
         </div>
         <!-- OffCanvas Wishlist End -->
 
-        {{-- Cart --}}
-        @include('cart')
+        {{-- Cart All Cart --}}
+        @include('view_cart')
 
         <!-- OffCanvas Menu Start -->
         <div id="offcanvas-mobile-menu" class="offcanvas offcanvas-mobile-menu">

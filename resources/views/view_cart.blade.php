@@ -35,7 +35,7 @@
                     <div class="content">
                         <a href="/product/detail/${cart.product_id}" class="title">${cart.product_name}</a>
                         <span class="quantity-price">${cart.quantity} x <span class="amount">$${cart.price}</span></span>
-                        <a href="#" onclick="CartRemove(${cart.product_id})" class="remove">×</a>
+                        <button onclick="CartRemove(${cart.product_id})" class="remove">×</button>
                     </div>
                 </li>
             `;
