@@ -65,8 +65,11 @@ Route::prefix('product')->group(function () {
     Route::controller(CartController::class)->group(function () {
         Route::get('add/to/cart/{id}', 'AddToCart');
         Route::get('cart/remove/{id}', 'CartRemove');
+        Route::put('cart/quantity/{id}', 'CartQuantity');
 
         Route::get('all/carts', 'ViewAllCart');
+        Route::get('cart', 'Cart')->name('cart');
+
     });
 });
 

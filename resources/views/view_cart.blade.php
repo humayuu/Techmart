@@ -11,7 +11,7 @@
           </div>
           <div class="foot">
               <div class="buttons mt-30px">
-                  <a href="cart.html" class="btn btn-dark btn-hover-primary mb-30px">view cart</a>
+                  <a href="{{ route('cart') }}" class="btn btn-dark btn-hover-primary mb-30px">view cart</a>
                   <a href="checkout.html" class="btn btn-outline-dark current-btn">checkout</a>
               </div>
           </div>
@@ -26,7 +26,9 @@
           const cartList = document.querySelector('#offcanvas-cart .minicart-product-list');
           cartList.innerHTML = '';
 
+          let subTotal = 0;
           Object.values(data.carts).forEach((cart, key) => {
+              subTotal += cart.price * cart.quantity;
               cartList.innerHTML += `
                 <li>
                     <a href="/product/detail/${cart.product_id}" class="image">
@@ -34,7 +36,7 @@
                     </a>
                     <div class="content">
                         <a href="/product/detail/${cart.product_id}" class="title">${cart.product_name}</a>
-                        <span class="quantity-price">${cart.quantity} x <span class="amount">$${cart.price}</span></span>
+                        <span class="quantity-price">${cart.quantity} x <span class="amount">$${subTotal}</span></span>
                         <button onclick="CartRemove(${cart.product_id})" class="remove">×</button>
                     </div>
                 </li>

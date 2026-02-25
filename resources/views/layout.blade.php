@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 </head>
 
 <body>
@@ -392,6 +394,7 @@
         <script src="{{ asset('frontend/assets/js/plugins/mailchimp-ajax.js') }}"></script>
         <!--Main JS (Common Activation Codes)-->
         <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
+        @yield('scripts')
 </body>
 
 </html>

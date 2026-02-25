@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
@@ -39,8 +40,10 @@ class CartController extends Controller
 
             return response()->json([
                 'status' => true,
+                'product_name' => $product->product_name,
                 'product_thumbnail' => $product->product_thumbnail,
                 'cart_count' => count($cart),
+                'quantity' => $cart[$id]['quantity'],
             ], 200);
         } catch (Exception $e) {
             Log::error('Error in Add to Cart '.$e->getMessage());
@@ -104,5 +107,49 @@ class CartController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * For Redirect to Cart Page
+     */
+    public function Cart()
+    {
+        $carts = session()->get('cart', []);
+
+        return view('cart', compact('carts'));
+    }
+
+    /**
+     * For handle Cart Quantity
+     */
+    public function CartQuantity(Request $request, $id)
+    {
+
+        try {
+            $request->validate([
+                'quantity' => 'required|integer|min:1',
+            ]);
+            $cart = session()->get('cart', []);
+
+            // Update Cart Quantity and Totals
+            $cart[$id]['quantity'] = $request->quantity;
+            session()->put('cart', $cart);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cart updated successfully',
+                'cart' => $cart,
+            ], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error in update cart quantity '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error in update cart quantity',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
     }
 }
