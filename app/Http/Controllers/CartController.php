@@ -114,9 +114,39 @@ class CartController extends Controller
      */
     public function Cart()
     {
-        $carts = session()->get('cart', []);
 
-        return view('cart', compact('carts'));
+        return view('cart');
+    }
+
+    /**
+     * For Redirect to Cart Page
+     */
+    public function AllCartData()
+    {
+        try {
+            $carts = session()->get('cart', []);
+
+            $total = 0;
+            foreach ($carts as $cart) {
+                $total += $cart['price'] * $cart['quantity'];
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully Fetch All Cart Data',
+                'carts' => $carts,
+                'cartCount' => count($carts),
+                'total' => $total,
+            ], 200);
+        } catch (Exception $e) {
+            Log::error('Error in fetch All Cart Data '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error in fetch All Cart Data ',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -133,11 +163,14 @@ class CartController extends Controller
 
             // Update Cart Quantity and Totals
             $cart[$id]['quantity'] = $request->quantity;
+            $subTotal = $cart[$id]['price'] * $cart[$id]['quantity'];
             session()->put('cart', $cart);
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cart updated successfully',
+                'quantity' => $cart[$id]['quantity'],
+                'subTotal' => $subTotal,
                 'cart' => $cart,
             ], 200);
 
@@ -151,5 +184,18 @@ class CartController extends Controller
             ], 500);
         }
 
+    }
+
+    /**
+     * For Cart Clear
+     */
+    public function CartClear()
+    {
+        session()->forget('cart');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Successfully clear cart',
+        ], 200);
     }
 }

@@ -61,12 +61,14 @@ Route::prefix('product')->group(function () {
         Route::get('/quick/{id}', 'QuickShow');
     });
 
-    // Add to Cart
+    // Product Cart All Routes
     Route::controller(CartController::class)->group(function () {
         Route::get('add/to/cart/{id}', 'AddToCart');
+        Route::get('all/cart', 'AllCartData');
         Route::get('cart/remove/{id}', 'CartRemove');
         Route::put('cart/quantity/{id}', 'CartQuantity');
 
+        Route::get('cart/clear', 'CartClear');
         Route::get('all/carts', 'ViewAllCart');
         Route::get('cart', 'Cart')->name('cart');
 
