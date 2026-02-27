@@ -157,6 +157,13 @@
                             <div class="menu-title">Dashboard</div>
                         </a>
                     </li>
+
+                    <li>
+                        <a href="{{ route('user.index') }}">
+                            <div class="parent-icon"><i class="fas fa-users"></i></div>
+                            <div class="menu-title">All Users</div>
+                        </a>
+                    </li>
                     <li class="menu-label">Main Menu</li>
 
                     <li>
@@ -213,17 +220,6 @@
 
                     <li>
                         <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-users"></i></div>
-                            <div class="menu-title">Manage Users</div>
-                        </a>
-                        <ul>
-                            <li>
-                                <a href="{{ route('user.index') }}"><i class="far fa-circle"></i>All Users</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
                             <div class="parent-icon"><i class="fas fa-user"></i></div>
                             <div class="menu-title">Manage Admin Users</div>
                         </a>
@@ -253,7 +249,10 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="#"><i class="far fa-circle"></i>All Shipping Areas</a>
+                                <a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All Province</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="far fa-circle"></i>All Cities</a>
                             </li>
                         </ul>
                     </li>
@@ -321,270 +320,271 @@
                     </li>
                 </ul>
             </div>
-            <!--end navigation-->
-        </aside>
-        <!--end sidebar -->
-        <main class="page-content">
-            <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="ps-3">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">@yield('page-title')
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
+    </div>
+    <!--end navigation-->
+    </aside>
+    <!--end sidebar -->
+    <main class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">@yield('page-title')
+                        </li>
+                    </ol>
+                </nav>
             </div>
-            <!--end breadcrumb-->
-            @yield('main')
-        </main>
+        </div>
+        <!--end breadcrumb-->
+        @yield('main')
+    </main>
 
-        <!--start footer-->
-        <footer class="footer">
-            <div class="footer-text">Copyright © 2026. All right reserved.</div>
-        </footer>
-        <!--end footer-->
+    <!--start footer-->
+    <footer class="footer">
+        <div class="footer-text">Copyright © 2026. All right reserved.</div>
+    </footer>
+    <!--end footer-->
 
 
-        <!-- Bootstrap bundle JS -->
-        <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- Bootstrap bundle JS -->
+    <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
 
-        <!--plugins-->
-        {{-- jQuary CDN --}}
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-        <script src="{{ asset('backend/assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
-        <script src="{{ asset('backend/assets/plugins/input-tags/js/tagsinput.js') }}"></script>
+    <!--plugins-->
+    {{-- jQuary CDN --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="{{ asset('backend/assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/plugins/input-tags/js/tagsinput.js') }}"></script>
 
-        <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
-        <!--app-->
-        <script src="{{ asset('backend/assets/js/app.js') }}"></script>
-        <script src="{{ asset('backend/assets/js/index.js') }}"></script>
+    <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
+    <!--app-->
+    <script src="{{ asset('backend/assets/js/app.js') }}"></script>
+    <script src="{{ asset('backend/assets/js/index.js') }}"></script>
 
-        <!-- Toaster JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <!-- Toaster JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
 
-        {{-- Sweet Alert CDN --}}
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- Sweet Alert CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        {{-- Data table CDN --}}
-        <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
+    {{-- Data table CDN --}}
+    <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 
-        <!-- Toastr Notification Script -->
-        <script>
-            toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "positionClass": "toast-bottom-left",
-                "timeOut": "3500"
-            };
+    <!-- Toastr Notification Script -->
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-left",
+            "timeOut": "3500"
+        };
 
-            @if (Session::has('message'))
-                let type = "{{ Session::get('alert-type', 'info') }}"
+        @if (Session::has('message'))
+            let type = "{{ Session::get('alert-type', 'info') }}"
 
-                switch (type) {
-                    case 'info':
-                        toastr.info(" {{ Session::get('message') }} ");
-                        break;
-                    case 'success':
-                        toastr.success("{{ Session::get('message') }}");
-                        break;
-                    case 'warning':
-                        toastr.warning("{{ Session::get('message') }}");
-                        break;
-                    case 'error':
-                        toastr.error("{{ Session::get('message') }}");
-                        break;
+            switch (type) {
+                case 'info':
+                    toastr.info(" {{ Session::get('message') }} ");
+                    break;
+                case 'success':
+                    toastr.success("{{ Session::get('message') }}");
+                    break;
+                case 'warning':
+                    toastr.warning("{{ Session::get('message') }}");
+                    break;
+                case 'error':
+                    toastr.error("{{ Session::get('message') }}");
+                    break;
 
-                }
-            @endif
+            }
+        @endif
 
-            // DataTable Initialization
-            $(document).ready(function() {
-                $('#categoryTable').DataTable({
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
-                        url: "{{ route('category.index') }}"
+        // DataTable Initialization
+        $(document).ready(function() {
+            $('#categoryTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('category.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'category_name',
-                            name: 'category_name'
-                        },
-                        {
-                            data: 'category_slug',
-                            name: 'category_slug'
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
-                    ]
-                });
-
-                $('#brandTable').DataTable({
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
-                        url: "{{ route('brand.index') }}"
+                    {
+                        data: 'category_name',
+                        name: 'category_name'
                     },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'brand_name',
-                            name: 'brand_name'
-                        },
-                        {
-                            data: 'brand_description',
-                            name: 'brand_description'
-                        },
-                        {
-                            data: 'image',
-                            name: 'image',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
-                    ]
-                });
-
-                $('#sliderTable').DataTable({
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
-                        url: "{{ route('slider.index') }}"
+                    {
+                        data: 'category_slug',
+                        name: 'category_slug'
                     },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'title',
-                            name: 'title'
-                        },
-                        {
-                            data: 'image',
-                            name: 'image',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'status',
-                            name: 'status',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
-                    ]
-                });
-
-                $('#productTable').DataTable({
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
-                        url: "{{ route('product.index') }}"
-                    },
-                    columns: [{
-                            data: 'image',
-                            name: 'image',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'product_name',
-                            name: 'product_name'
-                        },
-                        {
-                            data: 'brand',
-                            name: 'brand'
-                        },
-                        {
-                            data: 'category',
-                            name: 'category'
-                        },
-                        {
-                            data: 'selling_price',
-                            name: 'selling_price'
-                        },
-                        {
-                            data: 'status',
-                            name: 'status',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
-                    ]
-                });
-                $(document).ready(function() {
-                    $('#userTable').DataTable({
-                        serverSide: true,
-                        processing: true,
-                        ajax: {
-                            url: "{{ route('user.index') }}"
-                        },
-                        columns: [{
-                                data: 'DT_RowIndex',
-                                name: 'DT_RowIndex',
-                                orderable: false,
-                                searchable: false
-                            },
-                            {
-                                data: 'name',
-                                name: 'name'
-                            },
-                            {
-                                data: 'email',
-                                name: 'email'
-                            },
-                            {
-                                data: 'phone',
-                                name: 'phone'
-                            },
-                            {
-                                data: 'last_seen',
-                                name: 'last_seen'
-                            },
-                            {
-                                data: 'status',
-                                name: 'status'
-                            },
-                        ]
-                    });
-
-
-                });
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
             });
-        </script>
+
+            $('#brandTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('brand.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'brand_name',
+                        name: 'brand_name'
+                    },
+                    {
+                        data: 'brand_description',
+                        name: 'brand_description'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $('#sliderTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('slider.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $('#productTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('product.index') }}"
+                },
+                columns: [{
+                        data: 'image',
+                        name: 'image',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'product_name',
+                        name: 'product_name'
+                    },
+                    {
+                        data: 'brand',
+                        name: 'brand'
+                    },
+                    {
+                        data: 'category',
+                        name: 'category'
+                    },
+                    {
+                        data: 'selling_price',
+                        name: 'selling_price'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+            $(document).ready(function() {
+                $('#userTable').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: "{{ route('user.index') }}"
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'email',
+                            name: 'email'
+                        },
+                        {
+                            data: 'phone',
+                            name: 'phone'
+                        },
+                        {
+                            data: 'last_seen',
+                            name: 'last_seen'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status'
+                        },
+                    ]
+                });
+
+
+            });
+        });
+    </script>
 
 
 </body>

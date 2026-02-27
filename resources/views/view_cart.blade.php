@@ -37,13 +37,13 @@
                     <div class="content">
                         <a href="/product/detail/${cart.product_id}" class="title">${cart.product_name}</a>
                         <span class="quantity-price">${cart.quantity} x <span class="amount">$${subTotal}</span></span>
-                        <button onclick="CartRemove(${cart.product_id})" class="remove">×</button>
+                        <button onclick="Remove(${cart.product_id})" class="remove">×</button>
                     </div>
                 </li>
             `;
           });
       }
-      const CartRemove = async (id) => {
+      const Remove = async (id) => {
           const response = await fetch(`{{ url('product/cart/remove/') }}/${id}`);
           const data = await response.json();
 

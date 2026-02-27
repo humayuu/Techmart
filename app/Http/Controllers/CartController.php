@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Request;
 
 class CartController extends Controller
 {
@@ -150,39 +150,22 @@ class CartController extends Controller
     }
 
     /**
-     * For handle Cart Quantity
+     * For Cart Quantity
      */
     public function CartQuantity(Request $request, $id)
     {
+        $qty = $request->input('quantity');
+        $cart = session()->get('cart', []);
 
-        try {
-            $request->validate([
-                'quantity' => 'required|integer|min:1',
-            ]);
-            $cart = session()->get('cart', []);
-
-            // Update Cart Quantity and Totals
-            $cart[$id]['quantity'] = $request->quantity;
-            $subTotal = $cart[$id]['price'] * $cart[$id]['quantity'];
+        if (isset($cart[$id])) {
+            $cart[$id]['quantity'] = $qty;
             session()->put('cart', $cart);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Cart updated successfully',
-                'quantity' => $cart[$id]['quantity'],
-                'subTotal' => $subTotal,
-                'cart' => $cart,
-            ], 200);
-
-        } catch (Exception $e) {
-            Log::error('Error in update cart quantity '.$e->getMessage());
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Error in update cart quantity',
-                'error' => $e->getMessage(),
-            ], 500);
         }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Successfully Update Cart Quantity',
+        ]);
 
     }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
@@ -43,6 +44,8 @@ Route::prefix('admin')->group(function () {
         Route::resource('slider', SliderController::class);
         Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
 
+        Route::resource('province', ProvinceController::class);
+
     });
 });
 
@@ -66,12 +69,11 @@ Route::prefix('product')->group(function () {
         Route::get('add/to/cart/{id}', 'AddToCart');
         Route::get('all/cart', 'AllCartData');
         Route::get('cart/remove/{id}', 'CartRemove');
-        Route::put('cart/quantity/{id}', 'CartQuantity');
-
         Route::get('cart/clear', 'CartClear');
         Route::get('all/carts', 'ViewAllCart');
         Route::get('cart', 'Cart')->name('cart');
 
+        Route::put('cart/quantity/{id}', 'CartQuantity');
     });
 });
 
