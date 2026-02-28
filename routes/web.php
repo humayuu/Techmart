@@ -45,6 +45,7 @@ Route::prefix('admin')->group(function () {
         Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
 
         Route::resource('province', ProvinceController::class);
+        Route::get('province/status/{id}', [ProvinceController::class, 'ProvinceStatus'])->name('province.status');
 
     });
 });

@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('page-title')
-    Provinces
+    Provinces <span class="badge text-bg-dark">{{ $totalProvince }}</span>
 @endsection
 
 @section('main')
@@ -20,8 +20,8 @@
                                 @csrf
                                 <div class="col-12">
                                     <label class="form-label">Province Name</label>
-                                    <input type="text" class="form-control" name="name" placeholder="Province name"
-                                        autofocus>
+                                    <input type="text" class="form-control mb-3 @error('name') is-invalid  @enderror"
+                                        name="name" placeholder="Province name" autofocus>
                                     @error('name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -44,6 +44,9 @@
                                             </label>
                                         </div>
                                     </div>
+                                    @error('is_active')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 <div class="col-12">
                                     <div class="d-grid">

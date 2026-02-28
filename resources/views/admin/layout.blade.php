@@ -17,15 +17,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
-
     <!-- loader-->
     <link href="{{ asset('backend/assets/css/pace.min.css') }}" rel="stylesheet" />
-
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
     {{-- font-awesome icon --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 
     <title>TechMart Admin Dashboard</title>
 </head>
@@ -33,6 +30,7 @@
 <body>
     <!--start wrapper-->
     <div class="wrapper">
+
         <!--start top header-->
         <header class="top-header">
             <nav class="navbar navbar-expand gap-3">
@@ -48,6 +46,7 @@
                         <i class="bi bi-x-lg"></i>
                     </div>
                 </form>
+
                 <div class="top-navbar-right ms-auto">
                     <ul class="navbar-nav align-items-center">
                         <li class="nav-item search-toggle-icon">
@@ -57,6 +56,7 @@
                                 </div>
                             </a>
                         </li>
+
                         <li class="nav-item dropdown dropdown-large">
                             <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
                                 data-bs-toggle="dropdown">
@@ -81,17 +81,20 @@
                                                     <span class="msg-time float-end text-secondary">1 m</span>
                                                 </h6>
                                                 <small
-                                                    class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">You
-                                                    have recived new orders</small>
+                                                    class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">
+                                                    You have recived new orders
+                                                </small>
                                             </div>
                                         </div>
                                     </a>
-                                    <div class="p-2">
-                                    </div>
                                 </div>
+                            </div>
                         </li>
+                        <!-- END notification dropdown -->
+
                     </ul>
                 </div>
+
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
@@ -105,8 +108,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a href="{{ route('admin.profile.detail') }}" class="dropdown-item"
-                                href="pages-user-profile.html">
+                            <a href="{{ route('admin.profile.detail') }}" class="dropdown-item">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-person-fill"></i></div>
                                     <div class="ms-3"><span>Profile</span></div>
@@ -114,7 +116,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('admin.change.password') }}" class="dropdown-item" href="#">
+                            <a href="{{ route('admin.change.password') }}" class="dropdown-item">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="bi bi-gear-fill"></i></div>
                                     <div class="ms-3"><span>Change Password</span></div>
@@ -134,6 +136,7 @@
                         </li>
                     </ul>
                 </div>
+
             </nav>
         </header>
         <!--end top header-->
@@ -141,8 +144,7 @@
         <!--start sidebar -->
         <aside class="sidebar-wrapper">
             <div class="sidebar-header">
-                <div>
-                </div>
+                <div></div>
                 <div>
                     <h4 class="logo-text fs-2 m-4"><span class="text-dark">Tech</span>Mart</h4>
                 </div>
@@ -164,6 +166,7 @@
                             <div class="menu-title">All Users</div>
                         </a>
                     </li>
+
                     <li class="menu-label">Main Menu</li>
 
                     <li>
@@ -172,9 +175,7 @@
                             <div class="menu-title">Manage Brands</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('brand.index') }}"><i class="far fa-circle"></i>All Brands</a>
-                            </li>
+                            <li><a href="{{ route('brand.index') }}"><i class="far fa-circle"></i>All Brands</a></li>
                         </ul>
                     </li>
 
@@ -184,10 +185,8 @@
                             <div class="menu-title">Manage Categories</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('category.index') }}"><i class="far fa-circle"></i>All
-                                    Categories</a>
-                            </li>
+                            <li><a href="{{ route('category.index') }}"><i class="far fa-circle"></i>All
+                                    Categories</a></li>
                         </ul>
                     </li>
 
@@ -197,11 +196,9 @@
                             <div class="menu-title">Manage Products</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('product.index') }}"><i class="far fa-circle"></i>All Products</a>
+                            <li><a href="{{ route('product.index') }}"><i class="far fa-circle"></i>All Products</a>
                             </li>
-                            <li>
-                                <a href="{{ route('product.create') }}"><i class="far fa-circle"></i>Add Products</a>
+                            <li><a href="{{ route('product.create') }}"><i class="far fa-circle"></i>Add Products</a>
                             </li>
                         </ul>
                     </li>
@@ -212,8 +209,7 @@
                             <div class="menu-title">Manage Sliders</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('slider.index') }}"><i class="far fa-circle"></i>All Sliders</a>
+                            <li><a href="{{ route('slider.index') }}"><i class="far fa-circle"></i>All Sliders</a>
                             </li>
                         </ul>
                     </li>
@@ -224,9 +220,7 @@
                             <div class="menu-title">Manage Admin Users</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Users</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Users</a></li>
                         </ul>
                     </li>
 
@@ -236,9 +230,7 @@
                             <div class="menu-title">Manage Coupons</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Coupons</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Coupons</a></li>
                         </ul>
                     </li>
 
@@ -248,12 +240,9 @@
                             <div class="menu-title">Shipping Area</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All Province</a>
+                            <li><a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All Province</a>
                             </li>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Cities</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Cities</a></li>
                         </ul>
                     </li>
 
@@ -263,9 +252,7 @@
                             <div class="menu-title">Manage Orders</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Orders</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Orders</a></li>
                         </ul>
                     </li>
 
@@ -275,9 +262,7 @@
                             <div class="menu-title">Manage Stock</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Stock</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Stock</a></li>
                         </ul>
                     </li>
 
@@ -287,9 +272,7 @@
                             <div class="menu-title">Return Orders</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Return Orders</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Return Orders</a></li>
                         </ul>
                     </li>
 
@@ -299,9 +282,7 @@
                             <div class="menu-title">Manage Reviews</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#"><i class="far fa-circle"></i>All Reviews</a>
-                            </li>
+                            <li><a href="#"><i class="far fa-circle"></i>All Reviews</a></li>
                         </ul>
                     </li>
 
@@ -311,54 +292,51 @@
                             <div class="menu-title">Manage Settings</div>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('settings.index') }}"><i class="far fa-circle"></i>Site
-                                    Settings</a>
-                                <a href="#"><i class="far fa-circle"></i>Seo Settings</a>
-                            </li>
+                            <li><a href="{{ route('settings.index') }}"><i class="far fa-circle"></i>Site
+                                    Settings</a></li>
+                            <li><a href="#"><i class="far fa-circle"></i>Seo Settings</a></li>
                         </ul>
                     </li>
+
                 </ul>
             </div>
-    </div>
-    <!--end navigation-->
-    </aside>
-    <!--end sidebar -->
-    <main class="page-content">
-        <!--breadcrumb-->
-        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-            <div class="ps-3">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0 p-0">
-                        <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">@yield('page-title')
-                        </li>
-                    </ol>
-                </nav>
+        </aside>
+        <!--end sidebar -->
+
+        <main class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">@yield('page-title')
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-        </div>
-        <!--end breadcrumb-->
-        @yield('main')
-    </main>
+            <!--end breadcrumb-->
+            @yield('main')
+        </main>
 
-    <!--start footer-->
-    <footer class="footer">
-        <div class="footer-text">Copyright © 2026. All right reserved.</div>
-    </footer>
-    <!--end footer-->
+        <!--start footer-->
+        <footer class="footer">
+            <div class="footer-text">Copyright © 2026. All right reserved.</div>
+        </footer>
+        <!--end footer-->
 
+    </div>
+    <!--end wrapper-->
 
     <!-- Bootstrap bundle JS -->
     <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
 
     <!--plugins-->
-    {{-- jQuary CDN --}}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="{{ asset('backend/assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
     <script src="{{ asset('backend/assets/plugins/input-tags/js/tagsinput.js') }}"></script>
-
     <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
-    <!--app-->
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
     <script src="{{ asset('backend/assets/js/index.js') }}"></script>
 
@@ -382,7 +360,6 @@
 
         @if (Session::has('message'))
             let type = "{{ Session::get('alert-type', 'info') }}"
-
             switch (type) {
                 case 'info':
                     toastr.info(" {{ Session::get('message') }} ");
@@ -396,12 +373,11 @@
                 case 'error':
                     toastr.error("{{ Session::get('message') }}");
                     break;
-
             }
         @endif
 
-        // DataTable Initialization
         $(document).ready(function() {
+
             $('#categoryTable').DataTable({
                 serverSide: true,
                 processing: true,
@@ -545,47 +521,73 @@
                     }
                 ]
             });
-            $(document).ready(function() {
-                $('#userTable').DataTable({
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
-                        url: "{{ route('user.index') }}"
+
+            $('#userTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('user.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'name',
-                            name: 'name'
-                        },
-                        {
-                            data: 'email',
-                            name: 'email'
-                        },
-                        {
-                            data: 'phone',
-                            name: 'phone'
-                        },
-                        {
-                            data: 'last_seen',
-                            name: 'last_seen'
-                        },
-                        {
-                            data: 'status',
-                            name: 'status'
-                        },
-                    ]
-                });
-
-
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'phone',
+                        name: 'phone'
+                    },
+                    {
+                        data: 'last_seen',
+                        name: 'last_seen'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    }
+                ]
             });
+
+            $('#provinceTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('province.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'is_active',
+                        name: 'is_active'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
         });
     </script>
-
 
 </body>
 
