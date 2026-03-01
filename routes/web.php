@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
@@ -45,7 +46,9 @@ Route::prefix('admin')->group(function () {
         Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
 
         Route::resource('province', ProvinceController::class);
-        Route::get('province/status/{id}', [ProvinceController::class, 'ProvinceStatus'])->name('province.status');
+
+        Route::resource('city', CityController::class);
+        Route::get('city/status/{id}', [CityController::class, 'CityStatus'])->name('city.status');
 
     });
 });

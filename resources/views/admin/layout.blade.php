@@ -242,7 +242,7 @@
                         <ul>
                             <li><a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All Province</a>
                             </li>
-                            <li><a href="#"><i class="far fa-circle"></i>All Cities</a></li>
+                            <li><a href="{{ route('city.index') }}"><i class="far fa-circle"></i>All Cities</a></li>
                         </ul>
                     </li>
 
@@ -568,6 +568,36 @@
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+
+            $('#cityTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('city.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'province_id',
+                        name: 'province_id'
                     },
                     {
                         data: 'name',

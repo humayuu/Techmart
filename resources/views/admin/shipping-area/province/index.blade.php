@@ -26,28 +26,6 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
-                                <div class="col-12 mt-4">
-                                    <label class="form-label fw-bold">Status</label>
-                                    <div class="d-flex gap-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="is_active" value="1"
-                                                id="activeRadio" checked>
-                                            <label class="form-check-label fw-bold" for="activeRadio">
-                                                Active
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="is_active" value="0"
-                                                id="inactiveRadio">
-                                            <label class="form-check-label fw-bold" for="inactiveRadio">
-                                                Inactive
-                                            </label>
-                                        </div>
-                                    </div>
-                                    @error('is_active')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
                                 <div class="col-12">
                                     <div class="d-grid">
                                         <button class="btn btn-primary" type="submit">Add Province</button>
@@ -68,7 +46,6 @@
                                         <tr>
                                             <th>#</th>
                                             <th>Name</th>
-                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>

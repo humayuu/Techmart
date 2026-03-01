@@ -20,29 +20,13 @@ class ProvinceController extends Controller
 
             return DataTables::of($provinces)
                 ->addIndexColumn()
-                ->addColumn('is_active', function ($row) {
-                    if ($row->is_active == 1) {
-                        return '<span class="badge bg-primary fs-6">Active</span>';
-                    } else {
-                        return '<span class="badge bg-secondary fs-6">Inactive</span>';
-                    }
-                })
                 ->addColumn('action', function ($row) {
                     $editUrl = route('province.edit', $row->id);
                     $deleteUrl = route('province.destroy', $row->id);
-                    $statusUrl = route('province.status', $row->id);
-                    $class = $row->is_active == 1 ? 'success' : 'dark';
-                    $icon = $row->is_active == 1 ? 'thumbs-up' : 'thumbs-down';
 
                     $btn = '<div class="d-flex align-items-center gap-3 fs-5">
                             <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
                                 <i class="bi bi-pencil-fill"></i>
-                            </a>
-
-                               <a href="'.$statusUrl.'"
-                            class="text-'.$class.'" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" title="Edit info">
-                            <i class="bi bi-hand-'.$icon.'-fill"></i>
                             </a>
 
                             <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
@@ -56,7 +40,7 @@ class ProvinceController extends Controller
 
                     return $btn;
                 })
-                ->rawColumns(['action', 'is_active'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
 
@@ -72,7 +56,6 @@ class ProvinceController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|max:30',
-            'is_active' => 'required',
         ]);
         try {
 
@@ -146,33 +129,6 @@ class ProvinceController extends Controller
 
             return redirect()->back()->with([
                 'message' => 'Province delete Failed',
-                'alert-type' => 'error',
-            ]);
-        }
-    }
-
-    /**
-     * For Update Province Status
-     */
-    public function ProvinceStatus($id)
-    {
-        try {
-            $province = Province::findOrFail($id);
-
-            $province->update([
-                'is_active' => $province->is_active == 0 ? 1 : 0,
-            ]);
-
-            return redirect()->back()->with([
-                'message' => 'Status Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error updating province status: '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Status Update Failed',
                 'alert-type' => 'error',
             ]);
         }
