@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Stripe\Charge;
+use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
@@ -74,18 +76,66 @@ class CheckoutController extends Controller
         try {
 
             $carts = session()->get('cart', []);
-            $subTotal = 0;
-            foreach ($carts as $cart) {
-                $subTotal += $cart['price'] * $cart['quantity'];
+            if (empty($carts)) {
+                return redirect()->route('cart')->with('error', 'Your cart is empty.');
             }
             $orderDetails = session()->get('order_details', []);
+            if (empty($orderDetails)) {
+                return redirect()->route('cart')->with('error', 'Session expired. Please try again.');
+            }
+            $subTotal = collect($carts)->sum(fn ($c) => $c['price'] * $c['quantity']);
             $shippingCost = $orderDetails['shipping_method'] === 'express' ? 300 : 200;
             $totalAmount = $subTotal + $shippingCost;
 
+            // ============================================
+            // STRIPE PAYMENT
+            // ============================================
+            $transactionId = null;
+            $paymentStatus = 'pending'; // COD default
+            if ($request->payment_method === 'stripe') {
+
+                // Make sure token came from the form
+                if (! $request->stripe_token) {
+                    return redirect()->back()->with('error', 'Payment token missing. Please try again.');
+                }
+
+                Stripe::setApiKey(config('services.stripe.secret'));
+
+                try {
+                    $charge = Charge::create([
+                        'amount' => $totalAmount * 100,
+                        'currency' => 'pkr',
+                        'source' => $request->stripe_token,
+                        'description' => 'Order by User #'.Auth::id(),
+                    ]);
+
+                    // Payment failed (shouldn't normally reach here, exceptions handle it)
+                    if ($charge->status !== 'succeeded') {
+                        return redirect()->back()->with('error', 'Payment failed. Please try again.');
+                    }
+                    $transactionId = $charge->id;
+                    $paymentStatus = 'paid';
+
+                } catch (\Stripe\Exception\CardException $e) {
+                    // Card was declined
+                    return redirect()->back()->with('error', 'Card declined: '.$e->getMessage());
+
+                } catch (\Stripe\Exception\InvalidRequestException $e) {
+                    return redirect()->back()->with('error', 'Invalid payment request: '.$e->getMessage());
+
+                } catch (\Stripe\Exception\ApiConnectionException $e) {
+                    return redirect()->back()->with('error', 'Network error. Please try again.');
+                }
+            }
+            // ============================================
+
             $order = Order::create([
                 'user_id' => Auth::id(),
+                'status' => 'pending',
                 'payment_method' => $request->payment_method,
-                'coupon_code' => $orderDetails['coupon'],
+                'payment_status' => $paymentStatus,
+                'transaction_id' => $transactionId,
+                'coupon_code' => $orderDetails['coupon'] ?? null,
                 'subtotal' => $subTotal,
                 'shipping_amount' => $shippingCost,
                 'total_amount' => $totalAmount,
