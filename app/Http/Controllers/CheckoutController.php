@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderPlacedMail;
 use App\Models\Order;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Charge;
 use Stripe\Stripe;
 
@@ -165,16 +167,22 @@ class CheckoutController extends Controller
             session()->forget('order_details');
             session()->put('order_confirm', true);
 
-            return redirect()->route('thank.you.page');
-
         } catch (Exception $e) {
             DB::rollBack();
 
             Log::error('Error in Place order '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Place Order Failed');
-
         }
+
+        try {
+            Mail::to($request->email)->send(new OrderPlacedMail($order));
+        } catch (Exception $e) {
+            Log::error('Order mail failed: '.$e->getMessage());
+            dd($e->getMessage());
+        }
+
+        return redirect()->route('thank.you.page');
 
     }
 
