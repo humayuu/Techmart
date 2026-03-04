@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\Product;
+use App\Models\Province;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Request;
 
 class CartController extends Controller
 {
@@ -114,8 +116,10 @@ class CartController extends Controller
      */
     public function Cart()
     {
+        $provinces = Province::all();
+        $cities = City::all();
 
-        return view('cart');
+        return view('cart', compact('provinces', 'cities'));
     }
 
     /**
@@ -180,5 +184,32 @@ class CartController extends Controller
             'status' => true,
             'message' => 'Successfully clear cart',
         ], 200);
+    }
+
+    /**
+     * Fetch All Active Cities for a Specific Province
+     */
+    public function AllCities($id)
+    {
+        try {
+            $province = Province::with('cities')->findOrFail($id);
+
+            $availableCities = $province->cities->where('is_active', 1)->values();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully Fetch All Cities',
+                'cities' => $availableCities,
+            ], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error in fetch Cities Data '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error in fetch Cities Data',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

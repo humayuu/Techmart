@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
@@ -72,12 +73,25 @@ Route::prefix('product')->group(function () {
     Route::controller(CartController::class)->group(function () {
         Route::get('add/to/cart/{id}', 'AddToCart');
         Route::get('all/cart', 'AllCartData');
-        Route::get('cart/remove/{id}', 'CartRemove');
-        Route::get('cart/clear', 'CartClear');
+        Route::delete('cart/remove/{id}', 'CartRemove');
         Route::get('all/carts', 'ViewAllCart');
         Route::get('cart', 'Cart')->name('cart');
+        Route::get('cart/all/cities/{id}', 'AllCities');
 
         Route::put('cart/quantity/{id}', 'CartQuantity');
+        Route::post('cart/clear', 'CartClear');
+    });
+
+    // Checkout All Routes
+    Route::middleware('auth')->group(function () {
+        Route::controller(CheckoutController::class)->group(function () {
+            Route::get('checkout/page', 'CheckoutPage')->name('checkout.page');
+            Route::get('thank/you', 'ThanksPage')->name('thank.you.page');
+
+            Route::post('checkout/info', 'CheckOutInfo')->name('checkout.info');
+            Route::post('place/order', 'PlaceOrder')->name('place.order');
+
+        });
     });
 });
 
