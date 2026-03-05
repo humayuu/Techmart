@@ -1,71 +1,79 @@
 @component('mail::message')
-<div style="text-align:center;padding:10px 0 30px 0;">
-<span style="font-size:36px;font-weight:900;letter-spacing:2px;color:#111;">TECH<span style="color:#6366f1;">MART</span></span>
-<p style="margin:4px 0 0 0;font-size:11px;color:#888;letter-spacing:3px;">YOUR TECH DESTINATION</p>
+<div style="max-width:560px;margin:0 auto;background:#fff;border-top:3px solid #111;">
+
+<div style="padding:35px 40px 25px;border-bottom:1px solid #eee;">
+<p style="margin:0;font-size:22px;font-weight:700;letter-spacing:2px;color:#111;">TECHMART</p>
+<p style="margin:4px 0 0;font-size:11px;color:#999;letter-spacing:2px;">ORDER CONFIRMATION</p>
 </div>
 
-## Order Confirmed! 🎉
+<div style="padding:35px 40px;">
 
-Dear {{ $order->user->name }},
+<p style="font-size:15px;color:#111;margin:0 0 6px;">Hello, <strong>{{ $order->user->name }}</strong></p>
+<p style="font-size:13px;color:#777;margin:0 0 30px;line-height:1.7;">Your order has been placed successfully. Here's a summary of what you ordered.</p>
 
-Thank you for shopping with us. Your order has been placed successfully.
-
-<table style="width:100%;border-collapse:collapse;margin:20px 0;background:#f8f8f8;border-radius:6px;">
+<table style="width:100%;border-collapse:collapse;margin-bottom:30px;">
 <tr>
-<td style="padding:10px 15px;font-weight:bold;width:40%;">Order ID</td>
-<td style="padding:10px 15px;">#{{ $order->id }}</td>
+<td style="padding:9px 0;font-size:12px;color:#999;border-bottom:1px solid #f0f0f0;width:40%;">Order ID</td>
+<td style="padding:9px 0;font-size:13px;color:#111;border-bottom:1px solid #f0f0f0;font-weight:600;">#{{ $order->id }}</td>
 </tr>
 <tr>
-<td style="padding:10px 15px;font-weight:bold;">Date</td>
-<td style="padding:10px 15px;">{{ $order->created_at->format('d M Y') }}</td>
+<td style="padding:9px 0;font-size:12px;color:#999;border-bottom:1px solid #f0f0f0;">Date</td>
+<td style="padding:9px 0;font-size:13px;color:#111;border-bottom:1px solid #f0f0f0;">{{ $order->created_at->format('d M Y') }}</td>
 </tr>
 <tr>
-<td style="padding:10px 15px;font-weight:bold;">Payment</td>
-<td style="padding:10px 15px;">{{ strtoupper($order->payment_method) }}</td>
+<td style="padding:9px 0;font-size:12px;color:#999;border-bottom:1px solid #f0f0f0;">Payment</td>
+<td style="padding:9px 0;font-size:13px;color:#111;border-bottom:1px solid #f0f0f0;">{{ strtoupper($order->payment_method) }}</td>
 </tr>
 <tr>
-<td style="padding:10px 15px;font-weight:bold;">Status</td>
-<td style="padding:10px 15px;">{{ ucfirst($order->payment_status) }}</td>
+<td style="padding:9px 0;font-size:12px;color:#999;">Status</td>
+<td style="padding:9px 0;font-size:12px;">
+@if($order->payment_status === 'paid')
+<span style="background:#f0fdf4;color:#16a34a;padding:2px 10px;border-radius:3px;font-weight:600;">Paid</span>
+@else
+<span style="background:#fefce8;color:#ca8a04;padding:2px 10px;border-radius:3px;font-weight:600;">Pending</span>
+@endif
+</td>
 </tr>
 </table>
 
-## 🛍️ Order Items
+<p style="font-size:11px;letter-spacing:2px;color:#bbb;margin:0 0 15px;">ITEMS ORDERED</p>
 
-@component('mail::table')
-| Product | Qty | Price |
-|:--------|:---:|------:|
+<table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
 @foreach ($order->orderProducts as $item)
-| {{ $item->product_name }} | {{ $item->quantity }} | Rs. {{ number_format($item->sub_total, 2) }} |
+<tr style="border-bottom:1px solid #f0f0f0;">
+<td style="padding:10px 0;font-size:13px;color:#111;">{{ $item->product_name }}</td>
+<td style="padding:10px 0;font-size:13px;color:#999;text-align:center;">x{{ $item->quantity }}</td>
+<td style="padding:10px 0;font-size:13px;color:#111;text-align:right;">Rs. {{ number_format($item->sub_total, 2) }}</td>
+</tr>
 @endforeach
-@endcomponent
+</table>
 
-<table style="width:100%;border-collapse:collapse;margin:20px 0;background:#f8f8f8;">
+<table style="width:100%;border-collapse:collapse;margin-bottom:30px;">
 <tr>
-<td style="padding:10px 15px;">Subtotal</td>
-<td style="padding:10px 15px;text-align:right;">Rs. {{ number_format($order->subtotal, 2) }}</td>
+<td style="padding:6px 0;font-size:12px;color:#999;">Subtotal</td>
+<td style="padding:6px 0;font-size:12px;color:#777;text-align:right;">Rs. {{ number_format($order->subtotal, 2) }}</td>
 </tr>
 <tr>
-<td style="padding:10px 15px;">Shipping</td>
-<td style="padding:10px 15px;text-align:right;">Rs. {{ number_format($order->shipping_amount, 2) }}</td>
+<td style="padding:6px 0;font-size:12px;color:#999;">Shipping ({{ ucfirst($order->shipping_method) }})</td>
+<td style="padding:6px 0;font-size:12px;color:#777;text-align:right;">Rs. {{ number_format($order->shipping_amount, 2) }}</td>
 </tr>
-<tr style="font-weight:bold;border-top:2px solid #ddd;">
-<td style="padding:10px 15px;">Total</td>
-<td style="padding:10px 15px;text-align:right;">Rs. {{ number_format($order->total_amount, 2) }}</td>
+<tr style="border-top:1px solid #111;">
+<td style="padding:10px 0 0;font-size:14px;color:#111;font-weight:700;">Total</td>
+<td style="padding:10px 0 0;font-size:14px;color:#111;font-weight:700;text-align:right;">Rs. {{ number_format($order->total_amount, 2) }}</td>
 </tr>
 </table>
 
-📦 **Shipping Address**
-
-{{ $order->address }}, {{ $order->city }}, {{ $order->province }} {{ $order->zip }}
-
-@component('mail::button', ['url' => url('/'), 'color' => 'success'])
-Continue Shopping
-@endcomponent
-
-<p style="text-align:center;font-size:12px;color:#aaa;margin-top:30px;">
-© {{ date('Y') }} TechMart. All rights reserved.
+<p style="font-size:11px;letter-spacing:2px;color:#bbb;margin:0 0 10px;">SHIPPING TO</p>
+<p style="font-size:13px;color:#555;line-height:1.8;margin:0 0 35px;">
+{{ $order->address }}<br>
+{{ $order->city }}, {{ $order->province }} — {{ $order->zip }}
 </p>
 
-Thanks,
-**TechMart Team**
+</div>
+
+<div style="padding:20px 40px;border-top:1px solid #eee;text-align:center;">
+<p style="font-size:11px;color:#bbb;margin:0;">© {{ date('Y') }} TechMart &nbsp;·&nbsp; All rights reserved</p>
+</div>
+
+</div>
 @endcomponent

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderPlacedMail;
+use App\Models\City;
 use App\Models\Order;
+use App\Models\Province;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -85,6 +87,9 @@ class CheckoutController extends Controller
             if (empty($orderDetails)) {
                 return redirect()->route('cart')->with('error', 'Session expired. Please try again.');
             }
+
+            $provinceName = Province::find($orderDetails['province'])->name ?? $orderDetails['province'];
+            $cityName = City::find($orderDetails['city'])->name ?? $orderDetails['city'];
             $subTotal = collect($carts)->sum(fn ($c) => $c['price'] * $c['quantity']);
             $shippingCost = $orderDetails['shipping_method'] === 'express' ? 300 : 200;
             $totalAmount = $subTotal + $shippingCost;
@@ -142,8 +147,8 @@ class CheckoutController extends Controller
                 'shipping_amount' => $shippingCost,
                 'total_amount' => $totalAmount,
                 'shipping_method' => $orderDetails['shipping_method'],
-                'province' => $orderDetails['province'],
-                'city' => $orderDetails['city'],
+                'province' => $provinceName,
+                'city' => $cityName,
                 'address' => $request->address,
                 'zip' => $orderDetails['zipcode'],
                 'notes' => $request->note,
