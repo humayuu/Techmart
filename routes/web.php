@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
@@ -50,6 +51,8 @@ Route::prefix('admin')->group(function () {
 
         Route::resource('city', CityController::class);
         Route::get('city/status/{id}', [CityController::class, 'CityStatus'])->name('city.status');
+
+        Route::resource('coupon', CouponController::class);
 
     });
 });

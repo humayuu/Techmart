@@ -184,7 +184,8 @@ class CheckoutController extends Controller
             Mail::to($request->email)->send(new OrderPlacedMail($order));
         } catch (Exception $e) {
             Log::error('Order mail failed: '.$e->getMessage());
-            dd($e->getMessage());
+
+            return redirect()->back()->with('error', 'Order mail Failed');
         }
 
         return redirect()->route('thank.you.page');

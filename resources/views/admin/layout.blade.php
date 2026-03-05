@@ -230,7 +230,8 @@
                             <div class="menu-title">Manage Coupons</div>
                         </a>
                         <ul>
-                            <li><a href="#"><i class="far fa-circle"></i>All Coupons</a></li>
+                            <li><a href="{{ route('coupon.index') }}"><i class="far fa-circle"></i>All Coupons</a>
+                            </li>
                         </ul>
                     </li>
 
@@ -606,6 +607,43 @@
                     {
                         data: 'is_active',
                         name: 'is_active'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $('#couponTable').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('coupon.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'coupon_name',
+                        name: 'coupon_name'
+                    },
+                    {
+                        data: 'coupon_discount',
+                        name: 'coupon_discount'
+                    },
+                    {
+                        data: 'valid_until',
+                        name: 'valid_until'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: 'action',
