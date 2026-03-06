@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('coupon_name')->unique();
             $table->decimal('coupon_discount', 8, 2);
             $table->date('valid_until');
-            $table->enum('status', ['active', 'expired']);
+            $table->enum('status', ['active', 'expired'])->default('active');
             $table->timestamps();
         });
     }

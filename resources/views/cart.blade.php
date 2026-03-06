@@ -97,16 +97,20 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-6 mb-lm-30px">
+                            <div class="col-lg-4 col-md-6 mb-lm-30px" id="coupon-div">
                                 <div class="discount-code-wrapper">
                                     <div class="title-wrap">
                                         <h4 class="cart-bottom-title section-bg-gray">Use Coupon Code</h4>
                                     </div>
                                     <div class="discount-code">
                                         <p>Enter your coupon code if you have one.</p>
-                                        <input type="text" name="coupon_code" />
-                                        <button class="cart-btn-2" type="submit">Apply Coupon</button>
+                                        <input type="text" id="coupon_code" name="coupon_code" />
+                                        <a type="button" class="cart-btn-2" id="couponbtn" onclick="ApplyCoupon()">Apply
+                                            Coupon</a>
+                                        <a type="button" style="display:none;" class="cart-btn-2" id="removecoupon"
+                                            onclick="RemoveCoupon()">Remove Coupon</a>
                                     </div>
+                                    <span class="text-danger" id="coupon_message"></span>
                                 </div>
                             </div>
 
@@ -164,11 +168,37 @@
 @section('scripts')
     <script>
         const CSRF_TOKEN = '{{ csrf_token() }}';
+        let appliedCoupon = null;
+
+        const calculateGrandTotal = (productTotal) => {
+            let shipping = 0;
+            if (document.getElementById('standard').checked) shipping = 200;
+            else if (document.getElementById('express').checked) shipping = 300;
+
+            let discount = 0;
+            if (appliedCoupon) {
+                discount = productTotal * (appliedCoupon.discount / 100);
+            }
+
+            const grand = (productTotal - discount) + shipping;
+            document.getElementById('grandtotal').innerHTML = `Rs. ${Math.round(grand)}`;
+        };
+        const recalculateProductTotal = () => {
+            let productTotal = 0;
+            document.querySelectorAll('tr').forEach(tr => {
+                const qtyInput = tr.querySelector('input[name="quantity"]');
+                const priceEl = tr.querySelector('.product-price-cart .amount');
+                if (qtyInput && priceEl) {
+                    const rowPrice = parseFloat(priceEl.innerText.replace('Rs. ', ''));
+                    productTotal += rowPrice * parseInt(qtyInput.value);
+                }
+            });
+            return productTotal;
+        };
 
         const loadCart = async () => {
             let count = document.getElementById('cartCount');
             let tbodyEl = document.getElementById('cartBody');
-            let gTotal = document.getElementById('grandtotal');
             let pTotal = document.getElementById('producttotal');
             let standardShip = document.getElementById('standard');
             let expressShip = document.getElementById('express');
@@ -191,49 +221,121 @@
 
             Object.values(carts).forEach((cart) => {
                 productTotal += cart.price * cart.quantity;
-
                 tbodyEl.innerHTML += `
-                    <tr>
-                        <td class="product-thumbnail">
-                            <a href=""><img class="img-responsive ml-15px" src="/images/products/${cart.image}" alt="" /></a>
-                        </td>
-                        <td class="product-name"><a href="#">${cart.product_name}</a></td>
-                        <td class="product-price-cart"><span class="amount">Rs. ${cart.price}</span></td>
-                        <td class="product-quantity">
-                            <div>
-                                <input
-                                    type="number"
-                                    name="quantity"
-                                    onchange="CartQty(${cart.product_id}, this.value, ${cart.price}, this)"
-                                    value="${cart.quantity}"
-                                    min="1"
-                                    style="width:75px; border:none"
-                                />
-                            </div>
-                        </td>
-                        <td class="product-subtotal">Rs. ${cart.price * cart.quantity}</td>
-                        <td class="product-remove">
-                            <button onclick="CartRemove(${cart.product_id}, this)">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </td>
-                    </tr>`;
+            <tr>
+                <td class="product-thumbnail">
+                    <a href=""><img class="img-responsive ml-15px" src="/images/products/${cart.image}" alt="" /></a>
+                </td>
+                <td class="product-name"><a href="#">${cart.product_name}</a></td>
+                <td class="product-price-cart"><span class="amount">Rs. ${cart.price}</span></td>
+                <td class="product-quantity">
+                    <div>
+                        <input
+                            type="number"
+                            name="quantity"
+                            onchange="CartQty(${cart.product_id}, this.value, ${cart.price}, this)"
+                            value="${cart.quantity}"
+                            min="1"
+                            style="width:75px; border:none"
+                        />
+                    </div>
+                </td>
+                <td class="product-subtotal">Rs. ${cart.price * cart.quantity}</td>
+                <td class="product-remove">
+                    <button onclick="CartRemove(${cart.product_id}, this)">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </td>
+            </tr>`;
             });
 
             pTotal.innerHTML = `Rs. ${productTotal}`;
 
-            const calculateGrandTotal = (total) => {
-                let shipping = 0;
-                if (standardShip.checked) shipping = 200;
-                else if (expressShip.checked) shipping = 300;
-                gTotal.innerHTML = `Rs. ${total + shipping}`;
-            };
+            if (data.applied_coupon) {
+                appliedCoupon = data.applied_coupon;
+                document.getElementById('coupon_code').disabled = true;
+                document.getElementById('coupon_code').value = data.applied_coupon.coupon_code;
+                document.getElementById('couponbtn').style.pointerEvents = 'none';
+                document.getElementById('couponbtn').style.opacity = '0.5';
+                document.getElementById('removecoupon').style.display = 'block';
+
+            }
 
             calculateGrandTotal(productTotal);
 
-            standardShip.addEventListener('change', () => calculateGrandTotal(productTotal));
-            expressShip.addEventListener('change', () => calculateGrandTotal(productTotal));
+            standardShip.onchange = () => calculateGrandTotal(productTotal);
+            expressShip.onchange = () => calculateGrandTotal(productTotal);
         };
+
+        const ApplyCoupon = async () => {
+            const couponCode = document.getElementById('coupon_code').value.trim();
+
+            if (!couponCode) {
+                document.getElementById('coupon_message').innerHTML = 'Please Enter Your Coupon Code';
+                return
+            }
+
+            const response = await fetch(`{{ url('product/cart/apply-coupon') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN
+                },
+                body: JSON.stringify({
+                    coupon_code: couponCode
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status) {
+                appliedCoupon = {
+                    discount: data.discount
+                };
+
+                document.getElementById('coupon_code').disabled = true;
+                document.getElementById('couponbtn').style.pointerEvents = 'none';
+                document.getElementById('couponbtn').style.opacity = '0.5';
+
+                const productTotal = parseFloat(
+                    document.getElementById('producttotal').innerHTML.replace('Rs. ', '')
+                );
+                calculateGrandTotal(productTotal);
+                document.getElementById('coupon_message').innerHTML = '';
+                document.getElementById('removecoupon').style.display = 'block';
+
+
+            } else {
+                document.getElementById('coupon_message').innerHTML = 'Invalid or Expired Coupon';
+            }
+        };
+
+        const RemoveCoupon = async () => {
+            const response = await fetch(`{{ url('product/cart/remove-coupon') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.status) {
+                appliedCoupon = null;
+
+                document.getElementById('coupon_code').disabled = false;
+                document.getElementById('coupon_code').value = '';
+                document.getElementById('couponbtn').style.pointerEvents = 'auto';
+                document.getElementById('couponbtn').style.opacity = '1';
+                document.getElementById('removecoupon').style.display = 'none';
+                document.getElementById('coupon_message').innerHTML = '';
+
+                // Recalculate without discount
+                const productTotal = recalculateProductTotal();
+                calculateGrandTotal(productTotal);
+            }
+        }
 
         const ClearCart = async () => {
             const response = await fetch(`{{ url('product/cart/clear') }}`, {
@@ -246,6 +348,7 @@
             let data = await response.json();
             if (!data.status) return;
 
+            appliedCoupon = null;
             document.querySelector('.text-center').style.display = 'block';
             document.querySelector('.cart-main-area').style.display = 'none';
         };
@@ -266,26 +369,11 @@
 
             if (data.status) {
                 const row = inputEl.closest('tr');
-                const subtotalEl = row.querySelector('.product-subtotal');
-                subtotalEl.innerHTML = `Rs. ${price * qty}`;
+                row.querySelector('.product-subtotal').innerHTML = `Rs. ${price * qty}`;
 
-                // Recalculate product total from all rows
-                let productTotal = 0;
-                document.querySelectorAll('tr').forEach(tr => {
-                    const qtyInput = tr.querySelector('input[name="quantity"]');
-                    const priceEl = tr.querySelector('.product-price-cart .amount');
-                    if (qtyInput && priceEl) {
-                        const rowPrice = parseFloat(priceEl.innerText.replace('Rs. ', ''));
-                        productTotal += rowPrice * parseInt(qtyInput.value);
-                    }
-                });
-
+                const productTotal = recalculateProductTotal();
                 document.getElementById('producttotal').innerHTML = `Rs. ${productTotal}`;
-
-                let shipping = 0;
-                if (document.getElementById('standard').checked) shipping = 200;
-                else if (document.getElementById('express').checked) shipping = 300;
-                document.getElementById('grandtotal').innerHTML = `Rs. ${productTotal + shipping}`;
+                calculateGrandTotal(productTotal);
             }
         };
 
@@ -300,39 +388,23 @@
             const data = await response.json();
 
             if (data.status) {
-                const row = buttonEl.closest('tr');
-                row.remove();
+                buttonEl.closest('tr').remove();
 
-                // Recalculate product total
-                let productTotal = 0;
-                document.querySelectorAll('tr').forEach(tr => {
-                    const qtyInput = tr.querySelector('input[name="quantity"]');
-                    const priceEl = tr.querySelector('.product-price-cart .amount');
-                    if (qtyInput && priceEl) {
-                        const rowPrice = parseFloat(priceEl.innerText.replace('Rs. ', ''));
-                        productTotal += rowPrice * parseInt(qtyInput.value);
-                    }
-                });
-
+                const productTotal = recalculateProductTotal();
                 document.getElementById('producttotal').innerHTML = `Rs. ${productTotal}`;
                 document.getElementById('cartCount').innerHTML = `items ${data.cart_count}`;
-
-                let shipping = 0;
-                if (document.getElementById('standard').checked) shipping = 200;
-                else if (document.getElementById('express').checked) shipping = 300;
-                document.getElementById('grandtotal').innerHTML = `Rs. ${productTotal + shipping}`;
+                calculateGrandTotal(productTotal);
 
                 if (data.cart_count === 0) {
+                    appliedCoupon = null;
                     document.querySelector('.text-center').style.display = 'block';
                     document.querySelector('.cart-main-area').style.display = 'none';
                 }
             }
         };
 
-        // Fetch cities for selected province
         const SelectCity = async (provinceId) => {
             const cities = document.getElementById('allCities');
-
             const response = await fetch(`{{ url('product/cart/all/cities') }}/${provinceId}`);
             const data = await response.json();
 

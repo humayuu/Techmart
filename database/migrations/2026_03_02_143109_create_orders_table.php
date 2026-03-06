@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('payment_method', ['cod', 'stripe'])->nullable();
             $table->string('transaction_id', 100)->nullable();
             $table->string('coupon_code')->nullable();
+            $table->decimal('discount_amount', 10, 2)->default(0);
 
             // Amounts
             $table->decimal('subtotal', 10, 2);
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2);
 
             // Shipping info
-            $table->string('shipping_method')->nullable(); // "Standard" or "Express"
+            $table->string('shipping_method')->default('standard')->nullable(); // "Standard" or "Express"
             $table->string('province')->nullable();
             $table->string('city')->nullable();
             $table->string('address')->nullable();

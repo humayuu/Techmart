@@ -13,6 +13,7 @@ class Order extends Model
         'payment_method',
         'transaction_id',
         'coupon_code',
+        'discount_amount',
         'subtotal',
         'shipping_amount',
         'total_amount',
@@ -40,5 +41,4 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }

@@ -92,7 +92,16 @@ class CheckoutController extends Controller
             $cityName = City::find($orderDetails['city'])->name ?? $orderDetails['city'];
             $subTotal = collect($carts)->sum(fn ($c) => $c['price'] * $c['quantity']);
             $shippingCost = $orderDetails['shipping_method'] === 'express' ? 300 : 200;
-            $totalAmount = $subTotal + $shippingCost;
+            $appliedCoupon = session()->get('applied_coupon');
+            $discountAmount = 0;
+            $couponCode = null;
+
+            if ($appliedCoupon) {
+                $discountAmount = $subTotal * ($appliedCoupon['discount'] / 100);
+                $couponCode = $appliedCoupon['coupon_code'];
+            }
+
+            $totalAmount = ($subTotal - $discountAmount) + $shippingCost;
 
             // ============================================
             // STRIPE PAYMENT
@@ -136,13 +145,15 @@ class CheckoutController extends Controller
             }
             // ============================================
 
+            // Create order
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'status' => 'pending',
                 'payment_method' => $request->payment_method,
                 'payment_status' => $paymentStatus,
                 'transaction_id' => $transactionId,
-                'coupon_code' => $orderDetails['coupon'] ?? null,
+                'coupon_code' => $couponCode ?? null,
+                'discount_amount' => $discountAmount,
                 'subtotal' => $subTotal,
                 'shipping_amount' => $shippingCost,
                 'total_amount' => $totalAmount,
@@ -152,7 +163,6 @@ class CheckoutController extends Controller
                 'address' => $request->address,
                 'zip' => $orderDetails['zipcode'],
                 'notes' => $request->note,
-
             ]);
 
             foreach ($carts as $cart) {
@@ -170,6 +180,7 @@ class CheckoutController extends Controller
 
             session()->forget('cart');
             session()->forget('order_details');
+            session()->forget('applied_coupon');
             session()->put('order_confirm', true);
 
         } catch (Exception $e) {

@@ -10199,12 +10199,66 @@ Pages - My Account
     background-color: #000;
 }
 
-#card-element{
-     border: 1px solid #ccc;
-            padding: 12px 15px;
-            border-radius: 5px;
-            background: #fff;
-            width: 100%;
-            min-height: 45px;
-            box-sizing: border-box;
+#card-element {
+    border: 1px solid #ccc;
+    padding: 12px 15px;
+    border-radius: 5px;
+    background: #fff;
+    width: 100%;
+    min-height: 45px;
+    box-sizing: border-box;
+}
+
+#couponbtn {
+    color: #fff;
+    background-color: #266bf9;
+    border: 1px solid #266bf9;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+
+    display: inline-block;
+    width: 250px; /* Base width */
+    height: 50px;
+    line-height: 50px; /* Centers text vertically if using a fixed height */
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+
+    /* Combine all transitions here */
+    transition:
+        width 0.3s ease,
+        background-color 0.3s ease,
+        transform 0.1s ease;
+}
+
+#couponbtn:hover {
+    background-color: #000;
+}
+
+#removecoupon {
+    color: #fff;
+    background-color: #266bf9;
+    border: 1px solid #266bf9;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+
+    display: inline-block;
+    width: 250px; /* Base width */
+    height: 50px;
+    line-height: 50px; /* Centers text vertically if using a fixed height */
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+
+    /* Combine all transitions here */
+    transition:
+        width 0.3s ease,
+        background-color 0.3s ease,
+        transform 0.1s ease;
+}
+
+#removecoupon:hover {
+    background-color: #000;
 }

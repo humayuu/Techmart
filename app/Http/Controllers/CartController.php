@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Province;
 use Exception;
@@ -129,27 +130,25 @@ class CartController extends Controller
     {
         try {
             $carts = session()->get('cart', []);
-
             $total = 0;
             foreach ($carts as $cart) {
-                $total += $cart['price'] * $cart['quantity'];
+                $total += $cart['subtotal'];
             }
+
+            $appliedCoupon = session()->get('applied_coupon', null);
 
             return response()->json([
                 'status' => true,
-                'message' => 'Successfully Fetch All Cart Data',
                 'carts' => $carts,
                 'cartCount' => count($carts),
                 'total' => $total,
+                'applied_coupon' => $appliedCoupon,
             ], 200);
+
         } catch (Exception $e) {
             Log::error('Error in fetch All Cart Data '.$e->getMessage());
 
-            return response()->json([
-                'status' => false,
-                'message' => 'Error in fetch All Cart Data ',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['status' => false, 'message' => 'Error'], 500);
         }
     }
 
@@ -179,6 +178,7 @@ class CartController extends Controller
     public function CartClear()
     {
         session()->forget('cart');
+        session()->forget('applied_coupon');
 
         return response()->json([
             'status' => true,
@@ -211,5 +211,64 @@ class CartController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * For Apply Coupon
+     */
+    public function ApplyCoupon(Request $request)
+    {
+        $request->validate([
+            'coupon_code' => 'required',
+        ]);
+
+        $coupon = Coupon::where('coupon_name', $request->coupon_code)
+            ->where('status', 'active')
+            ->first();
+
+        if (! $coupon) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid or Expired Coupon code',
+            ], 422);
+        }
+
+        $carts = session()->get('cart', []);
+        $total = 0;
+        foreach ($carts as $cart) {
+            $total += $cart['subtotal'];
+        }
+
+        $discountAmount = $total * ($coupon->coupon_discount / 100);
+        $newTotal = $total - $discountAmount;
+
+        session()->put('applied_coupon', [
+            'coupon_code' => $coupon->coupon_name,
+            'discount' => $coupon->coupon_discount,
+            'discount_amount' => $discountAmount,
+            'new_total' => $newTotal,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Coupon applied successfully!',
+            'discount' => $coupon->coupon_discount,
+            'discount_amount' => $discountAmount,
+            'original_total' => $total,
+            'new_total' => $newTotal,
+        ]);
+    }
+
+    /**
+     * For Remove Coupon
+     */
+    public function RemoveCoupon()
+    {
+        session()->forget('applied_coupon');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Coupon removed successfully',
+        ]);
     }
 }

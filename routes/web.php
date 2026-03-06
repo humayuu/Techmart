@@ -83,6 +83,8 @@ Route::prefix('product')->group(function () {
 
         Route::put('cart/quantity/{id}', 'CartQuantity');
         Route::post('cart/clear', 'CartClear');
+        Route::post('cart/apply-coupon', 'ApplyCoupon');
+        Route::post('cart/remove-coupon', 'RemoveCoupon');
     });
 
     // Checkout All Routes

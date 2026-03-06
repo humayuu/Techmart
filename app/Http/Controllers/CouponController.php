@@ -15,7 +15,7 @@ class CouponController extends Controller
      */
     public function index(Request $request)
     {
-        $coupon = Coupon::all();
+        $coupon = Coupon::query();
         if ($request->ajax()) {
 
             return DataTables::of($coupon)
