@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
@@ -28,7 +30,7 @@ class ProductController extends Controller
                 ->addIndexColumn()
                 ->addColumn('image', function ($row) {
                     if ($row->product_thumbnail) {
-                        $imageUrl = asset('images/products/'.$row->product_thumbnail);
+                        $imageUrl = asset('images/products/thumbnail/'.$row->product_thumbnail);
 
                         return '<img src="'.$imageUrl.'" alt="Product Image" class="img-thumbnail w-75 rounded">';
                     }
@@ -142,37 +144,43 @@ class ProductController extends Controller
             'other_info' => 'required',
         ]);
 
-        // Create upload Directory
-        $destinationPath = public_path('images/products/');
-
-        if (! file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
-        }
-
         // Create Product Slug & status
         $slug = Str::slug($request->product_name);
         $status = 'active';
 
         DB::beginTransaction();
 
+        // Create Directory for Thumbnail
+        $thumbnailDestination = public_path('images/products/thumbnail');
+        if (! is_dir($thumbnailDestination)) {
+            mkdir($thumbnailDestination, 0755, true);
+        }
+
+        // Create Directory for Additional Images
+        $additionalDestination = public_path('images/products/additional_images');
+        if (! is_dir($additionalDestination)) {
+            mkdir($additionalDestination, 0755, true);
+        }
+
+        $manager = new ImageManager(new Driver);
+
+        $fileName = null;
+        $multiFileName = null;
+        $additionalImages = [];
+
         try {
             // Upload Product Thumbnail
-            $thumbnail = null;
-            $fileName = null;
-
-            if ($image = $request->file('thumbnail')) {
-                $fileName = uniqid('product_').time().'.'.$image->getClientOriginalExtension();
-                $image->move($destinationPath, $fileName);
-                $thumbnail = $fileName;
+            if ($img = $request->file('thumbnail')) {
+                $fileName = uniqid('thumbnail_').'.'.$img->getClientOriginalExtension();
+                $manager->read($img)->resize(300, 300)->save($thumbnailDestination.'/'.$fileName);
             }
 
             // Upload Additional Images
-            $additionalImages = [];
             if ($multipleImages = $request->file('images')) {
-                foreach ($multipleImages as $index => $img) {
-                    $additionalFilename = uniqid('product_').'_'.$index.'_'.time().'.'.$img->getClientOriginalExtension();
-                    $img->move($destinationPath, $additionalFilename);
-                    $additionalImages[] = $additionalFilename;
+                foreach ($multipleImages as $img) {
+                    $multiFileName = uniqid('additional_img_').'.'.$img->getClientOriginalExtension();
+                    $manager->read($img)->resize(800, 800)->save($additionalDestination.'/'.$multiFileName);
+                    $additionalImages[] = $multiFileName;
                 }
             }
 
@@ -188,7 +196,7 @@ class ProductController extends Controller
                 'long_description' => $request->long_description,
                 'selling_price' => $request->selling_price,
                 'discount_price' => $request->discount_price,
-                'product_thumbnail' => $thumbnail,
+                'product_thumbnail' => $fileName,
                 'product_multiple_image' => json_encode($additionalImages),
                 'featured' => $request->is_featured ?? 0,
                 'special_offer' => $request->special_offer ?? 0,
@@ -196,19 +204,17 @@ class ProductController extends Controller
                 'other_info' => $request->other_info,
                 'status' => $status,
             ]);
-
-            $notification = [
-                'message' => 'Product created Successfully',
-                'alert-type' => 'success',
-            ];
             DB::commit();
 
-            return redirect()->route('product.index')->with($notification);
+            return redirect()->route('product.index')->with([
+                'message' => 'Product created Successfully',
+                'alert-type' => 'success',
+            ]);
         } catch (Exception $e) {
             DB::rollBack();
 
-            if ($thumbnail && file_exists(public_path($thumbnail))) {
-                unlink(public_path($thumbnail));
+            if ($fileName && file_exists(public_path('images/products/thumbnail/'.$fileName))) {
+                unlink(public_path($fileName));
             }
 
             foreach ($additionalImages as $img) {
@@ -219,12 +225,10 @@ class ProductController extends Controller
 
             Log::error('Product creation failed '.$e->getMessage());
 
-            $notification = [
+            return redirect()->back()->with([
                 'message' => 'Product creation failed ',
                 'alert-type' => 'error',
-            ];
-
-            return redirect()->back()->with($notification);
+            ])->withInput();
         }
     }
 
@@ -233,11 +237,12 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
+        $product = Product::findOrFail($id);
         $brands = Brand::orderBy('id', 'DESC')->get();
         $categories = Category::orderBy('id', 'DESC')->get();
-        $product = Product::findOrFail($id);
+        $images = json_decode($product->product_multiple_image);
 
-        return view('admin.product.show', compact('product', 'brands', 'categories'));
+        return view('admin.product.show', compact('product', 'brands', 'categories', 'images'));
     }
 
     /**
@@ -248,8 +253,9 @@ class ProductController extends Controller
         $brands = Brand::orderBy('id', 'DESC')->get();
         $categories = Category::orderBy('id', 'DESC')->get();
         $product = Product::findOrFail($id);
+        $images = json_decode($product->product_multiple_image);
 
-        return view('admin.product.edit', compact('product', 'brands', 'categories'));
+        return view('admin.product.edit', compact('product', 'brands', 'categories', 'images'));
     }
 
     /**
@@ -259,10 +265,6 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        $oldThumbnail = $product->product_thumbnail;
-        $oldAdditionalImages = json_decode($product->product_multiple_image, true) ?? [];
-
-        // Fields validations
         $request->validate([
             'brand' => 'required',
             'category' => 'required',
@@ -280,41 +282,64 @@ class ProductController extends Controller
             'other_info' => 'required',
         ]);
 
-        // Create upload Directory
-        $destinationPath = public_path('images/products/');
-        if (! file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
-        }
-
         $slug = Str::slug($request->product_name);
 
+        $thumbnailDestination = public_path('images/products/thumbnail');
+        if (! is_dir($thumbnailDestination)) {
+            mkdir($thumbnailDestination, 0755, true);
+        }
+
+        $additionalDestination = public_path('images/products/additional_images');
+        if (! is_dir($additionalDestination)) {
+            mkdir($additionalDestination, 0755, true);
+        }
+
+        $manager = new ImageManager(new Driver);
+
+        // urrent DB values
+        $fileName = $product->product_thumbnail;
+        $oldImages = json_decode($product->product_multiple_image, true) ?? [];
+        $additionalImages = $oldImages;
+
+        // Track newly uploaded files for rollback cleanup
         $newThumbnail = null;
         $newAdditionalImages = [];
+
+        // Track old files to delete AFTER successful commit
+        $filesToDeleteAfterCommit = [];
 
         DB::beginTransaction();
 
         try {
-            // Upload Product Thumbnail
-            if ($image = $request->file('thumbnail')) {
-                $fileName = uniqid('product_').time().'.'.$image->getClientOriginalExtension();
-                $image->move($destinationPath, $fileName);
-                $newThumbnail = $fileName;
-            } else {
-                $newThumbnail = $oldThumbnail;
-            }
+            // Upload new thumbnail
+            if ($img = $request->file('thumbnail')) {
+                $newThumbnail = uniqid('thumbnail_').'.'.$img->getClientOriginalExtension();
+                $manager->read($img)->resize(300, 300)->save($thumbnailDestination.'/'.$newThumbnail);
 
-            // Upload Additional Images
-            if ($multipleImages = $request->file('images')) {
-                foreach ($multipleImages as $index => $img) {
-                    $additionalFilename = uniqid('product_').'_'.$index.'_'.time().'.'.$img->getClientOriginalExtension();
-                    $img->move($destinationPath, $additionalFilename);
-                    $newAdditionalImages[] = $additionalFilename;
+                // Schedule old thumbnail for deletion after commit
+                if ($product->product_thumbnail) {
+                    $filesToDeleteAfterCommit[] = $thumbnailDestination.'/'.$product->product_thumbnail;
                 }
-            } else {
-                $newAdditionalImages = $oldAdditionalImages;
+
+                $fileName = $newThumbnail;
             }
 
-            // Update Fields
+            // Upload new additional images
+            if ($multipleImg = $request->file('images')) {
+                foreach ($multipleImg as $img) {
+                    $multiFileName = uniqid('additional_img_').'.'.$img->getClientOriginalExtension();
+                    $manager->read($img)->resize(800, 800)->save($additionalDestination.'/'.$multiFileName);
+                    $newAdditionalImages[] = $multiFileName;
+                }
+
+                // Schedule old additional images for deletion after commit
+                foreach ($oldImages as $oldImg) {
+                    $filesToDeleteAfterCommit[] = $additionalDestination.'/'.$oldImg;
+                }
+
+                $additionalImages = $newAdditionalImages;
+            }
+
             $product->update([
                 'brand_id' => $request->brand,
                 'category_id' => $request->category,
@@ -327,8 +352,8 @@ class ProductController extends Controller
                 'long_description' => $request->long_description,
                 'selling_price' => $request->selling_price,
                 'discount_price' => $request->discount_price,
-                'product_thumbnail' => $newThumbnail,
-                'product_multiple_image' => json_encode($newAdditionalImages),
+                'product_thumbnail' => $fileName,
+                'product_multiple_image' => json_encode($additionalImages),
                 'featured' => $request->is_featured ?? 0,
                 'special_offer' => $request->special_offer ?? 0,
                 'product_weight' => $request->weight,
@@ -337,49 +362,36 @@ class ProductController extends Controller
 
             DB::commit();
 
-            // ✅ Delete OLD files after successful update
-            if ($request->hasFile('thumbnail') && ! empty($oldThumbnail) && file_exists(public_path('images/products/'.$oldThumbnail))) {
-                unlink(public_path('images/products/'.$oldThumbnail));
-            }
-
-            if ($request->hasFile('images') && ! empty($oldAdditionalImages)) {
-                foreach ($oldAdditionalImages as $img) {
-                    if (! empty($img) && file_exists(public_path('images/products/'.$img))) {
-                        unlink(public_path('images/products/'.$img));
-                    }
+            foreach ($filesToDeleteAfterCommit as $path) {
+                if (file_exists($path)) {
+                    unlink($path);
                 }
             }
 
-            $notification = [
+            return redirect()->route('product.index')->with([
                 'message' => 'Product Updated Successfully',
                 'alert-type' => 'success',
-            ];
+            ]);
 
-            return redirect()->route('product.index')->with($notification);
         } catch (Exception $e) {
             DB::rollBack();
 
-            // ✅ Delete NEW files on error (cleanup failed upload)
-            if (isset($newThumbnail) && $newThumbnail !== $oldThumbnail && file_exists(public_path('images/products/'.$newThumbnail))) {
-                unlink(public_path('images/products/'.$newThumbnail));
+            if ($newThumbnail && file_exists($thumbnailDestination.'/'.$newThumbnail)) {
+                unlink($thumbnailDestination.'/'.$newThumbnail);
             }
-
-            if (! empty($newAdditionalImages) && $newAdditionalImages !== $oldAdditionalImages) {
-                foreach ($newAdditionalImages as $img) {
-                    if ($img && file_exists(public_path('images/products/'.$img))) {
-                        unlink(public_path('images/products/'.$img));
-                    }
+            foreach ($newAdditionalImages as $img) {
+                $path = $additionalDestination.'/'.$img;
+                if (file_exists($path)) {
+                    unlink($path);
                 }
             }
 
             Log::error('Product Update failed: '.$e->getMessage());
 
-            $notification = [
+            return redirect()->back()->with([
                 'message' => 'Product Update failed',
                 'alert-type' => 'error',
-            ];
-
-            return redirect()->back()->with($notification)->withInput();
+            ])->withInput();
         }
     }
 
@@ -401,34 +413,31 @@ class ProductController extends Controller
             DB::commit();
 
             // Delete old slider image
-            if ($thumbnail && file_exists(public_path('images/products/'.$thumbnail))) {
-                unlink(public_path('images/products/'.$thumbnail));
+            if ($thumbnail && file_exists(public_path('images/products/thumbnail/'.$thumbnail))) {
+                unlink(public_path('images/products/thumbnail/'.$thumbnail));
             }
 
             if (! empty($additionalImage)) {
                 foreach ($additionalImage as $img) {
-                    if (! empty($img) && file_exists(public_path('images/products/'.$img))) {
-                        unlink(public_path('images/products/'.$img)); // ← Fixed
+                    if (! empty($img) && file_exists(public_path('images/products/additional_images/'.$img))) {
+                        unlink(public_path('images/products/additional_images/'.$img));
                     }
                 }
             }
 
-            $notification = [
+            return redirect()->back()->with([
                 'message' => 'Product Deleted Successfully',
                 'alert-type' => 'success',
-            ];
-
-            return redirect()->back()->with($notification);
+            ]);
         } catch (Exception $e) {
             DB::rollBack();
 
             Log::error('Product Deletion failed '.$e->getMessage());
-            $notification = [
+
+            return redirect()->back()->with([
                 'message' => 'Product Deletion failed',
                 'alert-type' => 'error',
-            ];
-
-            return redirect()->back()->with($notification);
+            ]);
         }
     }
 

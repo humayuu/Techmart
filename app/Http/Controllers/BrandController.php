@@ -90,8 +90,9 @@ class BrandController extends Controller
             // Upload logo
             if ($img = $request->file('logo')) {
                 $fileName = uniqid('brand_').'.'.$img->getClientOriginalExtension();
-                $image = $manager->read($img);
-                $image->scaleDown(191, 75)->save($destinationPath.'/'.$fileName);
+                $manager->read($img)
+                    ->coverDown(300, 150)
+                    ->save($destinationPath.'/'.$fileName);
             }
 
             Brand::create([
@@ -157,7 +158,7 @@ class BrandController extends Controller
             if ($img = $request->file('logo')) {
                 $newFileName = uniqid('brand_').'.'.$img->getClientOriginalExtension();
                 $manager->read($img)
-                    ->scaleDown(191, 75)
+                    ->coverDown(300, 150)
                     ->save($destinationPath.'/'.$newFileName);
 
                 if ($oldLogo && file_exists(public_path('images/brands/'.$oldLogo))) {

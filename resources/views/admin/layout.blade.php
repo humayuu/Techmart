@@ -94,12 +94,18 @@
 
                     </ul>
                 </div>
-
+                @php
+                    $user = Auth::guard('admin')->user();
+                @endphp
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
-                            <img src="{{ asset('backend/assets/images/avatars/avatar-1.png') }}" class="user-img"
-                                alt="" />
+                            @if (empty($user->profile_image))
+                                <img src="{{ asset('default-avatar.png') }}" class="user-img" alt="" />
+                            @else
+                                <img src="{{ asset('images/profile_image/' . $user->profile_image) }}" class="user-img"
+                                    alt="" />
+                            @endif
                             <div class="d-none d-sm-block">
                                 <p class="user-name mb-0">Humayun</p>
                                 <small class="mb-0 dropdown-user-designation">Admin</small>

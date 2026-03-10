@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class AdminController extends Controller
 {
@@ -76,23 +78,45 @@ class AdminController extends Controller
         return view('admin.profile', compact('user'));
     }
 
+    /**
+     * For Update User info
+     */
     public function AdminProfileUpdate(Request $request)
     {
+        $user = Auth::guard('admin')->user();
         $request->validate([
             'name' => 'required|max:50',
             'email' => 'required|email|unique:admins,email,'.Auth::guard('admin')->id(),
+            'profile_image' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
         try {
-            $admin = Auth::guard('admin')->user();
+            $UploadDir = public_path('images/profile_image');
 
-            if (! $admin) {
-                throw new Exception('Admin not found');
+            if (! is_dir($UploadDir)) {
+                mkdir($UploadDir, 0755, true);
             }
 
-            $admin->update([
+            $fileName = $user->profile_image;
+
+            if ($request->hasFile('profile_image')) {
+                $img = $request->file('profile_image');
+                $fileName = uniqid('user_').'.'.$img->getClientOriginalExtension();
+
+                $manager = new ImageManager(new Driver);
+                $manager->read($img)
+                    ->coverDown(200, 200)
+                    ->save($UploadDir.'/'.$fileName);
+
+                if ($user->profile_image && file_exists($UploadDir.'/'.$user->profile_image)) {
+                    unlink($UploadDir.'/'.$user->profile_image);
+                }
+            }
+
+            $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
+                'profile_image' => $fileName,
             ]);
 
             return redirect()->back()->with([
@@ -102,6 +126,11 @@ class AdminController extends Controller
 
         } catch (Exception $e) {
             Log::error('Error in update profile details: '.$e->getMessage());
+            if (isset($fileName) && $fileName !== $user->profile_image) {
+                if (file_exists($UploadDir.'/'.$fileName)) {
+                    unlink($UploadDir.'/'.$fileName);
+                }
+            }
 
             return redirect()->back()->with([
                 'message' => 'Error in update profile',

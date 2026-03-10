@@ -195,7 +195,7 @@
                                         <small class="text-muted">Main product image (leave empty to keep current)</small>
                                         <div class="mt-2">
                                             <img class="img-thumbnail" width="150"
-                                                src="{{ asset('images/products/' . $product->product_thumbnail) }}"
+                                                src="{{ asset('images/products/thumbnail/' . $product->product_thumbnail) }}"
                                                 id="image_preview_tag" alt="{{ $product->product_thumbnail }}">
                                         </div>
                                         @error('thumbnail')
@@ -210,14 +210,11 @@
                                             current)</small>
                                         <div id="multiplePreview" class="mt-2"
                                             style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                            @php
-                                                $images = json_decode($product->product_multiple_image);
-                                            @endphp
                                             @if ($images)
                                                 @foreach ($images as $img)
                                                     <img class="img-thumbnail" width="120" height="120"
                                                         style="object-fit: cover;"
-                                                        src="{{ asset('images/products/' . $img) }}"
+                                                        src="{{ asset('images/products/additional_images/' . $img) }}"
                                                         alt="{{ $img }}">
                                                 @endforeach
                                             @endif

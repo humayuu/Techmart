@@ -373,6 +373,13 @@ input {
     transform: translateY(-1px);
 }
 
+.slider-height {
+    height: 748px;
+    background-size: cover; /* ADD THIS */
+    background-position: center center; /* ADD THIS */
+    background-repeat: no-repeat; /* ADD THIS */
+}
+
 .slider-animated-1 > * {
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
