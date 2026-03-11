@@ -106,9 +106,10 @@
                                 <img src="{{ asset('images/profile_image/' . $user->profile_image) }}" class="user-img"
                                     alt="" />
                             @endif
-                            <div class="d-none d-sm-block">
-                                <p class="user-name mb-0">Humayun</p>
-                                <small class="mb-0 dropdown-user-designation">Admin</small>
+                            <div class="d-none d-sm-block ">
+                                <p class="user-name mb-0">{{ Str::upper($user->name) }}</p>
+                                <small class="mb-0 dropdown-user-designation fw-bold">Role :
+                                    {{ $user->name }}</small>
                             </div>
                         </div>
                     </a>
@@ -259,7 +260,14 @@
                             <div class="menu-title">Manage Orders</div>
                         </a>
                         <ul>
-                            <li><a href="#"><i class="far fa-circle"></i>All Orders</a></li>
+                            <li><a href="{{ route('pending.order') }}"><i class="far fa-circle"></i>Pending </a></li>
+                            <li><a href="{{ route('processing.order') }}"><i class="far fa-circle"></i>Processing</a>
+                            </li>
+                            <li><a href="{{ route('shipped.order') }}"><i class="far fa-circle"></i>Shipped</a></li>
+                            <li><a href="{{ route('delivered') }}"><i class="far fa-circle"></i>Delivered</a>
+                            </li>
+                            <li><a href="{{ route('cancel.order') }}"><i class="far fa-circle"></i>Cancelled</a></li>
+                            <li><a href="{{ route('refunded') }}"><i class="far fa-circle"></i>refunded</a></li>
                         </ul>
                     </li>
 
@@ -659,6 +667,370 @@
                     }
                 ]
             });
+
+            $('#pendingOrder').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('pending.order') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'order_id',
+                        name: 'order_id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'payment',
+                        name: 'payment',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+
+            $('#processingOrder').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('processing.order') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'order_id',
+                        name: 'order_id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'payment',
+                        name: 'payment',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+
+            $('#shippedOrder').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('shipped.order') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'order_id',
+                        name: 'order_id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'payment',
+                        name: 'payment',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+            $('#delivered').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('delivered') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'order_id',
+                        name: 'order_id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'payment',
+                        name: 'payment',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+
+            $('#cancelOrder').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('cancel.order') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'order_id',
+                        name: 'order_id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'payment',
+                        name: 'payment',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+
+            $('#refund').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('refunded') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'order_id',
+                        name: 'order_id',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'payment',
+                        name: 'payment',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+
+
+
+
+
 
         });
     </script>

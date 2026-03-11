@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\UserController;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,6 +55,23 @@ Route::prefix('admin')->group(function () {
         Route::get('city/status/{id}', [CityController::class, 'CityStatus'])->name('city.status');
 
         Route::resource('coupon', CouponController::class);
+
+        // Manage Order Routes
+        Route::prefix('order')->group(function () {
+            Route::controller(OrderController::class)->group(function () {
+                Route::get('pending', 'PendingOrders')->name('pending.order');
+                Route::get('processing', 'ProcessingOrders')->name('processing.order');
+                Route::get('shipped', 'ShippedOrders')->name('shipped.order');
+                Route::get('delivered', 'Delivered')->name('delivered');
+                Route::get('cancel', 'CancelOrder')->name('cancel.order');
+                Route::get('refunded', 'Refunded')->name('refunded');
+                Route::get('detail/{id}', 'OrderDetail')->name('orders.detail');
+                Route::get('invoice/{id}', 'InvoicePdf')->name('invoice.pdf');
+
+                Route::put('status/{id}', 'updateStatus')
+                    ->name('admin.orders.updateStatus');
+            });
+        });
 
     });
 });
