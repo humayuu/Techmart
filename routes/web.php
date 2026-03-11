@@ -59,14 +59,16 @@ Route::prefix('admin')->group(function () {
         // Manage Order Routes
         Route::prefix('order')->group(function () {
             Route::controller(OrderController::class)->group(function () {
-                Route::get('pending', 'PendingOrders')->name('pending.order');
-                Route::get('processing', 'ProcessingOrders')->name('processing.order');
-                Route::get('shipped', 'ShippedOrders')->name('shipped.order');
-                Route::get('delivered', 'Delivered')->name('delivered');
-                Route::get('cancel', 'CancelOrder')->name('cancel.order');
-                Route::get('refunded', 'Refunded')->name('refunded');
-                Route::get('detail/{id}', 'OrderDetail')->name('orders.detail');
-                Route::get('invoice/{id}', 'InvoicePdf')->name('invoice.pdf');
+                Route::get('pending', 'pendingOrders')->name('pending.order');
+                Route::get('processing', 'processingOrders')->name('processing.order');
+                Route::get('shipped', 'shippedOrders')->name('shipped.order');
+                Route::get('delivered', 'delivered')->name('delivered');
+                Route::get('cancel', 'cancelOrder')->name('cancel.order');
+                Route::get('refunded', 'refunded')->name('refunded');
+                Route::get('detail/{id}', 'orderDetail')->name('orders.detail');
+                Route::get('invoice/{id}', 'invoicePdf')->name('invoice.pdf');
+                Route::delete('delete/{id}', [OrderController::class, 'destroy'])
+                    ->name('orders.delete');
 
                 Route::put('status/{id}', 'updateStatus')
                     ->name('admin.orders.updateStatus');

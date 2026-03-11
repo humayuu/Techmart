@@ -1,7 +1,7 @@
     @extends('admin.layout')
 
     @section('page-title')
-        Delivered <span class="badge bg-dark"></span>
+        Delivered <span class="badge bg-dark">{{ $totalDelivered }}</span>
     @endsection
 
     @section('main')

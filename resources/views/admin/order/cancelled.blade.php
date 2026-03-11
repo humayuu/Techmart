@@ -1,7 +1,7 @@
     @extends('admin.layout')
 
     @section('page-title')
-        Processing <span class="badge bg-dark">{{ $totalCancelOrders }}</span>
+        Cancelled <span class="badge bg-dark">{{ $totalCancelOrders }}</span>
     @endsection
 
     @section('main')

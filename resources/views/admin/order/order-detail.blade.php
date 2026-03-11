@@ -106,7 +106,7 @@
 
                         <tbody>
 
-                            @foreach ($orderProducts as $key => $product)
+                            @foreach ($order->orderProducts as $key => $product)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td class="fw-semibold">{{ $product->product_name }}</td>
