@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\OrderPlacedMail;
 use App\Models\City;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Province;
 use Exception;
 use Illuminate\Http\Request;
@@ -174,6 +175,8 @@ class CheckoutController extends Controller
                     'unit_price' => $cart['price'],
                     'sub_total' => $cart['price'] * $cart['quantity'],
                 ]);
+                // Minus from Product Stock
+                Product::where('id', $cart['product_id'])->decrement('product_qty', $cart['quantity']);
             }
 
             DB::commit();

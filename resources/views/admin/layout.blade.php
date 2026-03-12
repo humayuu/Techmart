@@ -276,7 +276,7 @@
                             <div class="menu-title">Manage Stock</div>
                         </a>
                         <ul>
-                            <li><a href="#"><i class="far fa-circle"></i>All Stock</a></li>
+                            <li><a href="{{ route('stock.index') }}"><i class="far fa-circle"></i>All Stock</a></li>
                         </ul>
                     </li>
 
@@ -686,7 +686,7 @@
                         className: 'text-center'
                     },
                     {
-                        data: 'customer',
+                        data: 'image',
                         name: 'customer',
                         className: 'text-center'
                     },
@@ -1026,10 +1026,55 @@
 
             });
 
+            $('#stock').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('stock.index') }}"
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'product_name',
+                        name: 'product_name',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'image',
+                        name: 'image',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'selling_price',
+                        name: 'selling_price',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'stock',
+                        name: 'stock',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
 
+                ]
 
-
-
+            });
 
         });
     </script>

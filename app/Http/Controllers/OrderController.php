@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -272,10 +273,25 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled,refunded',
         ]);
 
-        $order = Order::findOrFail($id);
-        $order->update(['status' => $request->status]);
-        if ($request->status === 'delivered') {
+        $order = Order::with('orderProducts')->findOrFail($id);
+
+        $oldStatus = $order->status;
+        $newStatus = $request->status;
+
+        $order->update(['status' => $newStatus]);
+
+        if ($newStatus === 'delivered') {
             $order->update(['payment_status' => 'paid']);
+        }
+
+        if (
+            in_array($newStatus, ['cancelled', 'refunded']) &&
+            ! in_array($oldStatus, ['cancelled', 'refunded'])
+        ) {
+            foreach ($order->orderProducts as $item) {
+                Product::where('id', $item->product_id)
+                    ->increment('product_qty', $item->quantity);
+            }
         }
 
         return redirect()->back()->with('success', 'Order status updated successfully');

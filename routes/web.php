@@ -15,6 +15,7 @@ use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\UserController;
 use App\Models\Order;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +56,7 @@ Route::prefix('admin')->group(function () {
         Route::get('city/status/{id}', [CityController::class, 'CityStatus'])->name('city.status');
 
         Route::resource('coupon', CouponController::class);
+        Route::resource('stock', StockController::class);
 
         // Manage Order Routes
         Route::prefix('order')->group(function () {
