@@ -107,7 +107,7 @@
                                     alt="" />
                             @endif
                             <div class="d-none d-sm-block ">
-                                <p class="user-name mb-0">{{ Str::upper($user->name) }}</p>
+                                <p class="user-name mb-0">{{ Str::title($user->name) }}</p>
                                 <small class="mb-0 dropdown-user-designation fw-bold"></small>
                             </div>
                         </div>

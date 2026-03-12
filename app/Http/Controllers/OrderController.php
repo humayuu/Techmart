@@ -153,7 +153,6 @@ class OrderController extends Controller
             $datatable = $this->applySharedColumns(DataTables::of($query));
             $datatable = $this->buildActionColumn($datatable, [
                 'shipped' => 'Shipped',
-                'delivered' => 'Delivered',
                 'cancelled' => 'Cancelled',
             ]);
 
@@ -275,6 +274,9 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         $order->update(['status' => $request->status]);
+        if ($request->status === 'delivered') {
+            $order->update(['payment_status' => 'paid']);
+        }
 
         return redirect()->back()->with('success', 'Order status updated successfully');
     }
