@@ -43,7 +43,8 @@
                             <div class="top-nav">
                                 <ul>
                                     <li>
-                                        <a href="my-account.html"><i class="fa fa-envelope"></i> Contact us</a>
+                                        <a href="{{ route('contact.us') }}"><i class="fa fa-envelope"></i> Contact
+                                            us</a>
                                     </li>
                                     @if (Auth::check())
                                         <li>
@@ -234,7 +235,7 @@
             <div class="user-panel">
                 <ul>
                     <li>
-                        <a href="my-account.html"><i class="fa fa-envelope"></i> Contact us</a>
+                        <a href="{{ route('contact.us') }}"><i class="fa fa-envelope"></i> Contact us</a>
                     </li>
                     <li>
                         <a href="my-account.html"><i class="fa fa-user"></i> My Account</a>

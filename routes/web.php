@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -121,6 +122,11 @@ Route::prefix('product')->group(function () {
 
         });
     });
+});
+
+Route::controller(ContactUsController::class)->group(function () {
+    Route::get('contact/us', 'contactPage')->name('contact.us');
+    Route::post('send/email', 'sendMail')->name('send.email');
 });
 
 // Google Login

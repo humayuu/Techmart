@@ -686,7 +686,7 @@
                         className: 'text-center'
                     },
                     {
-                        data: 'image',
+                        data: 'customer',
                         name: 'customer',
                         className: 'text-center'
                     },

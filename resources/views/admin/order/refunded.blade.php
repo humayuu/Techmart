@@ -7,8 +7,7 @@
     @section('main')
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white py-3">
-                <h5 class="mb-0">
-                    <i class="bi bi-people-fill me-2"></i>Refund Orders
+                <h5 class="mb-0">Refund Orders
                 </h5>
             </div>
             <div class="card-body">
