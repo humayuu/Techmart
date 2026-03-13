@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderPlacedMail;
+use App\Models\Admin;
 use App\Models\City;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Province;
+use App\Notifications\NewOrderPlaced;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Stripe\Charge;
 use Stripe\Stripe;
 
@@ -178,6 +181,10 @@ class CheckoutController extends Controller
                 // Minus from Product Stock
                 Product::where('id', $cart['product_id'])->decrement('product_qty', $cart['quantity']);
             }
+
+            // For Admin Notification
+            $admins = Admin::all();
+            Notification::send($admins, new NewOrderPlaced($order));
 
             DB::commit();
 

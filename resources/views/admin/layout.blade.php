@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
     {{-- font-awesome icon --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>TechMart Admin Dashboard</title>
 </head>
@@ -58,13 +59,61 @@
                         </li>
 
                         <li class="nav-item dropdown dropdown-large">
+                            @php
+                                $unreadCount = auth('admin')->user()->unreadNotifications->count();
+                            @endphp
+
                             <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
                                 data-bs-toggle="dropdown">
                                 <div class="notifications">
-                                    <span class="notify-badge">8</span>
+                                    @if ($unreadCount > 0)
+                                        <span class="notify-badge">{{ $unreadCount }}</span>
+                                    @endif
                                     <i class="bi bi-bell-fill"></i>
                                 </div>
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end" id="notification-dropdown">
+
+                                <li class="px-3 py-2">
+                                    <h6 class="mb-0">Notifications</h6>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <div id="notifications-wrapper">
+                                    @forelse(auth('admin')->user()->unreadNotifications as $notification)
+                                        <li class="notification-item" id="notif-{{ $notification->id }}">
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.detail', $notification->data['order_id']) }}"
+                                                onclick="markRead('{{ $notification->id }}', event)">
+                                                <p class="mb-0">{{ $notification->data['message'] }}</p>
+                                                <small class="text-muted">
+                                                    Rs. {{ $notification->data['total_amount'] }}
+                                                    &bull; {{ $notification->created_at->diffForHumans() }}
+                                                </small>
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li id="no-notifications">
+                                            <span class="dropdown-item text-muted">No new notifications</span>
+                                        </li>
+                                    @endforelse
+                                </div>
+
+                                @if ($unreadCount > 0)
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a href="#" id="mark-all-btn"
+                                            class="dropdown-item text-center text-primary">
+                                            Mark all as read
+                                        </a>
+                                    </li>
+                                @endif
+
+                            </ul>
                             <div class="dropdown-menu dropdown-menu-end p-0">
                                 <div class="p-2 border-bottom m-2">
                                     <h5 class="h5 mb-0">Notifications</h5>
@@ -362,6 +411,95 @@
 
     {{-- Data table CDN --}}
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
+    <script>
+        // Mark single notification as read
+        function markRead(notificationId, event) {
+            event.preventDefault();
+            const link = event.currentTarget;
+
+            fetch(`/admin/notifications/${notificationId}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove this item from dropdown
+                        document.getElementById(`notif-${notificationId}`)?.remove();
+
+                        // Update badge
+                        updateBadge(-1);
+
+                        // Check if empty
+                        checkEmpty();
+
+                        // Navigate to order page
+                        window.location.href = link.href;
+                    }
+                });
+        }
+
+        // Mark all as read
+        const markAllBtn = document.getElementById('mark-all-btn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                fetch('/admin/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Clear all items
+                            document.getElementById('notifications-wrapper').innerHTML =
+                                `<li id="no-notifications">
+                            <span class="dropdown-item text-muted">No new notifications</span>
+                        </li>`;
+
+                            // Hide badge
+                            const badge = document.querySelector('.notify-badge');
+                            if (badge) badge.style.display = 'none';
+
+                            // Hide button
+                            markAllBtn.parentElement.style.display = 'none';
+                        }
+                    });
+            });
+        }
+
+        // Update badge number
+        function updateBadge(change) {
+            const badge = document.querySelector('.notify-badge');
+            if (!badge) return;
+            const newCount = (parseInt(badge.textContent) || 0) + change;
+            if (newCount <= 0) {
+                badge.style.display = 'none';
+            } else {
+                badge.textContent = newCount;
+            }
+        }
+
+        // Show empty message if no notifications left
+        function checkEmpty() {
+            const items = document.querySelectorAll('.notification-item');
+            if (items.length === 0) {
+                document.getElementById('notifications-wrapper').innerHTML =
+                    `<li id="no-notifications">
+                    <span class="dropdown-item text-muted">No new notifications</span>
+                </li>`;
+                const btn = document.getElementById('mark-all-btn');
+                if (btn) btn.parentElement.style.display = 'none';
+            }
+        }
+    </script>
 
     <!-- Toastr Notification Script -->
     <script>

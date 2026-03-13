@@ -77,7 +77,21 @@ Route::prefix('admin')->group(function () {
                     ->name('admin.orders.updateStatus');
             });
         });
+        Route::post('notifications/mark-all-read', function () {
+            auth('admin')->user()
+                ->notifications()
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
 
+            return response()->json(['success' => true]);
+        })->name('admin.notifications.markAllRead');
+
+        Route::post('notifications/{id}/read', function ($id) {
+            $notification = auth('admin')->user()->notifications()->findOrFail($id);
+            $notification->markAsRead();
+
+            return response()->json(['success' => true]);
+        })->name('admin.notifications.markRead');
     });
 });
 
