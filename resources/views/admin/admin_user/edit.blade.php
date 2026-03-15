@@ -103,8 +103,8 @@
                         @php
                             $modules = [
                                 ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge-high'],
-                                ['key' => 'users', 'label' => 'Users', 'icon' => 'fa-users'],
-                                ['key' => 'roles', 'label' => 'Roles', 'icon' => 'fa-shield-halved'],
+                                ['key' => 'admin_users', 'label' => 'Admin Users', 'icon' => 'fa-user-shield'],
+                                ['key' => 'customers', 'label' => 'Customers', 'icon' => 'fa-users'],
                                 ['key' => 'products', 'label' => 'Products', 'icon' => 'fa-box-open'],
                                 ['key' => 'orders', 'label' => 'Orders', 'icon' => 'fa-cart-shopping'],
                                 ['key' => 'categories', 'label' => 'Categories', 'icon' => 'fa-tags'],
@@ -117,7 +117,6 @@
                                 ['key' => 'return_orders', 'label' => 'Return Orders', 'icon' => 'fa-rotate-left'],
                                 ['key' => 'reports', 'label' => 'Reports', 'icon' => 'fa-chart-bar'],
                                 ['key' => 'settings', 'label' => 'Settings', 'icon' => 'fa-gear'],
-                                ['key' => 'notifications', 'label' => 'Notifications', 'icon' => 'fa-bell'],
                             ];
                         @endphp
 

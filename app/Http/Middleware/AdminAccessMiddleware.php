@@ -22,7 +22,7 @@ class AdminAccessMiddleware
         }
         // Access check
         if (! $admin->hasAccess($permission)) {
-            abort(403, 'Aap ko is section ka access nahi hai.');
+            abort(403, 'You do not have access to this section.');
         }
 
         return $next($request);

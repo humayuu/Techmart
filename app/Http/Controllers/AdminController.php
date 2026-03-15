@@ -33,9 +33,19 @@ class AdminController extends Controller
         ]);
 
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
-            $request->session()->regenerate();
 
-            return redirect()->route('admin.dashboard');
+            $admin = Auth::guard('admin')->user();
+
+            if ($admin->status === 'active') {
+                $request->session()->regenerate();
+
+                return redirect()->route('admin.dashboard');
+            }
+            Auth::guard('admin')->logout();
+
+            return redirect()->route('admin.login.page')->withErrors([
+                'email' => 'Your account is inactive.',
+            ])->withInput($request->only('email'));
         }
 
         return redirect()->route('admin.login.page')->withErrors([
@@ -203,18 +213,23 @@ class AdminController extends Controller
                         ? asset('images/profile_image/'.$row->profile_image)
                         : asset('default-avatar.png');
 
-                    return '<img src="'.$imageUrl.'" alt="Avatar" class="img-thumbnail" width=100; height=90;>';
+                    return '
+                    <div class="d-flex justify-content-center">
+                        <img src="'.$imageUrl.'" alt="Avatar"
+                            class="img-thumbnail object-fit-cover border"
+                            width="100" height="90">
+                    </div>';
                 })
                 ->addColumn('role', function ($row) {
-                    $color = $row->role === 'admin' ? 'primary' : 'secondary';
+                    $color = $row->role === 'admin' ? 'primary' : 'dark';
                     $label = ucwords(str_replace('_', ' ', $row->role));
 
-                    return '<span class="badge fs-6 bg-'.$color.'">'.$label.'</span>';
+                    return '<span class="badge fs-6 bg-'.$color.' px-3 py-2">'.$label.'</span>';
                 })
                 ->addColumn('status', function ($row) {
                     return $row->status === 'active'
-                        ? '<span class="badge fs-6 bg-success">Active</span>'
-                        : '<span class="badge fs-6 bg-danger">Inactive</span>';
+                        ? '<span class="badge fs-6 bg-success px-3 py-2">Active</span>'
+                        : '<span class="badge fs-6 bg-danger px-3 py-2">Inactive</span>';
                 })
                 ->addColumn('action', function ($row) {
                     $editUrl = route('admin.user.edit', $row->id);
@@ -223,34 +238,38 @@ class AdminController extends Controller
                     $detailUrl = route('admin.user.show', $row->id);
                     $class = $row->status == 'active' ? 'success' : 'dark';
                     $icon = $row->status == 'active' ? 'thumbs-up' : 'thumbs-down';
+                    $title = $row->status == 'active' ? 'Deactivate' : 'Activate';
 
-                    $btn = '<div class="d-flex align-items-center gap-3 fs-5">
+                    return '
+                    <div class="d-flex justify-content-center align-items-center gap-3 fs-5">
 
-                      <a href="'.$detailUrl.'"
-                      class="text-secondary fs-4 " data-bs-toggle="tooltip"
-                      data-bs-placement="bottom" title="View Info">
-                      <i class="bi bi-eye-fill"></i>
-                      </a>
-                            <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
-                                <i class="bi bi-pencil-fill"></i>
-                            </a>
-                            <a href="'.$statusUrl.'"
-                            class="text-'.$class.'" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" title="Edit info">
+                        <a href="'.$detailUrl.'" class="text-secondary"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" title="View Info">
+                            <i class="bi bi-eye-fill"></i>
+                        </a>
+
+                        <a href="'.$editUrl.'" class="text-primary"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit Info">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+
+                        <a href="'.$statusUrl.'" class="text-'.$class.'"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
                             <i class="bi bi-hand-'.$icon.'-fill"></i>
-                            </a>
+                        </a>
 
-
-                            <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
+                        <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
                             '.csrf_field().'
-                                '.method_field('DELETE').'
-                                <button type="submit" id="delete" class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" style="cursor: pointer; line-height: 1;">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
-                            </form>
-                        </div>';
+                            '.method_field('DELETE').'
+                            <button id="delete" type="submit"
+                                class="text-danger border-0 bg-transparent p-0 d-inline-flex align-items-center delete-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete"
+                                style="cursor: pointer; line-height: 1; font-size: inherit;">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </form>
 
-                    return $btn;
+                    </div>';
                 })
                 ->rawColumns(['image', 'role', 'status', 'action'])
                 ->make(true);
@@ -387,7 +406,7 @@ class AdminController extends Controller
             }
 
             return redirect()->back()->with([
-                'message' => 'User Updated Successfully',
+                'message' => 'User Deleted Successfully',
                 'alert-type' => 'success',
             ]);
         } catch (Exception $e) {

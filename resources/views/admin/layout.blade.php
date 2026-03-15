@@ -38,31 +38,22 @@
                 <div class="mobile-toggle-icon fs-3">
                     <i class="bi bi-list"></i>
                 </div>
-                <form class="searchbar">
-                    <div class="position-absolute top-50 translate-middle-y search-icon ms-3">
-                        <i class="bi bi-search"></i>
-                    </div>
-                    <input class="form-control" type="text" placeholder="Type here to search" />
-                    <div class="position-absolute top-50 translate-middle-y search-close-icon">
-                        <i class="bi bi-x-lg"></i>
-                    </div>
-                </form>
+
+                @php
+                    $admin = auth('admin')->user();
+                    $unreadCount = $admin->unreadNotifications->count();
+                @endphp
 
                 <div class="top-navbar-right ms-auto">
                     <ul class="navbar-nav align-items-center">
+
                         <li class="nav-item search-toggle-icon">
                             <a class="nav-link" href="#">
-                                <div class="">
-                                    <i class="bi bi-search"></i>
-                                </div>
+                                <i class="bi bi-search"></i>
                             </a>
                         </li>
 
                         <li class="nav-item dropdown dropdown-large">
-                            @php
-                                $unreadCount = auth('admin')->user()->unreadNotifications->count();
-                            @endphp
-
                             <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
                                 data-bs-toggle="dropdown">
                                 <div class="notifications">
@@ -72,8 +63,8 @@
                                     <i class="bi bi-bell-fill"></i>
                                 </div>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" id="notification-dropdown">
 
+                            <ul class="dropdown-menu dropdown-menu-end" id="notification-dropdown">
                                 <li class="px-3 py-2">
                                     <h6 class="mb-0">Notifications</h6>
                                 </li>
@@ -82,21 +73,33 @@
                                 </li>
 
                                 <div id="notifications-wrapper">
-                                    @forelse(auth('admin')->user()->unreadNotifications as $notification)
+                                    @forelse($admin->unreadNotifications as $notification)
                                         <li class="notification-item" id="notif-{{ $notification->id }}">
                                             <a class="dropdown-item"
-                                                href="{{ route('orders.detail', $notification->data['order_id']) }}"
+                                                href="{{ $admin->notificationRedirectUrl($notification->data) }}"
                                                 onclick="markRead('{{ $notification->id }}', event)">
-                                                <p class="mb-0">{{ $notification->data['message'] }}</p>
-                                                <small class="text-muted">
-                                                    Rs. {{ $notification->data['total_amount'] }}
-                                                    &bull; {{ $notification->created_at->diffForHumans() }}
-                                                </small>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="notification-box bg-light-primary text-primary">
+                                                        <i class="bi bi-basket2-fill"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-0 fw-semibold">
+                                                            {{ $notification->data['message'] }}</p>
+                                                        <small class="text-muted">
+                                                            Rs.
+                                                            {{ number_format($notification->data['total_amount']) }}
+                                                            &bull; {{ $notification->created_at->diffForHumans() }}
+                                                        </small>
+                                                    </div>
+                                                </div>
                                             </a>
                                         </li>
                                     @empty
                                         <li id="no-notifications">
-                                            <span class="dropdown-item text-muted">No new notifications</span>
+                                            <span class="dropdown-item text-muted text-center py-3">
+                                                <i class="bi bi-bell-slash d-block fs-4 mb-1"></i>
+                                                No new notifications
+                                            </span>
                                         </li>
                                     @endforelse
                                 </div>
@@ -112,52 +115,30 @@
                                         </a>
                                     </li>
                                 @endif
-
                             </ul>
-                            <div class="dropdown-menu dropdown-menu-end p-0">
-                                <div class="p-2 border-bottom m-2">
-                                    <h5 class="h5 mb-0">Notifications</h5>
-                                </div>
-                                <div class="header-notifications-list p-2">
-                                    <a class="dropdown-item" href="#">
-                                        <div class="d-flex align-items-center">
-                                            <div class="notification-box bg-light-primary text-primary">
-                                                <i class="bi bi-basket2-fill"></i>
-                                            </div>
-                                            <div class="ms-3 flex-grow-1">
-                                                <h6 class="mb-0 dropdown-msg-user">
-                                                    New Orders
-                                                    <span class="msg-time float-end text-secondary">1 m</span>
-                                                </h6>
-                                                <small
-                                                    class="mb-0 dropdown-msg-text text-secondary d-flex align-items-center">
-                                                    You have recived new orders
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
                         </li>
-                        <!-- END notification dropdown -->
+                        {{-- END notification dropdown --}}
 
                     </ul>
                 </div>
-                @php
-                    $user = Auth::guard('admin')->user();
-                @endphp
+
+                {{-- User Profile Dropdown --}}
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
-                            @if (empty($user->profile_image))
+                            @if (empty($admin->profile_image))
                                 <img src="{{ asset('default-avatar.png') }}" class="user-img" alt="" />
                             @else
-                                <img src="{{ asset('images/profile_image/' . $user->profile_image) }}" class="user-img"
-                                    alt="" />
+                                <img src="{{ asset('images/profile_image/' . $admin->profile_image) }}"
+                                    class="user-img" alt="" />
                             @endif
-                            <div class="d-none d-sm-block ">
-                                <p class="user-name mb-0">{{ Str::title($user->name) }}</p>
-                                <small class="mb-0 dropdown-user-designation fw-bold"></small>
+                            <div class="d-none d-sm-block">
+                                <p class="user-name mb-0">{{ Str::title($admin->name) }}</p>
+                                <small class="mb-0 dropdown-user-designation fw-bold">
+                                    @if ($admin->role === 'admin')
+                                        {{ Str::title($admin->role) }}
+                                    @endif
+                                </small>
                             </div>
                         </div>
                     </a>
@@ -165,16 +146,16 @@
                         <li>
                             <a href="{{ route('admin.profile.detail') }}" class="dropdown-item">
                                 <div class="d-flex align-items-center">
-                                    <div class=""><i class="bi bi-person-fill"></i></div>
-                                    <div class="ms-3"><span>Profile</span></div>
+                                    <i class="bi bi-person-fill"></i>
+                                    <span class="ms-3">Profile</span>
                                 </div>
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('admin.change.password') }}" class="dropdown-item">
                                 <div class="d-flex align-items-center">
-                                    <div class=""><i class="bi bi-gear-fill"></i></div>
-                                    <div class="ms-3"><span>Change Password</span></div>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span class="ms-3">Change Password</span>
                                 </div>
                             </a>
                         </li>
@@ -184,8 +165,8 @@
                         <li>
                             <a class="dropdown-item" href="{{ route('admin.logout') }}">
                                 <div class="d-flex align-items-center">
-                                    <div class=""><i class="bi bi-lock-fill"></i></div>
-                                    <div class="ms-3"><span>Logout</span></div>
+                                    <i class="bi bi-lock-fill"></i>
+                                    <span class="ms-3">Logout</span>
                                 </div>
                             </a>
                         </li>
@@ -196,6 +177,7 @@
         </header>
         <!--end top header-->
 
+
         <!--start sidebar -->
         <aside class="sidebar-wrapper">
             <div class="sidebar-header">
@@ -205,162 +187,215 @@
                 </div>
                 <div class="toggle-icon ms-auto"><i class="bi bi-list"></i></div>
             </div>
+
+            @php $admin = auth('admin')->user(); @endphp
+
             <!--navigation-->
             <div class="overflow-auto" style="height: calc(100vh - 80px);">
                 <ul class="metismenu" id="menu">
-                    <li>
-                        <a href="{{ route('admin.dashboard') }}">
-                            <div class="parent-icon"><i class="fas fa-home"></i></div>
-                            <div class="menu-title">Dashboard</div>
-                        </a>
-                    </li>
 
-                    <li>
-                        <a href="{{ route('customer.index') }}">
-                            <div class="parent-icon"><i class="fas fa-users"></i></div>
-                            <div class="menu-title">Customer</div>
-                        </a>
-                    </li>
+                    {{-- Dashboard — sab ke liye, koi check nahi --}}
+                    @if ($admin->hasAccess('dashboard'))
+                        <li>
+                            <a href="{{ route('admin.dashboard') }}">
+                                <div class="parent-icon"><i class="fas fa-home"></i></div>
+                                <div class="menu-title">Dashboard</div>
+                            </a>
+                        </li>
+                    @endif
+
+                    {{-- Customers --}}
+                    @if ($admin->hasAccess('customers'))
+                        <li>
+                            <a href="{{ route('customer.index') }}">
+                                <div class="parent-icon"><i class="fas fa-users"></i></div>
+                                <div class="menu-title">Customer</div>
+                            </a>
+                        </li>
+                    @endif
 
                     <li class="menu-label">Main Menu</li>
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-tag"></i></div>
-                            <div class="menu-title">Manage Brands</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('brand.index') }}"><i class="far fa-circle"></i>All Brands</a></li>
-                        </ul>
-                    </li>
+                    {{-- Brands --}}
+                    @if ($admin->hasAccess('brands'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-tag"></i></div>
+                                <div class="menu-title">Manage Brands</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('brand.index') }}"><i class="far fa-circle"></i>All Brands</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-th-large"></i></div>
-                            <div class="menu-title">Manage Categories</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('category.index') }}"><i class="far fa-circle"></i>All
-                                    Categories</a></li>
-                        </ul>
-                    </li>
+                    {{-- Categories --}}
+                    @if ($admin->hasAccess('categories'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-th-large"></i></div>
+                                <div class="menu-title">Manage Categories</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('category.index') }}"><i class="far fa-circle"></i>All
+                                        Categories</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-shopping-cart"></i></div>
-                            <div class="menu-title">Manage Products</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('product.index') }}"><i class="far fa-circle"></i>All Products</a>
-                            </li>
-                            <li><a href="{{ route('product.create') }}"><i class="far fa-circle"></i>Add Products</a>
-                            </li>
-                        </ul>
-                    </li>
+                    {{-- Products --}}
+                    @if ($admin->hasAccess('products'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-shopping-cart"></i></div>
+                                <div class="menu-title">Manage Products</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('product.index') }}"><i class="far fa-circle"></i>All
+                                        Products</a></li>
+                                <li><a href="{{ route('product.create') }}"><i class="far fa-circle"></i>Add
+                                        Products</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-images"></i></div>
-                            <div class="menu-title">Manage Sliders</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('slider.index') }}"><i class="far fa-circle"></i>All Sliders</a>
-                            </li>
-                        </ul>
-                    </li>
+                    {{-- Sliders --}}
+                    @if ($admin->hasAccess('sliders'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-images"></i></div>
+                                <div class="menu-title">Manage Sliders</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('slider.index') }}"><i class="far fa-circle"></i>All
+                                        Sliders</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-user"></i></div>
-                            <div class="menu-title">Manage Admin Users</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('admin.user') }}"><i class="far fa-circle"></i>All Admin Users</a>
-                            </li>
-                        </ul>
-                    </li>
+                    {{-- Admin Users --}}
+                    @if ($admin->hasAccess('admin_users'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-user"></i></div>
+                                <div class="menu-title">Manage Admin Users</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('admin.user') }}"><i class="far fa-circle"></i>All Admin
+                                        Users</a></li>
+                                <li><a href="{{ route('admin.user.create') }}"><i class="far fa-circle"></i>Add Admin
+                                        User</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-ticket-alt"></i></div>
-                            <div class="menu-title">Manage Coupons</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('coupon.index') }}"><i class="far fa-circle"></i>All Coupons</a>
-                            </li>
-                        </ul>
-                    </li>
+                    {{-- Coupons --}}
+                    @if ($admin->hasAccess('coupons'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-ticket-alt"></i></div>
+                                <div class="menu-title">Manage Coupons</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('coupon.index') }}"><i class="far fa-circle"></i>All
+                                        Coupons</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-shipping-fast"></i></div>
-                            <div class="menu-title">Shipping Area</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All Province</a>
-                            </li>
-                            <li><a href="{{ route('city.index') }}"><i class="far fa-circle"></i>All Cities</a></li>
-                        </ul>
-                    </li>
+                    {{-- Shipping --}}
+                    @if ($admin->hasAccess('shipping'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-shipping-fast"></i></div>
+                                <div class="menu-title">Shipping Area</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All
+                                        Province</a></li>
+                                <li><a href="{{ route('city.index') }}"><i class="far fa-circle"></i>All Cities</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-shopping-bag"></i></div>
-                            <div class="menu-title">Manage Orders</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('pending.order') }}"><i class="far fa-circle"></i>Pending </a></li>
-                            <li><a href="{{ route('processing.order') }}"><i class="far fa-circle"></i>Processing</a>
-                            </li>
-                            <li><a href="{{ route('shipped.order') }}"><i class="far fa-circle"></i>Shipped</a></li>
-                            <li><a href="{{ route('delivered') }}"><i class="far fa-circle"></i>Delivered</a>
-                            </li>
-                            <li><a href="{{ route('cancel.order') }}"><i class="far fa-circle"></i>Cancelled</a></li>
-                            <li><a href="{{ route('refunded') }}"><i class="far fa-circle"></i>refunded</a></li>
-                        </ul>
-                    </li>
+                    {{-- Orders --}}
+                    @if ($admin->hasAccess('orders'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-shopping-bag"></i></div>
+                                <div class="menu-title">Manage Orders</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('pending.order') }}"><i class="far fa-circle"></i>Pending</a>
+                                </li>
+                                <li><a href="{{ route('processing.order') }}"><i
+                                            class="far fa-circle"></i>Processing</a></li>
+                                <li><a href="{{ route('shipped.order') }}"><i class="far fa-circle"></i>Shipped</a>
+                                </li>
+                                <li><a href="{{ route('delivered') }}"><i class="far fa-circle"></i>Delivered</a>
+                                </li>
+                                <li><a href="{{ route('cancel.order') }}"><i class="far fa-circle"></i>Cancelled</a>
+                                </li>
+                                <li><a href="{{ route('refunded') }}"><i class="far fa-circle"></i>Refunded</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-boxes"></i></div>
-                            <div class="menu-title">Manage Stock</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('stock.index') }}"><i class="far fa-circle"></i>All Stock</a></li>
-                        </ul>
-                    </li>
+                    {{-- Stock --}}
+                    @if ($admin->hasAccess('stock'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-boxes"></i></div>
+                                <div class="menu-title">Manage Stock</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('stock.index') }}"><i class="far fa-circle"></i>All Stock</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-undo-alt"></i></div>
-                            <div class="menu-title">Return Orders</div>
-                        </a>
-                        <ul>
-                            <li><a href="#"><i class="far fa-circle"></i>All Return Orders</a></li>
-                        </ul>
-                    </li>
+                    {{-- Return Orders --}}
+                    @if ($admin->hasAccess('return_orders'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-undo-alt"></i></div>
+                                <div class="menu-title">Return Orders</div>
+                            </a>
+                            <ul>
+                                <li><a href="#"><i class="far fa-circle"></i>All Return Orders</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-star"></i></div>
-                            <div class="menu-title">Manage Reviews</div>
-                        </a>
-                        <ul>
-                            <li><a href="#"><i class="far fa-circle"></i>All Reviews</a></li>
-                        </ul>
-                    </li>
+                    {{-- Reviews --}}
+                    @if ($admin->hasAccess('reviews'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-star"></i></div>
+                                <div class="menu-title">Manage Reviews</div>
+                            </a>
+                            <ul>
+                                <li><a href="#"><i class="far fa-circle"></i>All Reviews</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li>
-                        <a href="javascript:;" class="has-arrow">
-                            <div class="parent-icon"><i class="fas fa-cog"></i></div>
-                            <div class="menu-title">Manage Settings</div>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('settings.index') }}"><i class="far fa-circle"></i>Site
-                                    Settings</a></li>
-                            <li><a href="#"><i class="far fa-circle"></i>Seo Settings</a></li>
-                        </ul>
-                    </li>
+                    {{-- Settings --}}
+                    @if ($admin->hasAccess('settings'))
+                        <li>
+                            <a href="javascript:;" class="has-arrow">
+                                <div class="parent-icon"><i class="fas fa-cog"></i></div>
+                                <div class="menu-title">Manage Settings</div>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('settings.index') }}"><i class="far fa-circle"></i>Site
+                                        Settings</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
                 </ul>
             </div>

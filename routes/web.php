@@ -18,60 +18,104 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\StockController;
-use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('index');
 });
 
-// Admin All Routes
 Route::prefix('admin')->group(function () {
+
+    // PUBLIC — No Auth
     Route::controller(AdminController::class)->group(function () {
         Route::get('/', 'AdminLogin')->name('admin.login.page')->middleware('is-LoggedIn');
-        Route::get('logout', 'AdminLogout')->name('admin.logout');
-        Route::get('dashboard', 'AdminDashboard')->name('admin.dashboard')->middleware('admin-check');
-        Route::get('profile/detail', 'AdminProfileDetail')->name('admin.profile.detail')->middleware('admin-check');
-        Route::get('profile/change/password', 'AdminChangePassword')->name('admin.change.password')->middleware('admin-check');
-
         Route::post('login', 'Login')->name('admin.login');
-        Route::put('profile/detail/update', 'AdminProfileUpdate')->name('admin.profile.update');
-        Route::put('profile/password/update', 'AdminPasswordUpdate')->name('admin.password.update');
-        Route::get('user', 'adminUser')->name('admin.user');
-        Route::get('user/create', 'adminUserCreate')->name('admin.user.create');
-        Route::get('user/edit/{id}', 'adminUserEdit')->name('admin.user.edit');
-        Route::get('user/show/{id}', 'adminUserShow')->name('admin.user.show');
-        Route::get('user/status/{id}', 'adminUserStatus')->name('admin.user.status');
-
-        Route::post('user/store', 'adminUserStore')->name('admin.user.store');
-        Route::put('user/update/{id}', 'adminUserUpdate')->name('admin.user.update');
-        Route::delete('user/delete/{id}', 'adminUserDelete')->name('admin.user.destroy');
-
+        Route::get('logout', 'AdminLogout')->name('admin.logout');
     });
 
+    // PROTECTED — Login Required
     Route::middleware(['admin-check'])->group(function () {
-        Route::resource('brand', BrandController::class);
-        Route::resource('category', CategoryController::class);
-        Route::resource('customer', CustomerController::class);
-        Route::resource('settings', SettingController::class);
 
-        Route::get('product/status/{id}', [ProductController::class, 'ProductStatus'])->name('product.status');
-        Route::resource('product', ProductController::class);
+        // Dashboard, Profile, Notifications — sab ke liye
+        Route::controller(AdminController::class)->group(function () {
+            Route::get('dashboard', 'AdminDashboard')->name('admin.dashboard');
+            Route::get('profile/detail', 'AdminProfileDetail')->name('admin.profile.detail');
+            Route::get('profile/change/password', 'AdminChangePassword')->name('admin.change.password');
+            Route::put('profile/detail/update', 'AdminProfileUpdate')->name('admin.profile.update');
+            Route::put('profile/password/update', 'AdminPasswordUpdate')->name('admin.password.update');
+            Route::post('notifications/{id}/read', 'markNotificationRead')->name('admin.notifications.markRead');
+            Route::post('notifications/mark-all-read', 'markAllNotificationsRead')->name('admin.notifications.markAllRead');
+        });
 
-        Route::resource('slider', SliderController::class);
-        Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
+        // Admin Users
+        Route::middleware('admin.access:admin_users')
+            ->controller(AdminController::class)
+            ->group(function () {
+                Route::get('user', 'adminUser')->name('admin.user');
+                Route::get('user/create', 'adminUserCreate')->name('admin.user.create');
+                Route::post('user/store', 'adminUserStore')->name('admin.user.store');
+                Route::get('user/show/{id}', 'adminUserShow')->name('admin.user.show');
+                Route::get('user/edit/{id}', 'adminUserEdit')->name('admin.user.edit');
+                Route::put('user/update/{id}', 'adminUserUpdate')->name('admin.user.update');
+                Route::get('user/status/{id}', 'adminUserStatus')->name('admin.user.status');
+                Route::delete('user/delete/{id}', 'adminUserDelete')->name('admin.user.destroy');
+            });
 
-        Route::resource('province', ProvinceController::class);
+        // Brands
+        Route::middleware('admin.access:brands')->group(function () {
+            Route::resource('brand', BrandController::class);
+        });
 
-        Route::resource('city', CityController::class);
-        Route::get('city/status/{id}', [CityController::class, 'CityStatus'])->name('city.status');
+        // Categories
+        Route::middleware('admin.access:categories')->group(function () {
+            Route::resource('category', CategoryController::class);
+        });
 
-        Route::resource('coupon', CouponController::class);
-        Route::resource('stock', StockController::class);
+        // Products —
+        Route::middleware('admin.access:products')->group(function () {
+            Route::get('product/status/{id}', [ProductController::class, 'ProductStatus'])->name('product.status');
+            Route::resource('product', ProductController::class);
+        });
 
-        // Manage Order Routes
-        Route::prefix('order')->group(function () {
-            Route::controller(OrderController::class)->group(function () {
+        // Sliders
+        Route::middleware('admin.access:sliders')->group(function () {
+            Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
+            Route::resource('slider', SliderController::class);
+        });
+
+        // Customers
+        Route::middleware('admin.access:customers')->group(function () {
+            Route::resource('customer', CustomerController::class);
+        });
+
+        // Coupons
+        Route::middleware('admin.access:coupons')->group(function () {
+            Route::resource('coupon', CouponController::class);
+        });
+
+        // Shipping
+        Route::middleware('admin.access:shipping')->group(function () {
+            Route::resource('province', ProvinceController::class);
+            Route::get('city/status/{id}', [CityController::class, 'CityStatus'])->name('city.status');
+            Route::resource('city', CityController::class);
+        });
+
+        // Stock
+        Route::middleware('admin.access:stock')->group(function () {
+            Route::resource('stock', StockController::class);
+        });
+
+        // Settings
+        Route::middleware('admin.access:settings')->group(function () {
+            Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('settings/update', [SettingController::class, 'update'])->name('settings.update');
+        });
+
+        // Orders
+        Route::middleware('admin.access:orders')
+            ->prefix('order')
+            ->controller(OrderController::class)
+            ->group(function () {
                 Route::get('pending', 'pendingOrders')->name('pending.order');
                 Route::get('processing', 'processingOrders')->name('processing.order');
                 Route::get('shipped', 'shippedOrders')->name('shipped.order');
@@ -80,32 +124,16 @@ Route::prefix('admin')->group(function () {
                 Route::get('refunded', 'refunded')->name('refunded');
                 Route::get('detail/{id}', 'orderDetail')->name('orders.detail');
                 Route::get('invoice/{id}', 'invoicePdf')->name('invoice.pdf');
-                Route::delete('delete/{id}', [OrderController::class, 'destroy'])
-                    ->name('orders.delete');
-
-                Route::put('status/{id}', 'updateStatus')
-                    ->name('admin.orders.updateStatus');
+                Route::put('status/{id}', 'updateStatus')->name('admin.orders.updateStatus');
+                Route::delete('delete/{id}', 'destroy')->name('orders.delete');
             });
-        });
-        Route::post('notifications/mark-all-read', function () {
-            auth('admin')->user()
-                ->notifications()
-                ->whereNull('read_at')
-                ->update(['read_at' => now()]);
 
-            return response()->json(['success' => true]);
-        })->name('admin.notifications.markAllRead');
+    }); // end admin-check
 
-        Route::post('notifications/{id}/read', function ($id) {
-            $notification = auth('admin')->user()->notifications()->findOrFail($id);
-            $notification->markAsRead();
+}); // end admin prefix
 
-            return response()->json(['success' => true]);
-        })->name('admin.notifications.markRead');
-    });
-});
+// ========================== Frontend All Routes ============================
 
-// Frontend All Routes
 Route::prefix('product')->group(function () {
     // Product Details
     Route::controller(ProductDetailController::class)->group(function () {
