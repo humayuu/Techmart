@@ -1,14 +1,14 @@
 @extends('admin.layout')
 
 @section('page-title')
-    Users <span class="badge bg-dark">{{ $totalUsers }}</span>
+    Customer <span class="badge bg-dark">{{ $totalCustomer }}</span>
 @endsection
 
 @section('main')
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white py-3">
             <h5 class="mb-0">
-                <i class="bi bi-people-fill me-2"></i>All Users
+                <i class="bi bi-people-fill me-2"></i>All Customer
             </h5>
         </div>
         <div class="card-body">

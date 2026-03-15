@@ -22,6 +22,9 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'access',
+        'status',
         'profile_image',
     ];
 
@@ -34,6 +37,22 @@ class Admin extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'access' => 'array',
         ];
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function hasAccess($permission)
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return in_array($permission, $this->access ?? []);
+
     }
 }

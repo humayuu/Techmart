@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminAccessMiddleware;
 use App\Http\Middleware\AdminCheck;
 use App\Http\Middleware\IsLoggedIn;
 use App\Http\Middleware\UserActivity;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin-check' => AdminCheck::class,
             'is-LoggedIn' => IsLoggedIn::class,
+            'admin.access' => AdminAccessMiddleware::class,
         ]);
         $middleware->web(append: [
             UserActivity::class,

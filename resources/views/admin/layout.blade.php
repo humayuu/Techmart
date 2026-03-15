@@ -216,9 +216,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('user.index') }}">
+                        <a href="{{ route('customer.index') }}">
                             <div class="parent-icon"><i class="fas fa-users"></i></div>
-                            <div class="menu-title">All Users</div>
+                            <div class="menu-title">Customer</div>
                         </a>
                     </li>
 
@@ -275,7 +275,8 @@
                             <div class="menu-title">Manage Admin Users</div>
                         </a>
                         <ul>
-                            <li><a href="#"><i class="far fa-circle"></i>All Users</a></li>
+                            <li><a href="{{ route('admin.user') }}"><i class="far fa-circle"></i>All Admin Users</a>
+                            </li>
                         </ul>
                     </li>
 
@@ -678,7 +679,7 @@
                 serverSide: true,
                 processing: true,
                 ajax: {
-                    url: "{{ route('user.index') }}"
+                    url: "{{ route('customer.index') }}"
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -1200,6 +1201,49 @@
                     {
                         data: 'stock',
                         name: 'stock',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center action-col'
+                    }
+
+                ]
+
+            });
+
+            $('#adminUser').DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "{{ route('admin.user') }}"
+                },
+                columns: [{
+                        data: 'image',
+                        name: 'image',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'role',
+                        name: 'role',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
                         className: 'text-center'
                     },
                     {

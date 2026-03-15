@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
@@ -17,7 +18,6 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\StockController;
-use App\Http\Controllers\UserController;
 use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
@@ -31,22 +31,32 @@ Route::prefix('admin')->group(function () {
         Route::get('/', 'AdminLogin')->name('admin.login.page')->middleware('is-LoggedIn');
         Route::get('logout', 'AdminLogout')->name('admin.logout');
         Route::get('dashboard', 'AdminDashboard')->name('admin.dashboard')->middleware('admin-check');
-        Route::get('profile/detail', 'AdminProfileDetail')->name('admin.profile.detail');
-        Route::get('profile/change/password', 'AdminChangePassword')->name('admin.change.password');
+        Route::get('profile/detail', 'AdminProfileDetail')->name('admin.profile.detail')->middleware('admin-check');
+        Route::get('profile/change/password', 'AdminChangePassword')->name('admin.change.password')->middleware('admin-check');
 
         Route::post('login', 'Login')->name('admin.login');
         Route::put('profile/detail/update', 'AdminProfileUpdate')->name('admin.profile.update');
         Route::put('profile/password/update', 'AdminPasswordUpdate')->name('admin.password.update');
+        Route::get('user', 'adminUser')->name('admin.user');
+        Route::get('user/create', 'adminUserCreate')->name('admin.user.create');
+        Route::get('user/edit/{id}', 'adminUserEdit')->name('admin.user.edit');
+        Route::get('user/show/{id}', 'adminUserShow')->name('admin.user.show');
+        Route::get('user/status/{id}', 'adminUserStatus')->name('admin.user.status');
+
+        Route::post('user/store', 'adminUserStore')->name('admin.user.store');
+        Route::put('user/update/{id}', 'adminUserUpdate')->name('admin.user.update');
+        Route::delete('user/delete/{id}', 'adminUserDelete')->name('admin.user.destroy');
+
     });
 
-    Route::middleware('admin-check')->group(function () {
+    Route::middleware(['admin-check'])->group(function () {
         Route::resource('brand', BrandController::class);
         Route::resource('category', CategoryController::class);
-        Route::resource('user', UserController::class);
+        Route::resource('customer', CustomerController::class);
         Route::resource('settings', SettingController::class);
 
-        Route::resource('product', ProductController::class);
         Route::get('product/status/{id}', [ProductController::class, 'ProductStatus'])->name('product.status');
+        Route::resource('product', ProductController::class);
 
         Route::resource('slider', SliderController::class);
         Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');

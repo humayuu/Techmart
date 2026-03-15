@@ -14,6 +14,7 @@ class AdminFactory extends Factory
      * The current password being used by the factory.
      */
     protected static ?string $password;
+
     /**
      * Define the model's default state.
      *
@@ -25,6 +26,8 @@ class AdminFactory extends Factory
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 1,
+            'access' => 'all',
         ];
     }
 }
