@@ -174,6 +174,7 @@
                                 ['key' => 'return_orders', 'label' => 'Return Orders', 'icon' => 'fa-rotate-left'],
                                 ['key' => 'reports', 'label' => 'Reports', 'icon' => 'fa-chart-bar'],
                                 ['key' => 'settings', 'label' => 'Settings', 'icon' => 'fa-gear'],
+                                ['key' => 'seo_settings', 'label' => 'Settings', 'icon' => 'fa-gear'],
                             ];
                         @endphp
 

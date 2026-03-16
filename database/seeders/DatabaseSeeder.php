@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
+use App\Models\SeoSetting;
 use App\Models\Setting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,5 +19,6 @@ class DatabaseSeeder extends Seeder
     {
         Admin::factory(1)->create();
         Setting::factory(1)->create();
+        SeoSetting::factory(1)->create();
     }
 }

@@ -318,7 +318,11 @@
                             <ul>
                                 <li><a href="{{ route('settings.index') }}"><i class="far fa-circle"></i> Site
                                         Settings</a></li>
-                                <li><a href="#"><i class="far fa-circle"></i> SEO Settings</a></li>
+                                @if ($admin->hasAccess('seo_settings'))
+                                    <li><a href="{{ route('seo.index') }}"><i class="far fa-circle"></i> Seo
+                                            Settings</a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
                     @endif

@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProvinceController;
+use App\Http\Controllers\SeoSettingController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
@@ -109,6 +110,11 @@ Route::prefix('admin')->group(function () {
         Route::middleware('admin.access:settings')->group(function () {
             Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
             Route::put('settings/update', [SettingController::class, 'update'])->name('settings.update');
+        });
+
+        Route::middleware('admin.access:seo_settings')->group(function () {
+            Route::get('seo', [SeoSettingController::class, 'index'])->name('seo.index');
+            Route::put('seo/update/{id}', [SeoSettingController::class, 'update'])->name('seo.update');
         });
 
         // Orders

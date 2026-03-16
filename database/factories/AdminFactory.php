@@ -26,8 +26,26 @@ class AdminFactory extends Factory
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => static::$password ??= Hash::make('password'),
-            'role' => 1,
-            'access' => 'all',
+            'role' => 'admin',
+            'access' => [
+                'dashboard',
+                'admin_users',
+                'customers',
+                'products',
+                'orders',
+                'categories',
+                'brands',
+                'coupons',
+                'sliders',
+                'shipping',
+                'stock',
+                'reviews',
+                'return_orders',
+                'reports',
+                'settings',
+                'seo_settings',
+            ],
+            'status' => 'active',
         ];
     }
 }

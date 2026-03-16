@@ -1,3 +1,6 @@
+@php
+    $seo = App\Models\SeoSetting::find(1);
+@endphp
 <!doctype html>
 <html lang="zxx" dir="ltr">
 
@@ -6,8 +9,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TechMart</title>
-    <meta name="robots" content="index, follow" />
-    <meta name="description" content="TechMart-Smart Product eCommerce html Template" />
+    <meta name="description" content="{{ $seo->meta_description }}" />
+    <meta name="keywords" content="{{ $seo->meta_keyword }}">
+    <meta name="author" content="{{ $seo->meta_author }}">
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend/assets/images/favicon.ico') }}" />
     <!-- CSS ============================================ -->
@@ -145,7 +149,8 @@
                                 <a href="#offcanvas-cart"
                                     class="header-action-btn header-action-btn-cart offcanvas-toggle pr-0">
                                     <i class="pe-7s-shopbag"></i>
-                                    <span class="header-action-num" id="count-mobile"> {{ count(session('cart', [])) }}
+                                    <span class="header-action-num" id="count-mobile">
+                                        {{ count(session('cart', [])) }}
                                     </span>
                                 </a>
                                 <a href="#offcanvas-mobile-menu"
