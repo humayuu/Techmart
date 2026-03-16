@@ -81,8 +81,8 @@
 
                             {{-- Action Buttons --}}
                             <div class="d-flex justify-content-end gap-2 pt-2 border-top">
-                                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                                    Cancel
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary px-4">
+                                    Back
                                 </a>
                                 <button type="submit" class="btn btn-primary px-4">
                                     <i class="bi bi-check-lg me-1"></i>Save Changes

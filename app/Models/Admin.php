@@ -55,4 +55,15 @@ class Admin extends Authenticatable
         return in_array($permission, $this->access ?? []);
 
     }
+
+    public function notificationRedirectUrl(array $data): string
+    {
+        $orderId = $data['order_id'] ?? null;
+
+        if ($orderId) {
+            return route('orders.detail', $orderId);
+        }
+
+        return route('admin.dashboard');
+    }
 }

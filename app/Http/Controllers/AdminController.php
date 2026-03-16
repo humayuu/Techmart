@@ -61,6 +61,28 @@ class AdminController extends Controller
         return view('admin.dashboard');
     }
 
+    // Mark single notification as read
+    public function markNotificationRead($id)
+    {
+        $notification = auth('admin')->user()
+            ->notifications()
+            ->findOrFail($id);
+
+        $notification->markAsRead();
+
+        return response()->json(['success' => true]);
+    }
+
+    // Mark all notifications as read
+    public function markAllNotificationsRead()
+    {
+        auth('admin')->user()
+            ->unreadNotifications
+            ->markAsRead();
+
+        return response()->json(['success' => true]);
+    }
+
     /**
      * Function Admin logout
      */

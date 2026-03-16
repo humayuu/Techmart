@@ -2,55 +2,50 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('backend/assets/images/favicon-32x32.png') }}" type="image/png" />
-    <!--plugins-->
+
+    {{-- Plugins & CSS --}}
     <link href="{{ asset('backend/assets/plugins/metismenu/css/metisMenu.min.css') }}" rel="stylesheet" />
-    <!-- Bootstrap CSS -->
     <link href="{{ asset('backend/assets/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/plugins/input-tags/css/tagsinput.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/css/bootstrap-extended.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/css/style.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/css/pace.min.css') }}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
-    <!-- Toastr CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
-    <!-- loader-->
-    <link href="{{ asset('backend/assets/css/pace.min.css') }}" rel="stylesheet" />
-    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
-    {{-- font-awesome icon --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>TechMart Admin Dashboard</title>
 </head>
 
 <body>
-    <!--start wrapper-->
+
+    @php
+        $admin = auth('admin')->user();
+        $unreadCount = $admin->unreadNotifications->count();
+    @endphp
+
     <div class="wrapper">
 
-        <!--start top header-->
+        {{-- ===================== TOP HEADER ===================== --}}
         <header class="top-header">
             <nav class="navbar navbar-expand gap-3">
+
                 <div class="mobile-toggle-icon fs-3">
                     <i class="bi bi-list"></i>
                 </div>
 
-                @php
-                    $admin = auth('admin')->user();
-                    $unreadCount = $admin->unreadNotifications->count();
-                @endphp
-
+                {{-- Notification Bell --}}
                 <div class="top-navbar-right ms-auto">
                     <ul class="navbar-nav align-items-center">
 
                         <li class="nav-item search-toggle-icon">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-search"></i>
-                            </a>
+                            <a class="nav-link" href="#"><i class="bi bi-search"></i></a>
                         </li>
 
                         <li class="nav-item dropdown dropdown-large">
@@ -75,9 +70,9 @@
                                 <div id="notifications-wrapper">
                                     @forelse($admin->unreadNotifications as $notification)
                                         <li class="notification-item" id="notif-{{ $notification->id }}">
-                                            <a class="dropdown-item"
-                                                href="{{ $admin->notificationRedirectUrl($notification->data) }}"
-                                                onclick="markRead('{{ $notification->id }}', event)">
+                                            <a class="dropdown-item" href="#"
+                                                data-redirect="{{ $admin->notificationRedirectUrl($notification->data) }}"
+                                                data-id="{{ $notification->id }}" onclick="markRead(this, event)">
                                                 <div class="d-flex align-items-center gap-2">
                                                     <div class="notification-box bg-light-primary text-primary">
                                                         <i class="bi bi-basket2-fill"></i>
@@ -117,7 +112,6 @@
                                 @endif
                             </ul>
                         </li>
-                        {{-- END notification dropdown --}}
 
                     </ul>
                 </div>
@@ -126,48 +120,35 @@
                 <div class="dropdown dropdown-user-setting">
                     <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center gap-3">
-                            @if (empty($admin->profile_image))
-                                <img src="{{ asset('default-avatar.png') }}" class="user-img" alt="" />
-                            @else
-                                <img src="{{ asset('images/profile_image/' . $admin->profile_image) }}"
-                                    class="user-img" alt="" />
-                            @endif
+                            <img src="{{ $admin->profile_image ? asset('images/profile_image/' . $admin->profile_image) : asset('default-avatar.png') }}"
+                                class="user-img" alt="Profile" />
                             <div class="d-none d-sm-block">
                                 <p class="user-name mb-0">{{ Str::title($admin->name) }}</p>
-                                <small class="mb-0 dropdown-user-designation fw-bold">
-                                    @if ($admin->role === 'admin')
+                                @if ($admin->role === 'admin')
+                                    <small class="mb-0 dropdown-user-designation fw-bold">
                                         {{ Str::title($admin->role) }}
-                                    @endif
-                                </small>
+                                    </small>
+                                @endif
                             </div>
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
                             <a href="{{ route('admin.profile.detail') }}" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-person-fill"></i>
-                                    <span class="ms-3">Profile</span>
-                                </div>
+                                <i class="bi bi-person-fill"></i><span class="ms-3">Profile</span>
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('admin.change.password') }}" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-gear-fill"></i>
-                                    <span class="ms-3">Change Password</span>
-                                </div>
+                                <i class="bi bi-gear-fill"></i><span class="ms-3">Change Password</span>
                             </a>
                         </li>
                         <li>
                             <hr class="dropdown-divider" />
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('admin.logout') }}">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-lock-fill"></i>
-                                    <span class="ms-3">Logout</span>
-                                </div>
+                            <a href="{{ route('admin.logout') }}" class="dropdown-item">
+                                <i class="bi bi-lock-fill"></i><span class="ms-3">Logout</span>
                             </a>
                         </li>
                     </ul>
@@ -175,10 +156,10 @@
 
             </nav>
         </header>
-        <!--end top header-->
+        {{-- ===================== END TOP HEADER ===================== --}}
 
 
-        <!--start sidebar -->
+        {{-- ===================== SIDEBAR ===================== --}}
         <aside class="sidebar-wrapper">
             <div class="sidebar-header">
                 <div></div>
@@ -188,13 +169,9 @@
                 <div class="toggle-icon ms-auto"><i class="bi bi-list"></i></div>
             </div>
 
-            @php $admin = auth('admin')->user(); @endphp
-
-            <!--navigation-->
             <div class="overflow-auto" style="height: calc(100vh - 80px);">
                 <ul class="metismenu" id="menu">
 
-                    {{-- Dashboard — sab ke liye, koi check nahi --}}
                     @if ($admin->hasAccess('dashboard'))
                         <li>
                             <a href="{{ route('admin.dashboard') }}">
@@ -204,195 +181,144 @@
                         </li>
                     @endif
 
-                    {{-- Customers --}}
                     @if ($admin->hasAccess('customers'))
                         <li>
                             <a href="{{ route('customer.index') }}">
                                 <div class="parent-icon"><i class="fas fa-users"></i></div>
-                                <div class="menu-title">Customer</div>
+                                <div class="menu-title">Customers</div>
                             </a>
                         </li>
                     @endif
 
                     <li class="menu-label">Main Menu</li>
 
-                    {{-- Brands --}}
                     @if ($admin->hasAccess('brands'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('brand.index') }}">
                                 <div class="parent-icon"><i class="fas fa-tag"></i></div>
-                                <div class="menu-title">Manage Brands</div>
+                                <div class="menu-title">Brands</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('brand.index') }}"><i class="far fa-circle"></i>All Brands</a>
-                                </li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Categories --}}
                     @if ($admin->hasAccess('categories'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('category.index') }}">
                                 <div class="parent-icon"><i class="fas fa-th-large"></i></div>
-                                <div class="menu-title">Manage Categories</div>
+                                <div class="menu-title">Categories</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('category.index') }}"><i class="far fa-circle"></i>All
-                                        Categories</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Products --}}
                     @if ($admin->hasAccess('products'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('product.index') }}">
                                 <div class="parent-icon"><i class="fas fa-shopping-cart"></i></div>
-                                <div class="menu-title">Manage Products</div>
+                                <div class="menu-title">Products</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('product.index') }}"><i class="far fa-circle"></i>All
-                                        Products</a></li>
-                                <li><a href="{{ route('product.create') }}"><i class="far fa-circle"></i>Add
-                                        Products</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Sliders --}}
                     @if ($admin->hasAccess('sliders'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('slider.index') }}">
                                 <div class="parent-icon"><i class="fas fa-images"></i></div>
-                                <div class="menu-title">Manage Sliders</div>
+                                <div class="menu-title">Sliders</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('slider.index') }}"><i class="far fa-circle"></i>All
-                                        Sliders</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Admin Users --}}
                     @if ($admin->hasAccess('admin_users'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('admin.user') }}">
                                 <div class="parent-icon"><i class="fas fa-user"></i></div>
-                                <div class="menu-title">Manage Admin Users</div>
+                                <div class="menu-title">Admin Users</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('admin.user') }}"><i class="far fa-circle"></i>All Admin
-                                        Users</a></li>
-                                <li><a href="{{ route('admin.user.create') }}"><i class="far fa-circle"></i>Add Admin
-                                        User</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Coupons --}}
                     @if ($admin->hasAccess('coupons'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('coupon.index') }}">
                                 <div class="parent-icon"><i class="fas fa-ticket-alt"></i></div>
-                                <div class="menu-title">Manage Coupons</div>
+                                <div class="menu-title">Coupons</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('coupon.index') }}"><i class="far fa-circle"></i>All
-                                        Coupons</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Shipping --}}
                     @if ($admin->hasAccess('shipping'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="javascript:;">
                                 <div class="parent-icon"><i class="fas fa-shipping-fast"></i></div>
                                 <div class="menu-title">Shipping Area</div>
                             </a>
                             <ul>
-                                <li><a href="{{ route('province.index') }}"><i class="far fa-circle"></i>All
-                                        Province</a></li>
-                                <li><a href="{{ route('city.index') }}"><i class="far fa-circle"></i>All Cities</a>
-                                </li>
+                                <li><a href="{{ route('province.index') }}"><i class="far fa-circle"></i>
+                                        Provinces</a></li>
+                                <li><a href="{{ route('city.index') }}"><i class="far fa-circle"></i> Cities</a></li>
                             </ul>
                         </li>
                     @endif
 
-                    {{-- Orders --}}
                     @if ($admin->hasAccess('orders'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="javascript:;">
                                 <div class="parent-icon"><i class="fas fa-shopping-bag"></i></div>
-                                <div class="menu-title">Manage Orders</div>
+                                <div class="menu-title">Orders</div>
                             </a>
                             <ul>
-                                <li><a href="{{ route('pending.order') }}"><i class="far fa-circle"></i>Pending</a>
+                                <li><a href="{{ route('pending.order') }}"><i class="far fa-circle"></i> Pending</a>
                                 </li>
-                                <li><a href="{{ route('processing.order') }}"><i
-                                            class="far fa-circle"></i>Processing</a></li>
-                                <li><a href="{{ route('shipped.order') }}"><i class="far fa-circle"></i>Shipped</a>
+                                <li><a href="{{ route('processing.order') }}"><i class="far fa-circle"></i>
+                                        Processing</a></li>
+                                <li><a href="{{ route('shipped.order') }}"><i class="far fa-circle"></i> Shipped</a>
                                 </li>
-                                <li><a href="{{ route('delivered') }}"><i class="far fa-circle"></i>Delivered</a>
+                                <li><a href="{{ route('delivered') }}"><i class="far fa-circle"></i> Delivered</a>
                                 </li>
-                                <li><a href="{{ route('cancel.order') }}"><i class="far fa-circle"></i>Cancelled</a>
+                                <li><a href="{{ route('cancel.order') }}"><i class="far fa-circle"></i> Cancelled</a>
                                 </li>
-                                <li><a href="{{ route('refunded') }}"><i class="far fa-circle"></i>Refunded</a></li>
+                                <li><a href="{{ route('refunded') }}"><i class="far fa-circle"></i> Refunded</a></li>
                             </ul>
                         </li>
                     @endif
 
-                    {{-- Stock --}}
                     @if ($admin->hasAccess('stock'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="{{ route('stock.index') }}">
                                 <div class="parent-icon"><i class="fas fa-boxes"></i></div>
-                                <div class="menu-title">Manage Stock</div>
+                                <div class="menu-title">Stock</div>
                             </a>
-                            <ul>
-                                <li><a href="{{ route('stock.index') }}"><i class="far fa-circle"></i>All Stock</a>
-                                </li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Return Orders --}}
                     @if ($admin->hasAccess('return_orders'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="javascript:;">
                                 <div class="parent-icon"><i class="fas fa-undo-alt"></i></div>
                                 <div class="menu-title">Return Orders</div>
                             </a>
-                            <ul>
-                                <li><a href="#"><i class="far fa-circle"></i>All Return Orders</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Reviews --}}
                     @if ($admin->hasAccess('reviews'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="javascript:;">
                                 <div class="parent-icon"><i class="fas fa-star"></i></div>
-                                <div class="menu-title">Manage Reviews</div>
+                                <div class="menu-title">Reviews</div>
                             </a>
-                            <ul>
-                                <li><a href="#"><i class="far fa-circle"></i>All Reviews</a></li>
-                            </ul>
                         </li>
                     @endif
 
-                    {{-- Settings --}}
                     @if ($admin->hasAccess('settings'))
                         <li>
-                            <a href="javascript:;" class="has-arrow">
+                            <a href="javascript:;">
                                 <div class="parent-icon"><i class="fas fa-cog"></i></div>
-                                <div class="menu-title">Manage Settings</div>
+                                <div class="menu-title">Settings</div>
                             </a>
                             <ul>
-                                <li><a href="{{ route('settings.index') }}"><i class="far fa-circle"></i>Site
+                                <li><a href="{{ route('settings.index') }}"><i class="far fa-circle"></i> Site
                                         Settings</a></li>
+                                <li><a href="#"><i class="far fa-circle"></i> SEO Settings</a></li>
                             </ul>
                         </li>
                     @endif
@@ -400,37 +326,36 @@
                 </ul>
             </div>
         </aside>
-        <!--end sidebar -->
+        {{-- ===================== END SIDEBAR ===================== --}}
 
+
+        {{-- ===================== MAIN CONTENT ===================== --}}
         <main class="page-content">
-            <!--breadcrumb-->
             <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">@yield('page-title')
+                            <li class="breadcrumb-item active fs-2 text-dark" aria-current="page">
+                                @yield('page-title')
                             </li>
                         </ol>
                     </nav>
                 </div>
             </div>
-            <!--end breadcrumb-->
             @yield('main')
         </main>
+        {{-- ===================== END MAIN CONTENT ===================== --}}
 
-        <!--start footer-->
+
         <footer class="footer">
-            <div class="footer-text">Copyright © 2026. All right reserved.</div>
+            <div class="footer-text">Copyright &copy; 2026. All rights reserved.</div>
         </footer>
-        <!--end footer-->
 
-    </div>
-    <!--end wrapper-->
+    </div>{{-- end wrapper --}}
 
-    <!-- Bootstrap bundle JS -->
+
+    {{-- ===================== SCRIPTS ===================== --}}
     <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!--plugins-->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="{{ asset('backend/assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
@@ -438,20 +363,16 @@
     <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
     <script src="{{ asset('backend/assets/js/index.js') }}"></script>
-
-    <!-- Toaster JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
-
-    {{-- Sweet Alert CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    {{-- Data table CDN --}}
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
+
+    {{-- ===================== NOTIFICATION SCRIPTS ===================== --}}
     <script>
-        // Mark single notification as read
-        function markRead(notificationId, event) {
+        function markRead(element, event) {
             event.preventDefault();
-            const link = event.currentTarget;
+            const notificationId = element.dataset.id;
+            const redirectUrl = element.dataset.redirect;
 
             fetch(`/admin/notifications/${notificationId}/read`, {
                     method: 'POST',
@@ -463,22 +384,18 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove this item from dropdown
                         document.getElementById(`notif-${notificationId}`)?.remove();
-
-                        // Update badge
                         updateBadge(-1);
-
-                        // Check if empty
                         checkEmpty();
-
-                        // Navigate to order page
-                        window.location.href = link.href;
                     }
+                    window.location.href = redirectUrl;
+
+                })
+                .catch(() => {
+                    window.location.href = redirectUrl;
                 });
         }
 
-        // Mark all as read
         const markAllBtn = document.getElementById('mark-all-btn');
         if (markAllBtn) {
             markAllBtn.addEventListener('click', function(e) {
@@ -491,810 +408,461 @@
                             'Content-Type': 'application/json',
                         }
                     })
-                    .then(r => r.json())
+                    .then(r => {
+                        if (!r.ok) throw new Error('Server error: ' + r.status);
+                        return r.json();
+                    })
                     .then(data => {
                         if (data.success) {
-                            // Clear all items
-                            document.getElementById('notifications-wrapper').innerHTML =
-                                `<li id="no-notifications">
-                            <span class="dropdown-item text-muted">No new notifications</span>
-                        </li>`;
+                            document.getElementById('notifications-wrapper').innerHTML = `
+                            <li id="no-notifications">
+                                <span class="dropdown-item text-muted text-center py-3">
+                                    <i class="bi bi-bell-slash d-block fs-4 mb-1"></i>
+                                    No new notifications
+                                </span>
+                            </li>`;
 
-                            // Hide badge
                             const badge = document.querySelector('.notify-badge');
                             if (badge) badge.style.display = 'none';
 
-                            // Hide button
-                            markAllBtn.parentElement.style.display = 'none';
+                            markAllBtn.closest('li').style.display = 'none';
+                            markAllBtn.closest('li').previousElementSibling.style.display = 'none';
                         }
+                    })
+                    .catch(() => {
+                        toastr.error('Something went wrong. Please try again.');
                     });
             });
         }
 
-        // Update badge number
         function updateBadge(change) {
             const badge = document.querySelector('.notify-badge');
             if (!badge) return;
             const newCount = (parseInt(badge.textContent) || 0) + change;
-            if (newCount <= 0) {
-                badge.style.display = 'none';
-            } else {
-                badge.textContent = newCount;
-            }
+            badge.style.display = newCount <= 0 ? 'none' : 'inline-block';
+            if (newCount > 0) badge.textContent = newCount;
         }
 
-        // Show empty message if no notifications left
         function checkEmpty() {
-            const items = document.querySelectorAll('.notification-item');
-            if (items.length === 0) {
-                document.getElementById('notifications-wrapper').innerHTML =
-                    `<li id="no-notifications">
-                    <span class="dropdown-item text-muted">No new notifications</span>
-                </li>`;
+            if (document.querySelectorAll('.notification-item').length === 0) {
+                document.getElementById('notifications-wrapper').innerHTML = `
+                    <li id="no-notifications">
+                        <span class="dropdown-item text-muted text-center py-3">
+                            <i class="bi bi-bell-slash d-block fs-4 mb-1"></i>
+                            No new notifications
+                        </span>
+                    </li>`;
+
                 const btn = document.getElementById('mark-all-btn');
-                if (btn) btn.parentElement.style.display = 'none';
+                if (btn) {
+                    btn.closest('li').style.display = 'none';
+                    btn.closest('li').previousElementSibling.style.display = 'none';
+                }
             }
         }
     </script>
 
-    <!-- Toastr Notification Script -->
+    {{-- ===================== TOASTR FLASH MESSAGES ===================== --}}
     <script>
         toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-bottom-left",
-            "timeOut": "3500"
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-bottom-left",
+            timeOut: "3500"
         };
 
         @if (Session::has('message'))
-            let type = "{{ Session::get('alert-type', 'info') }}"
-            switch (type) {
-                case 'info':
-                    toastr.info(" {{ Session::get('message') }} ");
-                    break;
-                case 'success':
-                    toastr.success("{{ Session::get('message') }}");
-                    break;
-                case 'warning':
-                    toastr.warning("{{ Session::get('message') }}");
-                    break;
-                case 'error':
-                    toastr.error("{{ Session::get('message') }}");
-                    break;
-            }
+            const alertType = "{{ Session::get('alert-type', 'info') }}";
+            const alertMsg = "{{ Session::get('message') }}";
+            if (toastr[alertType]) toastr[alertType](alertMsg);
         @endif
+    </script>
+
+    {{-- ===================== DATATABLES ===================== --}}
+    <script>
+        function initDataTable(tableId, url, columns) {
+            if (!$('#' + tableId).length) return;
+            $('#' + tableId).DataTable({
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: url
+                },
+                columns: columns
+            });
+        }
+
+        function orderColumns(extraActionClass = '') {
+            return [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center'
+                },
+                {
+                    data: 'order_id',
+                    name: 'order_id',
+                    className: 'text-center'
+                },
+                {
+                    data: 'customer',
+                    name: 'customer',
+                    className: 'text-center'
+                },
+                {
+                    data: 'city',
+                    name: 'city',
+                    className: 'text-center'
+                },
+                {
+                    data: 'payment',
+                    name: 'payment',
+                    className: 'text-center'
+                },
+                {
+                    data: 'total',
+                    name: 'total',
+                    className: 'text-center'
+                },
+                {
+                    data: 'date',
+                    name: 'date',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center action-col'
+                },
+            ];
+        }
 
         $(document).ready(function() {
 
-            $('#categoryTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('category.index') }}"
+            // --- Categories ---
+            initDataTable('categoryTable', "{{ route('category.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'category_name',
-                        name: 'category_name'
-                    },
-                    {
-                        data: 'category_slug',
-                        name: 'category_slug'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-            $('#brandTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('brand.index') }}"
+                {
+                    data: 'category_name',
+                    name: 'category_name'
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'brand_name',
-                        name: 'brand_name'
-                    },
-                    {
-                        data: 'brand_description',
-                        name: 'brand_description'
-                    },
-                    {
-                        data: 'image',
-                        name: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-            $('#sliderTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('slider.index') }}"
+                {
+                    data: 'category_slug',
+                    name: 'category_slug'
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'title',
-                        name: 'title'
-                    },
-                    {
-                        data: 'image',
-                        name: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-            $('#productTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('product.index') }}"
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'image',
-                        name: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'product_name',
-                        name: 'product_name'
-                    },
-                    {
-                        data: 'brand',
-                        name: 'brand'
-                    },
-                    {
-                        data: 'category',
-                        name: 'category'
-                    },
-                    {
-                        data: 'selling_price',
-                        name: 'selling_price'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
+            ]);
 
-            $('#userTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('customer.index') }}"
+            // --- Brands ---
+            initDataTable('brandTable', "{{ route('brand.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'email',
-                        name: 'email'
-                    },
-                    {
-                        data: 'phone',
-                        name: 'phone'
-                    },
-                    {
-                        data: 'last_seen',
-                        name: 'last_seen'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    }
-                ]
-            });
-
-            $('#provinceTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('province.index') }}"
+                {
+                    data: 'brand_name',
+                    name: 'brand_name'
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-
-            $('#cityTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('city.index') }}"
+                {
+                    data: 'brand_description',
+                    name: 'brand_description'
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'province_id',
-                        name: 'province_id'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'is_active',
-                        name: 'is_active'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-            $('#couponTable').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('coupon.index') }}"
+                {
+                    data: 'image',
+                    name: 'image',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'coupon_name',
-                        name: 'coupon_name'
-                    },
-                    {
-                        data: 'coupon_discount',
-                        name: 'coupon_discount'
-                    },
-                    {
-                        data: 'valid_until',
-                        name: 'valid_until'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-            $('#pendingOrder').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('pending.order') }}"
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'order_id',
-                        name: 'order_id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'customer',
-                        name: 'customer',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'city',
-                        name: 'city',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'payment',
-                        name: 'payment',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
+            ]);
 
-                ]
-
-            });
-
-            $('#processingOrder').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('processing.order') }}"
+            // --- Sliders ---
+            initDataTable('sliderTable', "{{ route('slider.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'order_id',
-                        name: 'order_id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'customer',
-                        name: 'customer',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'city',
-                        name: 'city',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'payment',
-                        name: 'payment',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
-
-                ]
-
-            });
-
-            $('#shippedOrder').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('shipped.order') }}"
+                {
+                    data: 'title',
+                    name: 'title'
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'order_id',
-                        name: 'order_id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'customer',
-                        name: 'customer',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'city',
-                        name: 'city',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'payment',
-                        name: 'payment',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
-
-                ]
-
-            });
-            $('#delivered').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('delivered') }}"
+                {
+                    data: 'image',
+                    name: 'image',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'order_id',
-                        name: 'order_id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'customer',
-                        name: 'customer',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'city',
-                        name: 'city',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'payment',
-                        name: 'payment',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
-
-                ]
-
-            });
-
-            $('#cancelOrder').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('cancel.order') }}"
+                {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'order_id',
-                        name: 'order_id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'customer',
-                        name: 'customer',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'city',
-                        name: 'city',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'payment',
-                        name: 'payment',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
-
-                ]
-
-            });
-
-            $('#refund').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('refunded') }}"
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'order_id',
-                        name: 'order_id',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'customer',
-                        name: 'customer',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'city',
-                        name: 'city',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'payment',
-                        name: 'payment',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
+            ]);
 
-                ]
-
-            });
-
-            $('#stock').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('stock.index') }}"
+            // --- Products ---
+            initDataTable('productTable', "{{ route('product.index') }}", [{
+                    data: 'image',
+                    name: 'image',
+                    orderable: false,
+                    searchable: false
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'product_name',
-                        name: 'product_name',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'image',
-                        name: 'image',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'selling_price',
-                        name: 'selling_price',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'stock',
-                        name: 'stock',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
-
-                ]
-
-            });
-
-            $('#adminUser').DataTable({
-                serverSide: true,
-                processing: true,
-                ajax: {
-                    url: "{{ route('admin.user') }}"
+                {
+                    data: 'product_name',
+                    name: 'product_name'
                 },
-                columns: [{
-                        data: 'image',
-                        name: 'image',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'email',
-                        name: 'email',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'role',
-                        name: 'role',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center action-col'
-                    }
+                {
+                    data: 'brand',
+                    name: 'brand'
+                },
+                {
+                    data: 'category',
+                    name: 'category'
+                },
+                {
+                    data: 'selling_price',
+                    name: 'selling_price'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ]);
 
-                ]
+            // --- Customers ---
+            initDataTable('userTable', "{{ route('customer.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'email',
+                    name: 'email'
+                },
+                {
+                    data: 'phone',
+                    name: 'phone'
+                },
+                {
+                    data: 'last_seen',
+                    name: 'last_seen'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+            ]);
 
-            });
+            // --- Provinces ---
+            initDataTable('provinceTable', "{{ route('province.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ]);
+
+            // --- Cities ---
+            initDataTable('cityTable', "{{ route('city.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'province_id',
+                    name: 'province_id'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'is_active',
+                    name: 'is_active'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ]);
+
+            // --- Coupons ---
+            initDataTable('couponTable', "{{ route('coupon.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'coupon_name',
+                    name: 'coupon_name'
+                },
+                {
+                    data: 'coupon_discount',
+                    name: 'coupon_discount'
+                },
+                {
+                    data: 'valid_until',
+                    name: 'valid_until'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ]);
+
+            // --- Orders (all 6 share the same columns via orderColumns()) ---
+            initDataTable('pendingOrder', "{{ route('pending.order') }}", orderColumns());
+            initDataTable('processingOrder', "{{ route('processing.order') }}", orderColumns());
+            initDataTable('shippedOrder', "{{ route('shipped.order') }}", orderColumns());
+            initDataTable('delivered', "{{ route('delivered') }}", orderColumns());
+            initDataTable('cancelOrder', "{{ route('cancel.order') }}", orderColumns());
+            initDataTable('refund', "{{ route('refunded') }}", orderColumns());
+
+            // --- Stock ---
+            initDataTable('stock', "{{ route('stock.index') }}", [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center'
+                },
+                {
+                    data: 'product_name',
+                    name: 'product_name',
+                    className: 'text-center'
+                },
+                {
+                    data: 'image',
+                    name: 'image',
+                    className: 'text-center'
+                },
+                {
+                    data: 'selling_price',
+                    name: 'selling_price',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center'
+                },
+                {
+                    data: 'stock',
+                    name: 'stock',
+                    className: 'text-center'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center action-col'
+                },
+            ]);
+
+            // --- Admin Users ---
+            initDataTable('adminUser', "{{ route('admin.user') }}", [{
+                    data: 'image',
+                    name: 'image',
+                    className: 'text-center'
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                    className: 'text-center'
+                },
+                {
+                    data: 'email',
+                    name: 'email',
+                    className: 'text-center'
+                },
+                {
+                    data: 'role',
+                    name: 'role',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center action-col'
+                },
+            ]);
 
         });
     </script>
+
+    {{-- Child views can push their own scripts here --}}
+    @stack('scripts')
 
 </body>
 
