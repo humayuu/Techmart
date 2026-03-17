@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,11 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $userOrders = Order::where('user_id', $request->user()->id)->orderBy('id', 'DESC')->paginate(5);
+
         return view('profile', [
             'user' => $request->user(),
+            'userOrders' => $userOrders,
         ]);
     }
 
@@ -56,5 +60,15 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * For User Order Detail
+     */
+    public function userOrderDetail($id)
+    {
+        $orderProducts = Order::with('orderProducts')->findOrFail($id);
+
+        return view('order-info', compact('orderProducts'));
     }
 }

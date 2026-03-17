@@ -1,44 +1,79 @@
 @extends('layout')
 @section('main')
-    <!-- account area start -->
     <div class="account-dashboard pt-100px pb-100px">
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 col-md-3 col-lg-3">
-                    <!-- Nav tabs -->
                     <div class="dashboard_tab_button" data-aos="fade-up" data-aos-delay="0">
                         <ul role="tablist" class="nav flex-column dashboard-list">
-                            <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Dashboard</a>
-                            </li>
-                            <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Account
-                                    details</a>
-                            </li>
+                            <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Order Info</a></li>
+                            <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Account details</a></li>
                             <li><a href="#changer-password" data-bs-toggle="tab" class="nav-link">Change Password</a></li>
                             <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                 @csrf
                                 <li>
                                     <a href="#" class="nav-link"
                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        logout
+                                        Logout
                                     </a>
                                 </li>
                             </form>
                         </ul>
                     </div>
                 </div>
+
                 <div class="col-sm-12 col-md-9 col-lg-9">
-                    <!-- Tab panes -->
                     <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
                         <div class="tab-pane fade show active" id="dashboard">
-                            <h4>Dashboard </h4>
-                            <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent
-                                    orders</a>, manage your <a href="#">shipping and billing addresses</a>
-                                and <a href="#">Edit your password and account details.</a></p>
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Payment Method</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>More Detail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($userOrders as $index => $order)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>#{{ $order->id }}</td>
+                                            <td>{{ $order->created_at->format('d M Y') }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-{{ $order->payment_method === 'cod' ? 'success' : 'secondary' }}">
+                                                    {{ ucfirst($order->payment_method) }}
+                                                </span>
+                                            </td>
+                                            <td>${{ number_format($order->total_amount, 2) }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-{{ $order->status === 'delivered' ? 'success' : ($order->status === 'cancelled' ? 'danger' : 'warning') }}">
+                                                    {{ ucfirst($order->status) }}
+                                                </span>
+                                            </td>
+                                            <td><a href="{{ route('order.show', $order->id) }}">Detail</a></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">No orders found.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-end">
+                                {{ $userOrders->links() }}
+                            </div>
                         </div>
+
+                        {{-- Change Password Tab --}}
                         <div class="tab-pane fade" id="changer-password">
                             <h4>Change Password</h4>
                             <div class="table_page table-responsive">
-                                {{-- Success message for password change --}}
                                 @if (session('status') === 'password-updated')
                                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                                         Password updated Successfully!
@@ -77,12 +112,13 @@
                                 </form>
                             </div>
                         </div>
+
+                        {{-- Account Details Tab --}}
                         <div class="tab-pane fade" id="account-details">
-                            <h3>Account details </h3>
+                            <h3>Account details</h3>
                             <div class="login">
                                 <div class="login_form_container">
                                     <div class="account_login_form">
-                                        {{-- Success message for profile update --}}
                                         @if (session('status') === 'profile-updated')
                                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                                 Profile updated Successfully!
@@ -122,23 +158,20 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- account area start -->
-    {{-- Auto-open correct tab on validation errors or success --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check for password change errors or success
             @if ($errors->updatePassword->any() || session('status') === 'password-updated')
                 const passwordTab = new bootstrap.Tab(document.querySelector('a[href="#changer-password"]'));
                 passwordTab.show();
             @endif
 
-            // Check for profile update errors or success
-            @if ($errors->default->any() || session('status') === 'profile-updated')
+            @if ($errors->updateProfile->any() || session('status') === 'profile-updated')
                 const accountTab = new bootstrap.Tab(document.querySelector('a[href="#account-details"]'));
                 accountTab.show();
             @endif
