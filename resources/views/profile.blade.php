@@ -32,9 +32,10 @@
                                         <th>Order ID</th>
                                         <th>Date</th>
                                         <th>Payment Method</th>
-                                        <th>Total</th>
+                                        <th>Shipping Amount</th>
+                                        <th>Total </th>
                                         <th>Status</th>
-                                        <th>More Detail</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -45,22 +46,26 @@
                                             <td>{{ $order->created_at->format('d M Y') }}</td>
                                             <td>
                                                 <span
-                                                    class="badge bg-{{ $order->payment_method === 'cod' ? 'success' : 'secondary' }}">
+                                                    class="badge fs-6 bg-{{ $order->payment_method === 'cod' ? 'success' : 'secondary' }}">
                                                     {{ ucfirst($order->payment_method) }}
                                                 </span>
                                             </td>
-                                            <td>${{ number_format($order->total_amount, 2) }}</td>
+                                            <td>Rs.{{ number_format($order->shipping_amount, 2) }}</td>
+                                            <td>Rs.{{ number_format($order->total_amount, 2) }}</td>
                                             <td>
-                                                <span
-                                                    class="badge bg-{{ $order->status === 'delivered' ? 'success' : ($order->status === 'cancelled' ? 'danger' : 'warning') }}">
-                                                    {{ ucfirst($order->status) }}
-                                                </span>
+                                                @if ($order->status !== 'delivered')
+                                                    <a href="{{ route('track.order', $order->id) }}"
+                                                        class="bg-primary text-white p-1 m-1 rounded">Track
+                                                        Order</a>
+                                                @else
+                                                    <span class="badge fs-6 bg-success">Delivered</span>
+                                                @endif
                                             </td>
                                             <td><a href="{{ route('order.show', $order->id) }}">Detail</a></td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">No orders found.</td>
+                                            <td colspan="8" class="text-center">No orders found.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

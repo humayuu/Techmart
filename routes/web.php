@@ -200,9 +200,10 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'userOrderInfo']);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/order/detail/{id}', [ProfileController::class, 'userOrderDetail'])->name('order.show');
+    Route::get('/profile/order/tracking/{id}', [ProfileController::class, 'trackOrder'])->name('track.order');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/profile/order/detail/{id}', [ProfileController::class, 'userOrderDetail'])->name('order.show');
 });
 
 // 404 Page

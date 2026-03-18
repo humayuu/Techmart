@@ -71,4 +71,14 @@ class ProfileController extends Controller
 
         return view('order-info', compact('orderProducts'));
     }
+
+    /**
+     * For Show Order Status
+     */
+    public function trackOrder($id)
+    {
+        $order = Order::with('orderProducts')->findOrFail($id);
+
+        return view('order-tracking', compact('order'));
+    }
 }
