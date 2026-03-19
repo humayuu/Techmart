@@ -43,18 +43,24 @@
           });
       }
       const Remove = async (id) => {
-          const response = await fetch(`{{ url('product/cart/remove/') }}/${id}`);
+          const response = await fetch(`{{ url('product/cart/remove/') }}/${id}`, {
+              method: 'DELETE',
+              headers: {
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                      'content'),
+                  'Content-Type': 'application/json',
+              }
+          });
+
           const data = await response.json();
 
           if (data.status) {
               AllCarts();
 
-              // Update count
               const countEl = document.getElementById('count');
               const countMobileEl = document.getElementById('count-mobile');
               if (countEl) countEl.innerHTML = data.cart_count;
               if (countMobileEl) countMobileEl.innerHTML = data.cart_count;
-
           }
       }
   </script>

@@ -99,8 +99,12 @@
                         <div class="col-lg-3 col">
                             <div class="header-actions">
                                 <!-- Single Wedge Start -->
+                                <!-- Desktop wishlist count -->
                                 <a href="#offcanvas-wishlist" class="header-action-btn offcanvas-toggle">
                                     <i class="pe-7s-like"></i>
+                                    <span class="header-action-num" id="wishlist-count">
+                                        {{ count(session('wishlist', [])) }}
+                                    </span>
                                 </a>
                                 <!-- Single Wedge End -->
                                 <a onclick="AllCarts()" href="#offcanvas-cart"
@@ -141,9 +145,12 @@
                         </div>
                         <div class="col-lg-3 col">
                             <div class="header-actions">
-                                <!-- Single Wedge Start -->
+                                <!-- Mobile wishlist count -->
                                 <a href="#offcanvas-wishlist" class="header-action-btn offcanvas-toggle">
                                     <i class="pe-7s-like"></i>
+                                    <span class="header-action-num" id="wishlist-count-mobile">
+                                        {{ count(session('wishlist', [])) }}
+                                    </span>
                                 </a>
                                 <!-- Single Wedge End -->
                                 <a href="#offcanvas-cart"
@@ -201,37 +208,9 @@
         <!-- offcanvas overlay start -->
         <div class="offcanvas-overlay"></div>
         <!-- offcanvas overlay end -->
-        <!-- OffCanvas Wishlist Start -->
-        <div id="offcanvas-wishlist" class="offcanvas offcanvas-wishlist">
-            <div class="inner">
-                <div class="head">
-                    <span class="title">Wishlist</span>
-                    <button class="offcanvas-close">×</button>
-                </div>
-                <div class="body customScroll">
-                    <ul class="minicart-product-list">
-                        <li>
-                            <a href="single-product.html" class="image"><img
-                                    src="{{ asset('frontend/assets/') }}images/product-image/1.webp"
-                                    alt="Cart product Image" /></a>
-                            <div class="content">
-                                <a href="single-product.html" class="title">Modern Smart Phone</a>
-                                <span class="quantity-price">1 x <span class="amount">$21.86</span></span>
-                                <a href="#" class="remove">×</a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="foot">
-                    <div class="buttons">
-                        <a href="wishlist.html" class="btn btn-dark btn-hover-primary mt-30px">view wishlist</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- OffCanvas Wishlist End -->
 
-        {{-- Cart All Cart --}}
+        @include('view-wishlist')
+
         @include('view_cart')
 
         <!-- OffCanvas Menu Start -->

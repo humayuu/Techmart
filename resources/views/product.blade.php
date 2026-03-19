@@ -133,7 +133,7 @@
                     data-bs-target="#exampleModal-Cart">
                     <i class="pe-7s-shopbag"></i>
                 </button>
-                <button class="action wishlist btn btn-sm" title="Wishlist" data-bs-toggle="modal"
+                <button onclick="AddToWishlist(${product.id})"  class="action wishlist btn btn-sm" title="Wishlist" data-bs-toggle="modal"
                     data-bs-target="#exampleModal-Wishlist">
                     <i class="pe-7s-like"></i>
                 </button>

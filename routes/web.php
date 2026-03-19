@@ -20,6 +20,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -164,7 +165,6 @@ Route::prefix('product')->group(function () {
     Route::controller(CartController::class)->group(function () {
         Route::get('add/to/cart/{id}', 'AddToCart');
         Route::get('all/cart', 'AllCartData');
-        Route::delete('cart/remove/{id}', 'CartRemove');
         Route::get('all/carts', 'ViewAllCart');
         Route::get('cart', 'Cart')->name('cart');
         Route::get('cart/all/cities/{id}', 'AllCities');
@@ -173,6 +173,17 @@ Route::prefix('product')->group(function () {
         Route::post('cart/clear', 'CartClear');
         Route::post('cart/apply-coupon', 'ApplyCoupon');
         Route::post('cart/remove-coupon', 'RemoveCoupon');
+        Route::delete('cart/remove/{id}', 'CartRemove');
+    });
+
+    // Product Wishlist All Routes
+    Route::controller(WishlistController::class)->group(function () {
+        Route::get('add/to/wishlist/{id}', 'addToWishlist');
+        Route::get('all/wishlist', 'allWishlistData');
+        Route::get('all/wishlist', 'wishlist')->name('wishlist');
+
+        Route::delete('wishlist/remove/{id}', 'wishlistRemove');
+
     });
 
     // Checkout All Routes
