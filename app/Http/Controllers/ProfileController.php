@@ -81,4 +81,14 @@ class ProfileController extends Controller
 
         return view('order-tracking', compact('order'));
     }
+
+    /**
+     * For Redirect to return order page
+     */
+    public function returnOrder($id)
+    {
+        $order = Order::with('orderProducts')->findOrFail($id);
+
+        return view('return-order', compact('order'));
+    }
 }

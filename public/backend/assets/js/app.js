@@ -75,7 +75,7 @@ $(function() {
 	})
 
 
-	// switcher 
+	// switcher
 
 	$("#LightTheme").on("click", function() {
 		$("html").attr("class", "light-theme")
@@ -125,7 +125,7 @@ $(function() {
 $(function(){
     $(document).on('click','#delete',function(e){
         e.preventDefault();
-        var form = $(this).closest("form"); 
+        var form = $(this).closest("form");
 
         Swal.fire({
             title: 'Are you sure?',
@@ -137,7 +137,26 @@ $(function(){
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                form.submit(); 
+                form.submit();
+            }
+        })
+    });
+
+       $(document).on('click','#updateStatus',function(e){
+        e.preventDefault();
+        var form = $(this).closest("form");
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You Want to update status?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
             }
         })
     });

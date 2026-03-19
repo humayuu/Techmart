@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
-            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'])
+            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'return_request', 'cancelled', 'refunded'])
                 ->default('pending');
             $table->enum('payment_status', ['pending', 'paid', 'refunded'])->default('pending');
             $table->enum('payment_method', ['cod', 'stripe'])->nullable();

@@ -293,7 +293,7 @@
 
                     @if ($admin->hasAccess('return_orders'))
                         <li>
-                            <a href="javascript:;">
+                            <a href="{{ route('return.index') }}">
                                 <div class="parent-icon"><i class="fas fa-undo-alt"></i></div>
                                 <div class="menu-title">Return Orders</div>
                             </a>
@@ -784,6 +784,7 @@
             initDataTable('delivered', "{{ route('delivered') }}", orderColumns());
             initDataTable('cancelOrder', "{{ route('cancel.order') }}", orderColumns());
             initDataTable('refund', "{{ route('refunded') }}", orderColumns());
+            initDataTable('return', "{{ route('return.index') }}", orderColumns());
 
             // --- Stock ---
             initDataTable('stock', "{{ route('stock.index') }}", [{

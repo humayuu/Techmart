@@ -10,7 +10,9 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
+    // =========================================================
     // PRIVATE HELPERS
+    // =========================================================
 
     private function applySharedColumns($datatable)
     {
@@ -119,13 +121,14 @@ class OrderController extends Controller
         };
     }
 
-    // shared rawColumns list
     private function rawCols(): array
     {
         return ['order_id', 'customer', 'payment', 'total', 'date', 'status', 'action'];
     }
 
+    // =========================================================
     // PUBLIC METHODS
+    // =========================================================
 
     public function pendingOrders(Request $request)
     {
@@ -189,7 +192,6 @@ class OrderController extends Controller
             $query = Order::with('user')->where('status', 'delivered')->latest();
             $datatable = $this->applySharedColumns(DataTables::of($query));
 
-            // delivered only gets invoice button — no status dropdown needed
             $datatable->addColumn('action', function ($order) {
                 $invoice = route('invoice.pdf', $order->id);
 
@@ -211,9 +213,6 @@ class OrderController extends Controller
         if ($request->ajax()) {
             $query = Order::with('user')->where('status', 'cancelled')->latest();
             $datatable = $this->applySharedColumns(DataTables::of($query));
-            $datatable = $this->buildActionColumn($datatable, [
-                'refunded' => 'Refunded',
-            ]);
 
             $datatable->addColumn('action', function ($order) {
                 $showUrl = route('orders.detail', $order->id);
@@ -225,7 +224,8 @@ class OrderController extends Controller
                 </a>
                 <form action="'.$deleteUrl.'" method="POST" class="d-inline">
                     '.csrf_field().method_field('DELETE').'
-                    <button id="delete" type="submit" class="btn btn-sm btn-danger mb-1">
+                    <button type="submit" class="btn btn-sm btn-danger mb-1"
+                        onclick="return confirm(\'Delete this order?\')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </form>';
@@ -245,7 +245,6 @@ class OrderController extends Controller
             $query = Order::with('user')->where('status', 'refunded')->latest();
             $datatable = $this->applySharedColumns(DataTables::of($query));
 
-            // refunded is final state — view button only, no dropdown
             $datatable->addColumn('action', function ($order) {
                 $showUrl = route('orders.detail', $order->id);
 
@@ -278,11 +277,14 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $newStatus = $request->status;
 
-        $order->update(['status' => $newStatus]);
+        $updateData = ['status' => $newStatus];
 
-        if ($newStatus === 'delivered') {
-            $order->update(['payment_status' => 'paid']);
+        if ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
+            $updateData['delivered_at'] = now();
+            $updateData['payment_status'] = 'paid';
         }
+
+        $order->update($updateData);
 
         if (
             in_array($newStatus, ['cancelled', 'refunded']) &&

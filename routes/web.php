@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProvinceController;
+use App\Http\Controllers\ReturnOrderController;
 use App\Http\Controllers\SeoSettingController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
@@ -117,6 +118,11 @@ Route::prefix('admin')->group(function () {
             Route::put('seo/update/{id}', [SeoSettingController::class, 'update'])->name('seo.update');
         });
 
+        // Return Order
+        Route::middleware('admin.access:return_orders')->group(function () {
+            Route::resource('return', ReturnOrderController::class);
+        });
+
         // Orders
         Route::middleware('admin.access:orders')
             ->prefix('order')
@@ -202,6 +208,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/order/detail/{id}', [ProfileController::class, 'userOrderDetail'])->name('order.show');
     Route::get('/profile/order/tracking/{id}', [ProfileController::class, 'trackOrder'])->name('track.order');
+    Route::get('/profile/order/return/{id}', [ProfileController::class, 'returnOrder'])->name('order.return');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

@@ -25,6 +25,31 @@
                 <div class="col-sm-12 col-md-9 col-lg-9">
                     <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
                         <div class="tab-pane fade show active" id="dashboard">
+
+                            {{-- Return Policy Note --}}
+                            <div class="alert alert-warning mb-3" role="alert">
+                                <strong>Return Policy:</strong>
+                                Orders can only be returned within <strong>10 days</strong> of delivery.
+                                After 10 days, the return option will no longer be available.
+                            </div>
+                            {{-- Session Alerts --}}
+                            @if (session('success'))
+                                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                                    {{ session('success') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                            @endif
+
+                            @if (session('error'))
+                                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                                    {{ session('error') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                            @endif
+
+
                             <table class="table text-center">
                                 <thead>
                                     <tr>
@@ -53,15 +78,23 @@
                                             <td>Rs.{{ number_format($order->shipping_amount, 2) }}</td>
                                             <td>Rs.{{ number_format($order->total_amount, 2) }}</td>
                                             <td>
-                                                @if ($order->status !== 'delivered')
-                                                    <a href="{{ route('track.order', $order->id) }}"
-                                                        class="bg-primary text-white p-1 m-1 rounded">Track
-                                                        Order</a>
-                                                @else
+                                                @if ($order->status === 'delivered')
                                                     <span class="badge fs-6 bg-success">Delivered</span>
+                                                @elseif ($order->status === 'return_request')
+                                                    <span class="badge fs-6 bg-dark">Return Request</span>
+                                                @elseif ($order->status === 'refunded')
+                                                    <span class="badge fs-6 bg-primary">Refunded</span>
+                                                @else
+                                                    <a href="{{ route('track.order', $order->id) }}"
+                                                        class="bg-primary text-white p-1 m-1 rounded">Track Order</a>
                                                 @endif
                                             </td>
-                                            <td><a href="{{ route('order.show', $order->id) }}">Detail</a></td>
+                                            <td class="d-flex gap-2">
+                                                @if ($order->status === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 10)
+                                                    <a href="{{ route('order.return', $order->id) }}">Return Order</a>
+                                                @endif
+                                                <a href="{{ route('order.show', $order->id) }}">Detail</a>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>

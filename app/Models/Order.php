@@ -23,12 +23,15 @@ class Order extends Model
         'address',
         'zip',
         'notes',
+        'delivered_at',
     ];
 
     protected $casts = [
         'subtotal' => 'decimal:2',
         'shipping_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'delivered_at' => 'datetime',
+
     ];
 
     // ── Relationships ──────────────────────
@@ -40,5 +43,10 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function returnOrder()
+    {
+        return $this->hasOne(ReturnOrder::class);
     }
 }
