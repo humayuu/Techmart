@@ -108,7 +108,9 @@ class WishlistController extends Controller
      */
     public function wishlist()
     {
-        return view('wishlist');
+        $wishlist = session()->get('wishlist', []);
+
+        return view('wishlist', compact('wishlist'));
     }
 
     /**

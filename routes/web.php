@@ -180,10 +180,8 @@ Route::prefix('product')->group(function () {
     Route::controller(WishlistController::class)->group(function () {
         Route::get('add/to/wishlist/{id}', 'addToWishlist');
         Route::get('all/wishlist', 'allWishlistData');
-        Route::get('all/wishlist', 'wishlist')->name('wishlist');
-
+        Route::get('wishlist', 'wishlist')->name('wishlist');
         Route::delete('wishlist/remove/{id}', 'wishlistRemove');
-
     });
 
     // Checkout All Routes
