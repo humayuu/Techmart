@@ -2,16 +2,6 @@
 
 An e-commerce store with a customer-facing site and an admin panel. This project is built with **Laravel**, **Bootstrap**, and **JavaScript**. Front-end assets are compiled with **Vite** when you develop or build for production.
 
-## Screenshots
-
-**Storefront** — home page with search, categories, and hero banner.
-
-![TechMart storefront](docs/screenshots/storefront.png)
-
-**Admin dashboard** — overview stats, orders, and sidebar navigation.
-
-![TechMart admin dashboard](docs/screenshots/admin-dashboard.png)
-
 ## What you need installed
 
 - **PHP** 8.2 or newer  
