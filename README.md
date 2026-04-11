@@ -242,9 +242,3 @@ Keep this running in production (supervisor, systemd, or your host’s queue too
 ### 4. Resend verification email
 
 Logged-in users who have not verified can use the “resend verification email” action on the verification page (route `verification.send`, throttled).
-
----
-
-## License
-
-This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
