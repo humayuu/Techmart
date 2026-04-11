@@ -55,7 +55,7 @@ class ProductController extends Controller
                 })
                 ->addColumn('selling_price', function ($row) {
                     if ($row->selling_price) {
-                        return '<span class="text-dark fw-semibold fs-5">$'.$row->selling_price.'</span>';
+                        return '<span class="text-dark fw-semibold fs-5">Rs. '.number_format((float) $row->selling_price, 2).'</span>';
                     }
 
                     return '<span class="text-muted fst-italic fs-6">No Category</span>';

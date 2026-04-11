@@ -27,6 +27,14 @@
             .replace(/"/g, '&quot;');
     }
 
+    function formatRs(n) {
+        var x = Number(n);
+        if (isNaN(x)) {
+            x = 0;
+        }
+        return x.toFixed(2);
+    }
+
     function syncWishlistPageTable(removedProductId) {
         var tbody = document.getElementById('wishlist-page-tbody');
         if (!tbody) {
@@ -46,7 +54,7 @@
             } else {
                 tbody.innerHTML =
                     '<tr class="wishlist-empty-placeholder">' +
-                    '<td colspan="5" class="text-center text-danger p-4">Your wishlist is empty.</td></tr>';
+                    '<td colspan="7" class="text-center text-danger p-4">Your wishlist is empty.</td></tr>';
             }
         }
     }
@@ -55,6 +63,7 @@
         try {
             var response = await fetch(urlAll, {
                 headers: { Accept: 'application/json' },
+                credentials: 'same-origin',
             });
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
@@ -70,9 +79,22 @@
                 return;
             }
             Object.values(data.wishlist).forEach(function (item) {
-                var itemTotal = Number(item.price) * Number(item.quantity);
                 var pid = item.product_id;
                 var nameSafe = escHtml(item.product_name);
+                var catSafe = escHtml(String(item.category_name || '').trim());
+                var brandSafe = escHtml(String(item.brand_name || '').trim());
+                var metaHtml =
+                    '<div class="wishlist-mini-meta">' +
+                    '<span class="wishlist-mini-price">Rs. ' +
+                    formatRs(item.price) +
+                    '</span>';
+                if (catSafe) {
+                    metaHtml += '<span class="wishlist-mini-line">Category: ' + catSafe + '</span>';
+                }
+                if (brandSafe) {
+                    metaHtml += '<span class="wishlist-mini-line">Brand: ' + brandSafe + '</span>';
+                }
+                metaHtml += '</div>';
                 wishlistEl.innerHTML +=
                     '<li>' +
                     '<a href="/product/detail/' +
@@ -92,21 +114,10 @@
                     '" class="title">' +
                     nameSafe +
                     '</a>' +
-                    '<span class="quantity-price">' +
-                    item.quantity +
-                    ' x <span class="amount">Rs. ' +
-                    escHtml(String(item.price)) +
-                    '</span> <span class="text-muted">(Rs. ' +
-                    itemTotal.toFixed(2) +
-                    ')</span></span>' +
-                    '<div class="wishlist-mini-actions">' +
-                    '<button type="button" class="wishlist-add-cart" data-wishlist-add-cart="' +
-                    pid +
-                    '">Add to cart</button>' +
+                    metaHtml +
                     '<button type="button" class="remove wishlist-remove-btn" data-wishlist-remove="' +
                     pid +
-                    '" title="Remove">×</button>' +
-                    '</div>' +
+                    '" title="Remove from wishlist">×</button>' +
                     '</div>' +
                     '</li>';
             });
@@ -127,6 +138,7 @@
                     'X-Requested-With': 'XMLHttpRequest',
                     'Content-Type': 'application/json',
                 },
+                credentials: 'same-origin',
             });
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
@@ -151,15 +163,6 @@
     }
 
     function onWishlistPanelClick(e) {
-        var addBtn = e.target.closest('[data-wishlist-add-cart]');
-        if (addBtn && panel.contains(addBtn)) {
-            e.preventDefault();
-            var pid = addBtn.getAttribute('data-wishlist-add-cart');
-            if (pid && typeof window.AddToCart === 'function') {
-                window.AddToCart(parseInt(pid, 10));
-            }
-            return;
-        }
         var rmBtn = e.target.closest('[data-wishlist-remove]');
         if (rmBtn && panel.contains(rmBtn)) {
             e.preventDefault();
@@ -191,4 +194,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         allWishlist();
     });
+
+    panel.addEventListener('shown.bs.offcanvas', function () {
+        allWishlist();
+    });
 })();
+

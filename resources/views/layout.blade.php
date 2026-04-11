@@ -102,10 +102,17 @@
                                     role="search" autocomplete="off">
                                     <div class="tm-header-search__inner">
                                         <label class="visually-hidden" for="live-search-desktop">Search products</label>
-                                        <input type="search" id="live-search-desktop" name="q"
-                                            class="tm-header-search__input" placeholder="Search products…"
-                                            value="{{ request('q') }}" maxlength="120" autocomplete="off"
-                                            enterkeyhint="search">
+                                        <div class="tm-header-search__combo">
+                                            <input type="search" id="live-search-desktop" name="q"
+                                                class="tm-header-search__input" placeholder="Search products…"
+                                                value="{{ request('q') }}" maxlength="120" autocomplete="off"
+                                                enterkeyhint="search" aria-expanded="false"
+                                                aria-controls="search-dropdown-desktop" aria-autocomplete="list">
+                                            <button type="submit" class="tm-header-search__submit"
+                                                aria-label="Search products">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
                                         <div id="search-dropdown-desktop" class="tm-header-search__dropdown"
                                             role="listbox" aria-label="Search suggestions"></div>
                                     </div>
@@ -158,10 +165,17 @@
                                     role="search" autocomplete="off">
                                     <div class="tm-header-search__inner">
                                         <label class="visually-hidden" for="live-search-mobile">Search products</label>
-                                        <input type="search" id="live-search-mobile" name="q"
-                                            class="tm-header-search__input" placeholder="Search products…"
-                                            value="{{ request('q') }}" maxlength="120" autocomplete="off"
-                                            enterkeyhint="search">
+                                        <div class="tm-header-search__combo">
+                                            <input type="search" id="live-search-mobile" name="q"
+                                                class="tm-header-search__input" placeholder="Search products…"
+                                                value="{{ request('q') }}" maxlength="120" autocomplete="off"
+                                                enterkeyhint="search" aria-expanded="false"
+                                                aria-controls="search-dropdown-mobile" aria-autocomplete="list">
+                                            <button type="submit" class="tm-header-search__submit"
+                                                aria-label="Search products">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
                                         <div id="search-dropdown-mobile" class="tm-header-search__dropdown"
                                             role="listbox" aria-label="Search suggestions"></div>
                                     </div>
@@ -405,114 +419,11 @@
         <script src="{{ asset('frontend/assets/js/wishlist-offcanvas.js') }}"></script>
         <script src="{{ asset('frontend/assets/js/cart-offcanvas.js') }}"></script>
         <script src="{{ asset('frontend/assets/js/header-categories-rail.js') }}"></script>
-        <script>
-            (function() {
-                const SEARCH_API = @json(route('search'));
-                const SEARCH_RESULTS = @json(route('search.results'));
-                const PLACEHOLDER_IMG = @json(asset('frontend/assets/images/product-image/1.webp'));
-
-                function escapeHtml(text) {
-                    if (text == null) return '';
-                    const d = document.createElement('div');
-                    d.textContent = text;
-                    return d.innerHTML;
-                }
-
-                function formatRs(n) {
-                    const x = Number(n);
-                    if (Number.isNaN(x)) return '0.00';
-                    return x.toLocaleString('en-PK', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                }
-
-                function setDropdownOpen(dropdown, open) {
-                    dropdown.classList.toggle('is-open', open);
-                    if (!open) dropdown.innerHTML = '';
-                }
-
-                function initSearch(inputId, dropdownId) {
-                    const input = document.getElementById(inputId);
-                    const dropdown = document.getElementById(dropdownId);
-                    const form = input && input.closest('form');
-                    if (!input || !dropdown || !form) return;
-
-                    let timer;
-
-                    input.addEventListener('input', function() {
-                        clearTimeout(timer);
-                        const q = this.value.trim();
-
-                        if (q.length < 2) {
-                            setDropdownOpen(dropdown, false);
-                            return;
-                        }
-
-                        timer = setTimeout(function() {
-                            const url = SEARCH_API + '?q=' + encodeURIComponent(q);
-                            fetch(url, {
-                                    headers: {
-                                        'Accept': 'application/json',
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                })
-                                .then(function(res) {
-                                    if (!res.ok) throw new Error('bad status');
-                                    return res.json();
-                                })
-                                .then(function(products) {
-                                    if (!products.length) {
-                                        dropdown.innerHTML =
-                                            '<div class="tm-header-search__empty">No results found</div>';
-                                        setDropdownOpen(dropdown, true);
-                                        return;
-                                    }
-
-                                    const items = products.map(function(p) {
-                                        const name = escapeHtml(p.name);
-                                        const href = String(p.url || '#');
-                                        const img = String(p.image || PLACEHOLDER_IMG);
-                                        const price = formatRs(p.price);
-                                        return '<a class="tm-header-search__item" href="' + href + '">' +
-                                            '<img class="tm-header-search__item-img" src="' + img +
-                                            '" alt="" width="44" height="44" loading="lazy" ' +
-                                            'onerror="this.onerror=null;this.src=' + JSON.stringify(PLACEHOLDER_IMG) +
-                                            '">' +
-                                            '<div class="tm-header-search__item-text">' +
-                                            '<div class="tm-header-search__item-name">' + name + '</div>' +
-                                            '<div class="tm-header-search__item-price">Rs. ' + price +
-                                            '</div></div></a>';
-                                    }).join('');
-
-                                    const footer = '<div class="tm-header-search__footer">' +
-                                        '<a href="' + SEARCH_RESULTS + '?q=' + encodeURIComponent(q) +
-                                        '">View all results</a></div>';
-
-                                    dropdown.innerHTML = items + footer;
-                                    setDropdownOpen(dropdown, true);
-                                })
-                                .catch(function() {
-                                    dropdown.innerHTML =
-                                        '<div class="tm-header-search__error">Search is temporarily unavailable. Try again.</div>';
-                                    setDropdownOpen(dropdown, true);
-                                });
-                        }, 280);
-                    });
-
-                    document.addEventListener('click', function(e) {
-                        if (!form.contains(e.target)) setDropdownOpen(dropdown, false);
-                    });
-
-                    form.addEventListener('submit', function() {
-                        setDropdownOpen(dropdown, false);
-                    });
-                }
-
-                initSearch('live-search-desktop', 'search-dropdown-desktop');
-                initSearch('live-search-mobile', 'search-dropdown-mobile');
-            })();
-        </script>
+        <div id="tm-header-search-boot" hidden
+            data-search-api="{{ route('search') }}"
+            data-search-results="{{ route('search.results') }}"
+            data-placeholder-img="{{ asset('frontend/assets/images/product-image/1.webp') }}"></div>
+        <script src="{{ asset('frontend/assets/js/header-search.js') }}"></script>
         @yield('scripts')
 </body>
 

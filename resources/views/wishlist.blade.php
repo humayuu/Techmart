@@ -11,6 +11,8 @@
                                 <tr>
                                     <th>Image</th>
                                     <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Brand</th>
                                     <th>Price</th>
                                     <th>Add To Cart</th>
                                     <th>Remove</th>
@@ -30,8 +32,14 @@
                                                 {{ $list['product_name'] }}
                                             </a>
                                         </td>
+                                        <td class="product-category">
+                                            {{ $list['category_name'] ?? '' }}
+                                        </td>
+                                        <td class="product-brand">
+                                            {{ $list['brand_name'] ?? '' }}
+                                        </td>
                                         <td class="product-price-cart">
-                                            <span class="amount">Rs. {{ $list['price'] }}</span>
+                                            <span class="amount">Rs. {{ number_format((float) ($list['price'] ?? 0), 2) }}</span>
                                         </td>
                                         <td class="product-wishlist-cart">
                                             <a href="javascript:void(0)"
@@ -47,7 +55,7 @@
                                     </tr>
                                 @empty
                                     <tr class="wishlist-empty-placeholder">
-                                        <td colspan="5" class="text-center text-danger p-4">
+                                        <td colspan="7" class="text-center text-danger p-4">
                                             Your wishlist is empty.
                                         </td>
                                     </tr>

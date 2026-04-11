@@ -1,6 +1,63 @@
 /**
- * Header live search — white input, dropdown, alignment (production).
+ * Header live search — overrides theme `.search-element form input` (padding-right: 80px
+ * for a removed button), combo field, dropdown, full-width column layout.
  */
+
+/* —— Reset theme rules (style.css `.search-element form input` wins specificity 0,1,2 over a single class) —— */
+.header-bottom .search-element,
+.mobile-search-box .search-element {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+}
+
+.header-bottom .search-element form.tm-header-search,
+.mobile-search-box .search-element form.tm-header-search {
+    position: relative;
+    width: 100%;
+}
+
+.header-bottom .search-element form.tm-header-search input.tm-header-search__input,
+.mobile-search-box .search-element form.tm-header-search input.tm-header-search__input {
+    height: auto;
+    min-height: 44px;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0.55rem 0.5rem 0.55rem 1rem;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    background-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Theme `.search-element form button` is `position:absolute` — keep submit in the flex row */
+.header-bottom .search-element form.tm-header-search button.tm-header-search__submit,
+.mobile-search-box .search-element form.tm-header-search button.tm-header-search__submit {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    width: 48px;
+    min-width: 48px;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    font-size: 1rem;
+    line-height: 1;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    background-color: #266bf9;
+}
 
 .tm-header-search {
     width: 100%;
@@ -12,33 +69,76 @@
     width: 100%;
 }
 
-.tm-header-search__input {
-    display: block;
+/* Single bordered shell: input + submit (no gap / double border) */
+.tm-header-search__combo {
+    display: flex;
+    align-items: stretch;
     width: 100%;
-    padding: 0.55rem 1rem;
-    font-size: 0.9375rem;
-    line-height: 1.45;
-    color: #1a1a1a;
     background-color: #fff;
     border: 1px solid #d8d8d8;
     border-radius: 8px;
-    outline: none;
     box-sizing: border-box;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.tm-header-search__combo:hover {
+    border-color: #c0c0c0;
+}
+
+.tm-header-search__combo:focus-within {
+    border-color: #266bf9;
+    box-shadow: 0 0 0 3px rgba(38, 107, 249, 0.2);
+}
+
+.tm-header-search__input {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.55rem 0.5rem 0.55rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: #1a1a1a;
+    border: 0;
+    outline: none;
+    background: transparent;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .tm-header-search__input::placeholder {
     color: #6c757d;
 }
 
-.tm-header-search__input:hover {
-    border-color: #c0c0c0;
+.tm-header-search__submit {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    min-width: 48px;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: #266bf9;
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.tm-header-search__input:focus {
-    border-color: #266bf9;
-    box-shadow: 0 0 0 3px rgba(38, 107, 249, 0.2);
+.tm-header-search__submit:hover {
+    background-color: #1a56d6;
+    color: #fff;
+}
+
+.tm-header-search__submit:focus-visible {
+    outline: 2px solid #0d3a99;
+    outline-offset: -2px;
+    z-index: 1;
 }
 
 .tm-header-search__dropdown {
@@ -53,9 +153,11 @@
     border-radius: 8px;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
     z-index: 10050;
-    max-height: 380px;
+    max-height: min(380px, 70vh);
     overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tm-header-search__dropdown.is-open {

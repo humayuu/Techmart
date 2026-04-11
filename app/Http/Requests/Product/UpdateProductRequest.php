@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Rules\DiscountLessThanSellingPrice;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +28,7 @@ class UpdateProductRequest extends FormRequest
             ],
             'product_code' => ['required'],
             'selling_price' => ['required', 'numeric', 'min:0'],
-            'discount_price' => ['required', 'numeric', 'min:0'],
+            'discount_price' => ['required', 'numeric', 'min:0', new DiscountLessThanSellingPrice],
             'quantity' => ['required', 'integer', 'min:0'],
             'weight' => ['required'],
             'tags' => ['required'],

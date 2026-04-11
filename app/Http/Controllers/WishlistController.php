@@ -7,6 +7,49 @@ use App\Models\Product;
 class WishlistController extends Controller
 {
     /**
+     * Attach live price, category, and brand from the database for wishlist rows.
+     *
+     * @param  array<int|string, array<string, mixed>>  $wishlist
+     * @return array<int|string, array<string, mixed>>
+     */
+    private function enrichWishlist(array $wishlist): array
+    {
+        if ($wishlist === []) {
+            return [];
+        }
+
+        $ids = array_map(intval(...), array_keys($wishlist));
+        $products = Product::query()
+            ->with(['category', 'brand'])
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy(fn ($p) => (int) $p->id);
+
+        $out = [];
+        foreach ($wishlist as $key => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $id = (int) $key;
+            $product = $products->get($id);
+            $base = $row;
+            if ($product) {
+                $selling = (float) ($product->selling_price ?? 0);
+                $discount = (float) ($product->discount_price ?? 0);
+                $base['price'] = max(0.0, $selling - $discount);
+                $base['category_name'] = $product->category?->category_name ?? '';
+                $base['brand_name'] = $product->brand?->brand_name ?? '';
+            } else {
+                $base['category_name'] = $base['category_name'] ?? '';
+                $base['brand_name'] = $base['brand_name'] ?? '';
+            }
+            $out[$key] = $base;
+        }
+
+        return $out;
+    }
+
+    /**
      * For Add To Wishlist & create Session
      */
     public function addToWishlist($id)
@@ -50,7 +93,7 @@ class WishlistController extends Controller
 
         return response()->json([
             'status' => true,
-            'wishlist' => $wishlist,
+            'wishlist' => $this->enrichWishlist($wishlist),
         ], 200);
     }
 
@@ -80,7 +123,7 @@ class WishlistController extends Controller
      */
     public function wishlist()
     {
-        $wishlist = session()->get('wishlist', []);
+        $wishlist = $this->enrichWishlist(session()->get('wishlist', []));
 
         return view('wishlist', compact('wishlist'));
     }
@@ -94,7 +137,7 @@ class WishlistController extends Controller
 
         return response()->json([
             'status' => true,
-            'wishlist' => $wishlist,
+            'wishlist' => $this->enrichWishlist($wishlist),
             'wishlistCount' => count($wishlist),
         ], 200);
     }
