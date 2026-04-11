@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Brand\StoreBrandRequest;
+use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Models\Brand;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class BrandController extends Controller
@@ -67,53 +68,33 @@ class BrandController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBrandRequest $request)
     {
-        $request->validate([
-            'name' => 'required|unique:brands,brand_name',
-            'description' => 'required',
-            'logo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
-        ]);
+        $manager = new ImageManager(new Driver);
 
-        DB::beginTransaction();
+        $destinationPath = public_path('images/brands');
+        if (! is_dir($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
 
         $fileName = null;
+        if ($img = $request->file('logo')) {
+            $fileName = uniqid('brand_').'.'.$img->getClientOriginalExtension();
+            $manager->read($img)
+                ->coverDown(300, 150)
+                ->save($destinationPath.'/'.$fileName);
+        }
+
         try {
-            $manager = new ImageManager(new Driver);
-
-            // Create Directory
-            $destinationPath = public_path('images/brands');
-            if (! is_dir($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-
-            // Upload logo
-            if ($img = $request->file('logo')) {
-                $fileName = uniqid('brand_').'.'.$img->getClientOriginalExtension();
-                $manager->read($img)
-                    ->coverDown(300, 150)
-                    ->save($destinationPath.'/'.$fileName);
-            }
-
             Brand::create([
                 'brand_name' => $request->name,
                 'brand_description' => $request->description,
                 'brand_logo' => $fileName ?? null,
             ]);
-
-            DB::commit();
-
-            return redirect()->route('brand.index')->with([
-                'message' => 'Brand created Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            if ($fileName && file_exists(public_path('images/brands/'.$fileName))) {
-                unlink(public_path('images/brands/'.$fileName));
+        } catch (Throwable $e) {
+            if ($fileName && file_exists($destinationPath.'/'.$fileName)) {
+                unlink($destinationPath.'/'.$fileName);
             }
-
             Log::error('Brand creation failed '.$e->getMessage());
 
             return redirect()->back()->with([
@@ -121,6 +102,11 @@ class BrandController extends Controller
                 'alert-type' => 'error',
             ])->withInput();
         }
+
+        return redirect()->route('brand.index')->with([
+            'message' => 'Brand created Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -134,58 +120,39 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Brand $brand)
+    public function update(UpdateBrandRequest $request, Brand $brand)
     {
-        $request->validate([
-            'name' => 'required|min:5|unique:brands,brand_name,'.$brand->id,
-            'description' => 'required',
-            'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-        ]);
+        $oldLogo = $brand->brand_logo;
+        $manager = new ImageManager(new Driver);
 
-        DB::beginTransaction();
+        $destinationPath = public_path('images/brands');
+        if (! is_dir($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
 
         $newFileName = null;
 
+        if ($img = $request->file('logo')) {
+            $newFileName = uniqid('brand_').'.'.$img->getClientOriginalExtension();
+            $manager->read($img)
+                ->coverDown(300, 150)
+                ->save($destinationPath.'/'.$newFileName);
+
+            if ($oldLogo && file_exists(public_path('images/brands/'.$oldLogo))) {
+                unlink(public_path('images/brands/'.$oldLogo));
+            }
+        }
+
         try {
-            $oldLogo = $brand->brand_logo;
-            $manager = new ImageManager(new Driver);
-
-            $destinationPath = public_path('images/brands');
-            if (! is_dir($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-
-            if ($img = $request->file('logo')) {
-                $newFileName = uniqid('brand_').'.'.$img->getClientOriginalExtension();
-                $manager->read($img)
-                    ->coverDown(300, 150)
-                    ->save($destinationPath.'/'.$newFileName);
-
-                if ($oldLogo && file_exists(public_path('images/brands/'.$oldLogo))) {
-                    unlink(public_path('images/brands/'.$oldLogo));
-                }
-            }
-
             $brand->update([
                 'brand_name' => $request->name,
                 'brand_description' => $request->description,
                 'brand_logo' => $newFileName ?? $oldLogo,
             ]);
-
-            DB::commit();
-
-            return redirect()->route('brand.index')->with([
-                'message' => 'Brand Updated Successfully',
-                'alert-type' => 'info',
-            ]);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            if ($newFileName && file_exists(public_path('images/brands/'.$newFileName))) {
-                unlink(public_path('images/brands/'.$newFileName));
+        } catch (Throwable $e) {
+            if ($newFileName && file_exists($destinationPath.'/'.$newFileName)) {
+                unlink($destinationPath.'/'.$newFileName);
             }
-
             Log::error('Brand Update Failed: '.$e->getMessage());
 
             return redirect()->back()->with([
@@ -193,6 +160,11 @@ class BrandController extends Controller
                 'alert-type' => 'error',
             ])->withInput();
         }
+
+        return redirect()->route('brand.index')->with([
+            'message' => 'Brand Updated Successfully',
+            'alert-type' => 'info',
+        ]);
     }
 
     /**
@@ -200,32 +172,16 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        DB::beginTransaction();
+        $logo = $brand->brand_logo;
+        $brand->delete();
 
-        try {
-
-            $brand->delete();
-
-            DB::commit();
-
-            // Delete the logo file if it exists
-            if ($brand->brand_logo && file_exists(public_path('images/brands/'.$brand->brand_logo))) {
-                unlink(public_path('images/brands/'.$brand->brand_logo));
-            }
-
-            return redirect()->route('brand.index')->with([
-                'message' => 'Brand Deleted Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Brand deletion failed: '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Brand deletion failed',
-                'alert-type' => 'error',
-            ]);
+        if ($logo && file_exists(public_path('images/brands/'.$logo))) {
+            unlink(public_path('images/brands/'.$logo));
         }
+
+        return redirect()->route('brand.index')->with([
+            'message' => 'Brand Deleted Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 }

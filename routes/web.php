@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\ReturnOrderController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeoSettingController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
@@ -158,12 +159,11 @@ Route::prefix('product')->group(function () {
 
         Route::get('brand/{id}', 'BrandWiseProduct')->name('brand.wise.product');
         Route::get('brand/{id}/sorting', 'BrandWiseSorting');
-        Route::get('/quick/{id}', 'QuickShow');
     });
 
     // Product Cart All Routes
     Route::controller(CartController::class)->group(function () {
-        Route::get('add/to/cart/{id}', 'AddToCart');
+        Route::post('add/to/cart/{id}', 'AddToCart');
         Route::get('all/cart', 'AllCartData');
         Route::get('all/carts', 'ViewAllCart');
         Route::get('cart', 'Cart')->name('cart');
@@ -207,6 +207,10 @@ Route::controller(SocialiteController::class)->group(function () {
     Route::get('auth/google', 'GoogleLogin')->name('auth.google');
     Route::get('auth/google-callback', 'GoogleAuthentication')->name('auth.google.callback');
 });
+
+// routes/web.php
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search/results', [SearchController::class, 'results'])->name('search.results');
 
 Route::get('/dashboard', function () {
     return view('index');

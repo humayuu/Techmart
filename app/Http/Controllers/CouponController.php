@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Coupon\StoreCouponRequest;
+use App\Http\Requests\Coupon\UpdateCouponRequest;
 use App\Models\Coupon;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class CouponController extends Controller
@@ -65,29 +65,14 @@ class CouponController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCouponRequest $request)
     {
-        $couponValidate = $request->validate([
-            'coupon_name' => 'required|string|unique:coupons,coupon_name',
-            'coupon_discount' => 'required|numeric|min:0|max:100',
-            'valid_until' => 'required|date',
+        Coupon::create($request->validated());
+
+        return redirect()->back()->with([
+            'message' => 'Coupon Created Successfully',
+            'alert-type' => 'success',
         ]);
-        try {
-            Coupon::create($couponValidate);
-
-            return redirect()->back()->with([
-                'message' => 'Coupon Created Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in Coupon Creation '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Coupon Creation Failed',
-                'alert-type' => 'error',
-            ])->withInput();
-        }
     }
 
     /**
@@ -102,29 +87,14 @@ class CouponController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Coupon $coupon)
+    public function update(UpdateCouponRequest $request, Coupon $coupon)
     {
-        $couponValidate = $request->validate([
-            'coupon_name' => 'required|string|unique:coupons,coupon_name,'.$coupon->id,
-            'coupon_discount' => 'required|numeric|min:0|max:100',
-            'valid_until' => 'required|date',
+        $coupon->update($request->validated());
+
+        return redirect()->route('coupon.index')->with([
+            'message' => 'Coupon Updated Successfully',
+            'alert-type' => 'success',
         ]);
-        try {
-            $coupon->update($couponValidate);
-
-            return redirect()->route('coupon.index')->with([
-                'message' => 'Coupon Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in Coupon Updated '.$e->getMessage());
-
-            return redirect()->route('coupon.index')->with([
-                'message' => 'Coupon Updated Failed',
-                'alert-type' => 'error',
-            ])->withInput();
-        }
     }
 
     /**

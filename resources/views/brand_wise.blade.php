@@ -63,10 +63,10 @@
                                                             <div class="thumb">
                                                                 <a href="{{ route('product.detail', $item->id) }}"
                                                                     class="image">
-                                                                    <img src="{{ asset('images/products/' . $item->product_thumbnail) }}"
+                                                                    <img src="{{ asset('images/products/thumbnail/' . $item->product_thumbnail) }}"
                                                                         alt="Product" />
                                                                     <img class="hover-image"
-                                                                        src="{{ asset('images/products/' . $item->product_thumbnail) }}"
+                                                                        src="{{ asset('images/products/thumbnail/' . $item->product_thumbnail) }}"
                                                                         alt="Product" />
                                                                 </a>
                                                             </div>
@@ -99,15 +99,9 @@
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#exampleModal-Cart"><i
                                                                         class="pe-7s-shopbag"></i></button>
-                                                                <button class="action wishlist" title="Wishlist"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#exampleModal-Wishlist"><i
+                                                                <button type="button" onclick="AddToWishlist({{ $item->id }})"
+                                                                    class="action wishlist" title="Wishlist"><i
                                                                         class="pe-7s-like"></i></button>
-                                                                <button onclick="QuickView({{ $item->id }})"
-                                                                    class="action quickview" data-link-action="quickview"
-                                                                    title="Quick view" data-bs-toggle="modal"
-                                                                    data-bs-target="#exampleModal"><i
-                                                                        class="pe-7s-look"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -124,10 +118,10 @@
                                                                 <div class="thumb">
                                                                     <a href="{{ route('product.detail', $tabProduct->id) }}"
                                                                         class="image">
-                                                                        <img src="{{ asset('images/products/' . $tabProduct->product_thumbnail) }}"
+                                                                        <img src="{{ asset('images/products/thumbnail/' . $tabProduct->product_thumbnail) }}"
                                                                             alt="Product" />
                                                                         <img class="hover-image"
-                                                                            src="{{ asset('images/products/' . $tabProduct->product_thumbnail) }}"
+                                                                            src="{{ asset('images/products/thumbnail/' . $tabProduct->product_thumbnail) }}"
                                                                             alt="Product" />
                                                                     </a>
                                                                 </div>
@@ -166,16 +160,10 @@
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#exampleModal-Cart"><i
                                                                                 class="pe-7s-shopbag"></i></button>
-                                                                        <button class="action wishlist" title="Wishlist"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#exampleModal-Wishlist"><i
+                                                                        <button type="button"
+                                                                            onclick="AddToWishlist({{ $tabProduct->id }})"
+                                                                            class="action wishlist" title="Wishlist"><i
                                                                                 class="pe-7s-like"></i></button>
-                                                                        <button onclick="QuickView({{ $tabProduct->id }})"
-                                                                            class="action quickview"
-                                                                            data-link-action="quickview"
-                                                                            title="Quick view" data-bs-toggle="modal"
-                                                                            data-bs-target="#exampleModal"><i
-                                                                                class="pe-7s-look"></i></button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -203,11 +191,7 @@
             </div>
         </div>
         <!-- Shop Page End  -->
-        {{-- For Product Quick Show --}}
-        @include('product_quick_view')
 
-        {{-- For Add To Cart --}}
-        @include('add-to-cart')
     </div>
 
     <script>
@@ -226,8 +210,8 @@
                     <div class="product">
                         <div class="thumb">
                             <a href="/product/detail/${item.id}" class="image">
-                                <img src="/images/products/${item.product_thumbnail}" alt="Product" />
-                                <img class="hover-image" src="/images/products/${item.product_thumbnail}" alt="Product" />
+                                <img src="/images/products/thumbnail/${item.product_thumbnail}" alt="Product" />
+                                <img class="hover-image" src="/images/products/thumbnail/${item.product_thumbnail}" alt="Product" />
                             </a>
                         </div>
                         <div class="content">
@@ -242,11 +226,8 @@
                             <button title="Add To Cart" class="action add-to-cart" data-bs-toggle="modal" data-bs-target="#exampleModal-Cart">
                                 <i class="pe-7s-shopbag"></i>
                             </button>
-                            <button class="action wishlist" title="Wishlist" data-bs-toggle="modal" data-bs-target="#exampleModal-Wishlist">
+                            <button type="button" onclick="AddToWishlist(${item.id})" class="action wishlist" title="Wishlist">
                                 <i class="pe-7s-like"></i>
-                            </button>
-                            <button class="action quickview" data-link-action="quickview" title="Quick view" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                <i class="pe-7s-look"></i>
                             </button>
                         </div>
                     </div>
@@ -270,8 +251,8 @@
                         <div class="product">
                             <div class="thumb">
                                 <a href="/product/detail/${item.id}" class="image">
-                                    <img src="/images/products/${item.product_thumbnail}" alt="Product" />
-                                    <img class="hover-image" src="/images/products/${item.product_thumbnail}" alt="Product" />
+                                    <img src="/images/products/thumbnail/${item.product_thumbnail}" alt="Product" />
+                                    <img class="hover-image" src="/images/products/thumbnail/${item.product_thumbnail}" alt="Product" />
                                 </a>
                             </div>
                         </div>
@@ -292,11 +273,8 @@
                                     <button title="Add To Cart" class="action add-to-cart" data-bs-toggle="modal" data-bs-target="#exampleModal-Cart">
                                         <i class="pe-7s-shopbag"></i>
                                     </button>
-                                    <button class="action wishlist" title="Wishlist" data-bs-toggle="modal" data-bs-target="#exampleModal-Wishlist">
+                                    <button type="button" onclick="AddToWishlist(${item.id})" class="action wishlist" title="Wishlist">
                                         <i class="pe-7s-like"></i>
-                                    </button>
-                                    <button class="action quickview" data-link-action="quickview" title="Quick view" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                        <i class="pe-7s-look"></i>
                                     </button>
                                 </div>
                             </div>

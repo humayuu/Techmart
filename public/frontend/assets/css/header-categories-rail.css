@@ -1,0 +1,172 @@
+/**
+ * Category rail — original theme blue bar (#266bf9) + prev/next (5 per page via JS).
+ */
+
+header .header-nav-area {
+    background: transparent;
+}
+
+header .header-nav-area .tm-category-rail {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: #266bf9;
+    border: none;
+    border-radius: 0;
+    min-height: 52px;
+    margin: 0;
+    box-shadow: none;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 12px;
+}
+
+/* Backward / Forward — medium circular controls (~44px touch-friendly) */
+header .header-nav-area .tm-category-rail__btn {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.22);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background-color 0.2s ease, transform 0.12s ease, opacity 0.2s ease;
+    z-index: 2;
+}
+
+header .header-nav-area .tm-category-rail__btn:active:not(:disabled) {
+    transform: scale(0.92);
+}
+
+header .header-nav-area .tm-category-rail__btn:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.38);
+    color: #fff;
+}
+
+header .header-nav-area .tm-category-rail__btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+header .header-nav-area .tm-category-rail__btn:disabled {
+    opacity: 0.28;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.12);
+}
+
+header .header-nav-area .tm-category-rail__viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    border-left: 1px solid rgba(255, 255, 255, 0.22);
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+    opacity: 1;
+    transition: opacity 0.22s ease;
+    will-change: opacity;
+}
+
+header .header-nav-area .tm-category-rail__viewport.is-fading {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    header .header-nav-area .tm-category-rail__viewport {
+        transition: none;
+    }
+
+    header .header-nav-area .tm-category-rail__btn {
+        transition: background-color 0.2s ease, opacity 0.2s ease;
+    }
+
+    header .header-nav-area .tm-category-rail__btn:active:not(:disabled) {
+        transform: none;
+    }
+}
+
+header .header-nav-area .tm-category-rail__list {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0 14px;
+    width: 100%;
+    min-height: 52px;
+    gap: 0;
+}
+
+header .header-nav-area .tm-category-rail__item {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+header .header-nav-area .tm-category-rail__item + .tm-category-rail__item {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+}
+
+header .header-nav-area .tm-category-rail__item.is-hidden {
+    display: none !important;
+}
+
+/* Match legacy header .main-menu ul li a */
+header .header-nav-area .tm-category-rail__link {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #fff;
+    padding: 0 12px;
+    line-height: 52px;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+header .header-nav-area .tm-category-rail__link:hover {
+    color: #fff;
+    opacity: 0.95;
+    border-bottom-color: rgba(255, 255, 255, 0.85);
+    background: transparent;
+}
+
+header .header-nav-area .tm-category-rail__item--empty {
+    flex: 1 1 auto !important;
+    justify-content: center;
+}
+
+header .header-nav-area .tm-category-rail__item--empty .text-danger {
+    color: #ffc9c9 !important;
+    line-height: 52px;
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    header .header-nav-area .tm-category-rail__link {
+        font-size: 13px;
+        padding: 0 8px;
+    }
+}

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Slider\StoreSliderRequest;
+use App\Http\Requests\Slider\UpdateSliderRequest;
 use App\Models\Slider;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class SliderController extends Controller
@@ -80,44 +81,31 @@ class SliderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSliderRequest $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'slider' => 'required|mimes:jpeg,jpg,png|max:2048',
-        ]);
-
         $destinationPath = public_path('images/slider');
         if (! is_dir($destinationPath)) {
             mkdir($destinationPath, 0755, true);
         }
 
-        $fileName = null;
+        $img = $request->file('slider');
+        $fileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
+
+        $manager = new ImageManager(new Driver);
+        $manager->read($img)
+            ->coverDown(1920, 600)
+            ->save($destinationPath.'/'.$fileName);
+
         try {
-            $img = $request->file('slider');
-            $fileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
-
-            $manager = new ImageManager(new Driver);
-            $manager->read($img)
-                ->coverDown(1920, 600)
-                ->save($destinationPath.'/'.$fileName);
-
             Slider::create([
                 'slider_image' => $fileName,
                 'title' => $request->title,
                 'status' => 'active',
             ]);
-
-            return redirect()->back()->with([
-                'message' => 'Slider created successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            if ($fileName && file_exists($destinationPath.'/'.$fileName)) {
+        } catch (Throwable $e) {
+            if (file_exists($destinationPath.'/'.$fileName)) {
                 unlink($destinationPath.'/'.$fileName);
             }
-
             Log::error('Slider creation failed: '.$e->getMessage());
 
             return redirect()->back()->with([
@@ -125,6 +113,11 @@ class SliderController extends Controller
                 'alert-type' => 'error',
             ]);
         }
+
+        return redirect()->back()->with([
+            'message' => 'Slider created successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -138,57 +131,38 @@ class SliderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Slider $slider)
+    public function update(UpdateSliderRequest $request, Slider $slider)
     {
-        $request->validate([
-            'title' => 'required',
-            'slider' => 'nullable|mimes:png,jpg,jpeg|max:2048',
-        ]);
-
         $destinationPath = public_path('images/slider');
         if (! is_dir($destinationPath)) {
             mkdir($destinationPath, 0755, true);
         }
 
-        DB::beginTransaction();
-
         $oldSlider = $slider->slider_image;
         $fileName = $oldSlider;
 
-        try {
-            if ($img = $request->file('slider')) {
-                $fileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
+        if ($img = $request->file('slider')) {
+            $fileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
 
-                $manager = new ImageManager(new Driver);
-                $manager->read($img)
-                    ->coverDown(1920, 600)
-                    ->save($destinationPath.'/'.$fileName);
+            $manager = new ImageManager(new Driver);
+            $manager->read($img)
+                ->coverDown(1920, 600)
+                ->save($destinationPath.'/'.$fileName);
 
-                // Unlink Old Slider
-                if ($oldSlider && file_exists($destinationPath.'/'.$oldSlider)) {
-                    unlink($destinationPath.'/'.$oldSlider);
-                }
+            if ($oldSlider && file_exists($destinationPath.'/'.$oldSlider)) {
+                unlink($destinationPath.'/'.$oldSlider);
             }
+        }
 
+        try {
             $slider->update([
                 'title' => $request->title,
                 'slider_image' => $fileName,
             ]);
-
-            DB::commit();
-
-            return redirect()->route('slider.index')->with([
-                'message' => 'Slider updated successfully',
-                'alert-type' => 'info',
-            ]);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            if ($fileName && $fileName !== $oldSlider && file_exists($destinationPath.'/'.$fileName)) {
+        } catch (Throwable $e) {
+            if ($fileName !== $oldSlider && file_exists($destinationPath.'/'.$fileName)) {
                 unlink($destinationPath.'/'.$fileName);
             }
-
             Log::error('Slider Update Failed: '.$e->getMessage());
 
             return redirect()->back()->with([
@@ -196,6 +170,11 @@ class SliderController extends Controller
                 'alert-type' => 'error',
             ])->withInput();
         }
+
+        return redirect()->route('slider.index')->with([
+            'message' => 'Slider updated successfully',
+            'alert-type' => 'info',
+        ]);
     }
 
     /**
@@ -203,31 +182,16 @@ class SliderController extends Controller
      */
     public function destroy(Slider $slider)
     {
-        DB::beginTransaction();
-        try {
-            // Delete old slider image
-            if ($slider->slider_image && file_exists(public_path('images/slider/'.$slider->slider_image))) {
-                unlink(public_path('images/slider/'.$slider->slider_image));
-            }
-
-            $slider->delete();
-
-            DB::commit();
-
-            return redirect()->back()->with([
-                'message' => 'Slider Deleted Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Slider deletion Failed: '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Slider deletion failed',
-                'alert-type' => 'error',
-            ]);
+        if ($slider->slider_image && file_exists(public_path('images/slider/'.$slider->slider_image))) {
+            unlink(public_path('images/slider/'.$slider->slider_image));
         }
+
+        $slider->delete();
+
+        return redirect()->back()->with([
+            'message' => 'Slider Deleted Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -235,27 +199,17 @@ class SliderController extends Controller
      */
     public function SliderStatus($id)
     {
-        try {
-            $slider = Slider::findOrFail($id);
+        $slider = Slider::findOrFail($id);
 
-            $newStatus = $slider->status == 'active' ? 'inactive' : 'active';
+        $newStatus = $slider->status == 'active' ? 'inactive' : 'active';
 
-            $slider->update([
-                'status' => $newStatus,
-            ]);
+        $slider->update([
+            'status' => $newStatus,
+        ]);
 
-            return redirect()->back()->with([
-                'message' => 'Status Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-
-            Log::error('Status update failed : '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Status update failed',
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Status Updated Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 }

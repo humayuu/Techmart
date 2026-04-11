@@ -2,12 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Admin\AdminLoginRequest;
+use App\Http\Requests\Admin\AdminPasswordUpdateRequest;
+use App\Http\Requests\Admin\AdminProfileUpdateRequest;
+use App\Http\Requests\Admin\AdminUserStoreRequest;
+use App\Http\Requests\Admin\AdminUserUpdateRequest;
 use App\Models\Admin;
-use Exception;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Yajra\DataTables\Facades\DataTables;
@@ -25,13 +34,8 @@ class AdminController extends Controller
     /**
      * Admin Logged In
      */
-    public function Login(Request $request)
+    public function Login(AdminLoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
-        ]);
-
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
 
             $admin = Auth::guard('admin')->user();
@@ -58,7 +62,45 @@ class AdminController extends Controller
      */
     public function AdminDashboard()
     {
-        return view('admin.dashboard');
+        $now = Carbon::now();
+
+        $totalProducts = Product::count();
+        $totalBrands = Brand::count();
+        $totalCategories = Category::count();
+        $totalUsers = User::count();
+        $totalAdminUsers = Admin::count();
+        $ordersThisMonth = Order::query()
+            ->whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month)
+            ->count();
+        $ordersThisYear = Order::query()
+            ->whereYear('created_at', $now->year)
+            ->count();
+        $ordersLast24Hours = Order::query()
+            ->where('created_at', '>=', $now->copy()->subHours(24))
+            ->count();
+        $totalOrders = Order::count();
+
+        $recentOrders = Order::query()
+            ->with(['user:id,name,email'])
+            ->withCount('orderProducts')
+            ->with(['orderProducts' => fn ($q) => $q->select('id', 'order_id', 'product_name', 'product_image', 'quantity', 'unit_price')->limit(1)])
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalProducts',
+            'totalBrands',
+            'totalCategories',
+            'totalUsers',
+            'totalAdminUsers',
+            'ordersThisMonth',
+            'ordersThisYear',
+            'ordersLast24Hours',
+            'totalOrders',
+            'recentOrders',
+        ));
     }
 
     // Mark single notification as read
@@ -90,7 +132,6 @@ class AdminController extends Controller
     {
         Auth::guard('admin')->logout();
 
-        // $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         $notification = [
@@ -114,62 +155,42 @@ class AdminController extends Controller
     /**
      * For Update User info
      */
-    public function AdminProfileUpdate(Request $request)
+    public function AdminProfileUpdate(AdminProfileUpdateRequest $request)
     {
         $user = Auth::guard('admin')->user();
-        $request->validate([
-            'name' => 'required|max:50',
-            'email' => 'required|email|unique:admins,email,'.Auth::guard('admin')->id(),
-            'profile_image' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+
+        $UploadDir = public_path('images/profile_image');
+
+        if (! is_dir($UploadDir)) {
+            mkdir($UploadDir, 0755, true);
+        }
+
+        $fileName = $user->profile_image;
+
+        if ($request->hasFile('profile_image')) {
+            $img = $request->file('profile_image');
+            $fileName = uniqid('user_').'.'.$img->getClientOriginalExtension();
+
+            $manager = new ImageManager(new Driver);
+            $manager->read($img)
+                ->coverDown(200, 200)
+                ->save($UploadDir.'/'.$fileName);
+
+            if ($user->profile_image && file_exists($UploadDir.'/'.$user->profile_image)) {
+                unlink($UploadDir.'/'.$user->profile_image);
+            }
+        }
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'profile_image' => $fileName,
         ]);
 
-        try {
-            $UploadDir = public_path('images/profile_image');
-
-            if (! is_dir($UploadDir)) {
-                mkdir($UploadDir, 0755, true);
-            }
-
-            $fileName = $user->profile_image;
-
-            if ($request->hasFile('profile_image')) {
-                $img = $request->file('profile_image');
-                $fileName = uniqid('user_').'.'.$img->getClientOriginalExtension();
-
-                $manager = new ImageManager(new Driver);
-                $manager->read($img)
-                    ->coverDown(200, 200)
-                    ->save($UploadDir.'/'.$fileName);
-
-                if ($user->profile_image && file_exists($UploadDir.'/'.$user->profile_image)) {
-                    unlink($UploadDir.'/'.$user->profile_image);
-                }
-            }
-
-            $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'profile_image' => $fileName,
-            ]);
-
-            return redirect()->back()->with([
-                'message' => 'Detail Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in update profile details: '.$e->getMessage());
-            if (isset($fileName) && $fileName !== $user->profile_image) {
-                if (file_exists($UploadDir.'/'.$fileName)) {
-                    unlink($UploadDir.'/'.$fileName);
-                }
-            }
-
-            return redirect()->back()->with([
-                'message' => 'Error in update profile',
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Detail Updated Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -184,14 +205,9 @@ class AdminController extends Controller
     /**
      * Function for Update Admin user password
      */
-    public function AdminPasswordUpdate(Request $request)
+    public function AdminPasswordUpdate(AdminPasswordUpdateRequest $request)
     {
         $auth = Auth::guard('admin')->user();
-
-        $request->validate([
-            'current_password' => 'required',
-            'password' => 'required|confirmed|min:8',
-        ]);
 
         if (! Hash::check($request->current_password, $auth->password)) {
             return redirect()->back()->with([
@@ -200,24 +216,14 @@ class AdminController extends Controller
             ]);
         }
 
-        try {
-            $auth->update([
-                'password' => $request->password,
-            ]);
+        $auth->update([
+            'password' => $request->password,
+        ]);
 
-            return redirect()->back()->with([
-                'message' => 'Password Update Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in update Password '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Error in update Password',
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Password Update Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     // ======================= For Manage Admin User =========================
@@ -313,59 +319,38 @@ class AdminController extends Controller
     /**
      * For Admin user store
      */
-    public function adminUserStore(Request $request)
+    public function adminUserStore(AdminUserStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|max:50',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:admin,normal_user',
-            'status' => 'required|in:active,inactive',
-            'profile_image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            'access' => 'required',
+        $UploadDir = public_path('images/profile_image');
+        if (! is_dir($UploadDir)) {
+            mkdir($UploadDir, 0755, true);
+        }
+
+        $fileName = null;
+
+        if ($img = $request->file('profile_image')) {
+            $fileName = uniqid('user_').'.'.$img->getClientOriginalExtension();
+
+            $manager = new ImageManager(new Driver);
+            $manager->read($img)
+                ->coverDown(200, 200)
+                ->save($UploadDir.'/'.$fileName);
+        }
+
+        Admin::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+            'role' => $request->role,
+            'status' => $request->status,
+            'profile_image' => $fileName,
+            'access' => $request->access,
         ]);
 
-        try {
-            $manager = new ImageManager(new Driver);
-            // Create Upload Directory
-            $UploadDir = public_path('images/profile_image');
-            if (! is_dir($UploadDir)) {
-                mkdir($UploadDir, 0755, true);
-            }
-
-            $fileName = null;
-
-            // Upload user image with Resize
-            if ($img = $request->file('profile_image')) {
-                $fileName = uniqid('user_').'.'.$img->getClientOriginalExtension();
-
-                $manager = new ImageManager(new Driver);
-                $manager->read($img)
-                    ->coverDown(200, 200)
-                    ->save($UploadDir.'/'.$fileName);
-            }
-
-            Admin::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $request->password,
-                'role' => $request->role,
-                'status' => $request->status,
-                'profile_image' => $fileName,
-                'access' => $request->access,
-            ]);
-
-            return redirect()->back()->with([
-                'message' => 'Admin User Created Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            return redirect()->back()->with([
-                'message' => 'Error in creating Admin user '.$e->getMessage(),
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Admin User Created Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -381,35 +366,21 @@ class AdminController extends Controller
     /**
      * For Admin user Update
      */
-    public function adminUserUpdate(Request $request, $id)
+    public function adminUserUpdate(AdminUserUpdateRequest $request, $id)
     {
         $adminUser = Admin::findOrFail($id);
-        $request->validate([
-            'name' => 'required|max:50',
-            'email' => 'required|email',
-            'role' => 'required|in:admin,normal_user',
-            'access' => 'required',
+
+        $adminUser->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'access' => $request->access,
         ]);
 
-        try {
-            $adminUser->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'role' => $request->role,
-                'access' => $request->access,
-            ]);
-
-            return redirect()->back()->with([
-                'message' => 'User Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            return redirect()->back()->with([
-                'message' => 'Error in update Admin user '.$e->getMessage(),
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'User Updated Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -417,26 +388,18 @@ class AdminController extends Controller
      */
     public function adminUserDelete($id)
     {
-        try {
-            $adminUser = Admin::findOrFail($id);
-            $userImage = $adminUser->profile_image;
-            $adminUser->delete();
+        $adminUser = Admin::findOrFail($id);
+        $userImage = $adminUser->profile_image;
+        $adminUser->delete();
 
-            // Unlink User Image
-            if ($userImage && file_exists(public_path('images/profile_image/'.$userImage))) {
-                unlink(public_path('images/profile_image/'.$userImage));
-            }
-
-            return redirect()->back()->with([
-                'message' => 'User Deleted Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            return redirect()->back()->with([
-                'message' => 'Error in delete Admin user '.$e->getMessage(),
-                'alert-type' => 'error',
-            ]);
+        if ($userImage && file_exists(public_path('images/profile_image/'.$userImage))) {
+            unlink(public_path('images/profile_image/'.$userImage));
         }
+
+        return redirect()->back()->with([
+            'message' => 'User Deleted Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -444,21 +407,14 @@ class AdminController extends Controller
      */
     public function adminUserStatus($id)
     {
-        try {
-            $adminUser = Admin::findOrFail($id);
-            $newStatus = $adminUser->status == 'active' ? 'inactive' : 'active';
-            $adminUser->update(['status' => $newStatus]);
+        $adminUser = Admin::findOrFail($id);
+        $newStatus = $adminUser->status == 'active' ? 'inactive' : 'active';
+        $adminUser->update(['status' => $newStatus]);
 
-            return redirect()->back()->with([
-                'message' => 'Status Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            return redirect()->back()->with([
-                'message' => 'Error in update user status '.$e->getMessage(),
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Status Updated Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**

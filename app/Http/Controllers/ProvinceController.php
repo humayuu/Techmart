@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Province\StoreProvinceRequest;
+use App\Http\Requests\Province\UpdateProvinceRequest;
 use App\Models\Province;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProvinceController extends Controller
@@ -52,28 +52,14 @@ class ProvinceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProvinceRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|max:30',
+        Province::create($request->validated());
+
+        return redirect()->back()->with([
+            'message' => 'Province Created Successfully',
+            'alert-type' => 'success',
         ]);
-        try {
-
-            Province::create($validated);
-
-            return redirect()->back()->with([
-                'message' => 'Province Created Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in province creation '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Province Creation Failed',
-                'alert-type' => 'error',
-            ])->withInput();
-        }
     }
 
     /**
@@ -87,28 +73,14 @@ class ProvinceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Province $province)
+    public function update(UpdateProvinceRequest $request, Province $province)
     {
-        $validated = $request->validate([
-            'name' => 'required|max:30',
+        $province->update($request->validated());
+
+        return redirect()->route('province.index')->with([
+            'message' => 'Province Updated Successfully',
+            'alert-type' => 'success',
         ]);
-        try {
-
-            $province->update($validated);
-
-            return redirect()->route('province.index')->with([
-                'message' => 'Province Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in update province name '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Province Update Failed',
-                'alert-type' => 'error',
-            ])->withInput();
-        }
     }
 
     /**
@@ -116,21 +88,11 @@ class ProvinceController extends Controller
      */
     public function destroy(Province $province)
     {
-        try {
-            $province->delete();
+        $province->delete();
 
-            return redirect()->back()->with([
-                'message' => 'Province Deleted Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in delete province name '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Province delete Failed',
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Province Deleted Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 }

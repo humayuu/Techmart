@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Admin>
+ * @extends Factory<Admin>
  */
 class AdminFactory extends Factory
 {
@@ -39,7 +40,6 @@ class AdminFactory extends Factory
                 'sliders',
                 'shipping',
                 'stock',
-                'reviews',
                 'return_orders',
                 'reports',
                 'settings',

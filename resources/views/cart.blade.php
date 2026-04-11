@@ -155,7 +155,7 @@
     </div>
 
     <!-- Empty Cart State -->
-    <div class="text-center py-5 mt-5" style="display: none;">
+    <div id="empty-cart-state" class="text-center py-5 mt-5" style="display: none;">
         <i class="fa fa-shopping-cart fa-4x text-muted mb-3"></i>
         <h4 class="text-muted">Your cart is empty</h4>
         <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
@@ -185,15 +185,33 @@
         };
         const recalculateProductTotal = () => {
             let productTotal = 0;
-            document.querySelectorAll('tr').forEach(tr => {
+            document.querySelectorAll('#cartBody tr').forEach(tr => {
                 const qtyInput = tr.querySelector('input[name="quantity"]');
                 const priceEl = tr.querySelector('.product-price-cart .amount');
                 if (qtyInput && priceEl) {
                     const rowPrice = parseFloat(priceEl.innerText.replace('Rs. ', ''));
-                    productTotal += rowPrice * parseInt(qtyInput.value);
+                    productTotal += rowPrice * parseInt(qtyInput.value, 10);
                 }
             });
             return productTotal;
+        };
+
+        const escapeHtml = (s) => {
+            const d = document.createElement('div');
+            d.textContent = s == null ? '' : String(s);
+            return d.innerHTML;
+        };
+
+        const cartPageQtyChange = (productId, unitPrice, delta, btnEl) => {
+            const tr = btnEl.closest('tr');
+            if (!tr) return;
+            const input = tr.querySelector('input[name="quantity"]');
+            if (!input) return;
+            let v = parseInt(input.value, 10) || 1;
+            const next = v + delta;
+            if (next < 1) return;
+            input.value = next;
+            CartQty(productId, String(next), unitPrice, input);
         };
 
         const loadCart = async () => {
@@ -205,51 +223,77 @@
 
             tbodyEl.innerHTML = '';
 
-            const response = await fetch(`{{ url('product/all/cart') }}`);
-            let data = await response.json();
-            const carts = data.carts;
-            const cartCount = data.cartCount;
-            count.innerHTML = `items ${cartCount}`;
+            const response = await fetch(`{{ url('product/all/cart') }}`, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin',
+            });
+            let data = await response.json().catch(() => ({}));
 
-            if (!carts || Object.keys(carts).length === 0) {
-                document.querySelector('.text-center').style.display = 'block';
-                document.querySelector('.cart-main-area').style.display = 'none';
+            if (!response.ok || !data.status) {
+                tbodyEl.innerHTML = '';
+                if (typeof AllCarts === 'function') await AllCarts();
                 return;
             }
+
+            const carts = data.carts || {};
+            const cartCount =
+                typeof data.cartCount === 'number' ? data.cartCount : Object.keys(carts).length;
+            count.innerHTML = `items ${cartCount}`;
+            var hdrCount = document.getElementById('count');
+            var hdrCountM = document.getElementById('count-mobile');
+            if (hdrCount) hdrCount.innerHTML = cartCount;
+            if (hdrCountM) hdrCountM.innerHTML = cartCount;
+
+            if (!carts || Object.keys(carts).length === 0) {
+                document.getElementById('empty-cart-state').style.display = 'block';
+                document.querySelector('.cart-main-area').style.display = 'none';
+                if (typeof AllCarts === 'function') await AllCarts();
+                return;
+            }
+
+            document.getElementById('empty-cart-state').style.display = 'none';
+            document.querySelector('.cart-main-area').style.display = 'block';
 
             let productTotal = 0;
 
             Object.values(carts).forEach((cart) => {
-                productTotal += cart.price * cart.quantity;
+                const q = parseInt(cart.quantity, 10) || 1;
+                const unit = Number(cart.price) || 0;
+                const line =
+                    cart.subtotal != null && cart.subtotal !== ''
+                        ? Number(cart.subtotal)
+                        : unit * q;
+                productTotal += line;
+                const decDisabled = q <= 1 ? ' disabled' : '';
+                const nameSafe = escapeHtml(cart.product_name);
+                const imgSafe = escapeHtml(cart.image || '');
                 tbodyEl.innerHTML += `
             <tr>
                 <td class="product-thumbnail">
-                    <a href=""><img class="img-responsive ml-15px" src="/images/products/${cart.image}" alt="" /></a>
+                    <a href="/product/detail/${cart.product_id}"><img class="img-responsive ml-15px" src="/images/products/thumbnail/${imgSafe}" alt="${nameSafe}" /></a>
                 </td>
-                <td class="product-name"><a href="#">${cart.product_name}</a></td>
-                <td class="product-price-cart"><span class="amount">Rs. ${cart.price}</span></td>
+                <td class="product-name"><a href="/product/detail/${cart.product_id}">${nameSafe}</a></td>
+                <td class="product-price-cart"><span class="amount">Rs. ${unit.toFixed(2)}</span></td>
                 <td class="product-quantity">
-                    <div>
-                        <input
-                            type="number"
-                            name="quantity"
-                            onchange="CartQty(${cart.product_id}, this.value, ${cart.price}, this)"
-                            value="${cart.quantity}"
-                            min="1"
-                            style="width:75px; border:none"
-                        />
+                    <div class="cart-page-qty-stepper">
+                        <button type="button" class="cart-page-qty-dec" title="Decrease quantity"${decDisabled}
+                            onclick="cartPageQtyChange(${cart.product_id}, ${unit}, -1, this)">−</button>
+                        <input type="number" class="cart-page-qty-input" name="quantity" min="1" value="${q}"
+                            onchange="CartQty(${cart.product_id}, this.value, ${unit}, this)" />
+                        <button type="button" class="cart-page-qty-inc" title="Increase quantity"
+                            onclick="cartPageQtyChange(${cart.product_id}, ${unit}, 1, this)">+</button>
                     </div>
                 </td>
-                <td class="product-subtotal">Rs. ${cart.price * cart.quantity}</td>
+                <td class="product-subtotal">Rs. ${line.toFixed(2)}</td>
                 <td class="product-remove">
-                    <button onclick="CartRemove(${cart.product_id}, this)">
+                    <button type="button" onclick="CartRemove(${cart.product_id}, this)">
                         <i class="fa fa-times"></i>
                     </button>
                 </td>
             </tr>`;
             });
 
-            pTotal.innerHTML = `Rs. ${productTotal}`;
+            pTotal.innerHTML = `Rs. ${productTotal.toFixed(2)}`;
 
             if (data.applied_coupon) {
                 appliedCoupon = data.applied_coupon;
@@ -263,8 +307,8 @@
 
             calculateGrandTotal(productTotal);
 
-            standardShip.onchange = () => calculateGrandTotal(productTotal);
-            expressShip.onchange = () => calculateGrandTotal(productTotal);
+            standardShip.onchange = () => calculateGrandTotal(recalculateProductTotal());
+            expressShip.onchange = () => calculateGrandTotal(recalculateProductTotal());
         };
 
         const ApplyCoupon = async () => {
@@ -277,8 +321,10 @@
 
             const response = await fetch(`{{ url('product/cart/apply-coupon') }}`, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF_TOKEN
                 },
                 body: JSON.stringify({
@@ -306,15 +352,17 @@
 
 
             } else {
-                document.getElementById('coupon_message').innerHTML = 'Invalid or Expired Coupon';
+                document.getElementById('coupon_message').innerHTML = data.message || 'Invalid or Expired Coupon';
             }
         };
 
         const RemoveCoupon = async () => {
             const response = await fetch(`{{ url('product/cart/remove-coupon') }}`, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF_TOKEN
                 },
             });
@@ -340,8 +388,10 @@
         const ClearCart = async () => {
             const response = await fetch(`{{ url('product/cart/clear') }}`, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF_TOKEN
                 }
             });
@@ -349,64 +399,109 @@
             if (!data.status) return;
 
             appliedCoupon = null;
-            document.querySelector('.text-center').style.display = 'block';
+            document.getElementById('empty-cart-state').style.display = 'block';
             document.querySelector('.cart-main-area').style.display = 'none';
+            var hC = document.getElementById('count');
+            var hCm = document.getElementById('count-mobile');
+            if (hC) hC.innerHTML = '0';
+            if (hCm) hCm.innerHTML = '0';
+            if (typeof AllCarts === 'function') await AllCarts();
         };
 
         const CartQty = async (productId, qty, price, inputEl) => {
             const response = await fetch(`{{ url('product/cart/quantity') }}/${productId}`, {
                 method: 'PUT',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF_TOKEN
                 },
                 body: JSON.stringify({
-                    quantity: qty
+                    quantity: parseInt(qty, 10)
                 })
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
-            if (data.status) {
-                const row = inputEl.closest('tr');
-                row.querySelector('.product-subtotal').innerHTML = `Rs. ${price * qty}`;
+            if (!response.ok || !data.status) {
+                alert(data.message || 'Could not update quantity.');
+                if (typeof data.max_qty === 'number') {
+                    inputEl.value = data.max_qty;
+                }
+                await loadCart();
+                return;
+            }
 
-                const productTotal = recalculateProductTotal();
-                document.getElementById('producttotal').innerHTML = `Rs. ${productTotal}`;
-                calculateGrandTotal(productTotal);
+            const row = inputEl.closest('tr');
+            const unit = typeof data.unit_price === 'number' ? data.unit_price : parseFloat(price);
+            const q = typeof data.quantity === 'number' ? data.quantity : parseInt(qty, 10);
+            inputEl.value = q;
+            row.querySelector('.product-price-cart .amount').innerHTML = `Rs. ${Number(unit).toFixed(2)}`;
+            row.querySelector('.product-subtotal').innerHTML = `Rs. ${(unit * q).toFixed(2)}`;
+
+            const decBtn = row.querySelector('.cart-page-qty-dec');
+            if (decBtn) {
+                decBtn.disabled = q <= 1;
+            }
+
+            const productTotal = recalculateProductTotal();
+            document.getElementById('producttotal').innerHTML = `Rs. ${productTotal.toFixed(2)}`;
+            calculateGrandTotal(productTotal);
+
+            if (typeof AllCarts === 'function') {
+                await AllCarts();
             }
         };
 
         const CartRemove = async (id, buttonEl) => {
             const response = await fetch(`{{ url('product/cart/remove') }}/${id}`, {
                 method: 'DELETE',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF_TOKEN
                 }
             });
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (data.status) {
                 buttonEl.closest('tr').remove();
 
                 const productTotal = recalculateProductTotal();
-                document.getElementById('producttotal').innerHTML = `Rs. ${productTotal}`;
+                document.getElementById('producttotal').innerHTML = `Rs. ${productTotal.toFixed(2)}`;
                 document.getElementById('cartCount').innerHTML = `items ${data.cart_count}`;
                 calculateGrandTotal(productTotal);
 
+                var hc = document.getElementById('count');
+                var hcm = document.getElementById('count-mobile');
+                if (hc) hc.innerHTML = data.cart_count;
+                if (hcm) hcm.innerHTML = data.cart_count;
+                if (typeof AllCarts === 'function') await AllCarts();
+
                 if (data.cart_count === 0) {
                     appliedCoupon = null;
-                    document.querySelector('.text-center').style.display = 'block';
+                    document.getElementById('empty-cart-state').style.display = 'block';
                     document.querySelector('.cart-main-area').style.display = 'none';
                 }
+            } else {
+                await loadCart();
             }
         };
 
         const SelectCity = async (provinceId) => {
             const cities = document.getElementById('allCities');
-            const response = await fetch(`{{ url('product/cart/all/cities') }}/${provinceId}`);
-            const data = await response.json();
+            const response = await fetch(`{{ url('product/cart/all/cities') }}/${provinceId}`, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin',
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || !data.status || !Array.isArray(data.cities)) {
+                cities.innerHTML = '<option value="" disabled selected>Could not load cities</option>';
+                return;
+            }
 
             if (data.cities.length >= 1) {
                 cities.innerHTML = '<option value="" disabled selected>Select a City</option>';
@@ -417,6 +512,12 @@
                 cities.innerHTML = '<option value="" disabled selected>No City Available</option>';
             }
         };
+
+        document.addEventListener('techmart:cart-changed', () => {
+            if (document.getElementById('cartBody')) {
+                loadCart();
+            }
+        });
 
         loadCart();
     </script>

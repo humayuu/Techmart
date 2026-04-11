@@ -7,9 +7,4 @@
 
     @include('brand')
 
-    @include('product_quick_view')
-
-    @include('add-to-cart')
-
-    @include('add-to-wishlist')
 @endsection

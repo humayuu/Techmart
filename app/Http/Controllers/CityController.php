@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\City\StoreCityRequest;
+use App\Http\Requests\City\UpdateCityRequest;
 use App\Models\City;
 use App\Models\Province;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class CityController extends Controller
@@ -72,30 +72,14 @@ class CityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCityRequest $request)
     {
-        $validated = $request->validate([
-            'province_id' => 'required',
-            'name' => 'required|max:30',
-            'is_active' => 'required',
+        City::create($request->validated());
+
+        return redirect()->back()->with([
+            'message' => 'City Created Successfully',
+            'alert-type' => 'success',
         ]);
-        try {
-
-            City::create($validated);
-
-            return redirect()->back()->with([
-                'message' => 'City Created Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in city creation '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'City Creation Failed',
-                'alert-type' => 'error',
-            ])->withInput();
-        }
     }
 
     /**
@@ -112,29 +96,14 @@ class CityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, City $city)
+    public function update(UpdateCityRequest $request, City $city)
     {
-        $validated = $request->validate([
-            'province_id' => 'required',
-            'name' => 'required|max:30',
+        $city->update($request->validated());
+
+        return redirect()->route('city.index')->with([
+            'message' => 'City name updated Successfully',
+            'alert-type' => 'success',
         ]);
-        try {
-
-            $city->update($validated);
-
-            return redirect()->route('city.index')->with([
-                'message' => 'City name updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in update city name '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'City update Failed',
-                'alert-type' => 'error',
-            ])->withInput();
-        }
     }
 
     /**
@@ -142,22 +111,12 @@ class CityController extends Controller
      */
     public function destroy(City $city)
     {
-        try {
-            $city->delete();
+        $city->delete();
 
-            return redirect()->back()->with([
-                'message' => 'City Deleted Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in delete city name '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'City delete Failed',
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'City Deleted Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -165,26 +124,16 @@ class CityController extends Controller
      */
     public function CityStatus($id)
     {
-        try {
-            $city = City::findOrFail($id);
+        $city = City::findOrFail($id);
 
-            $newStatus = $city->is_active == 0 ? 1 : 0;
-            $city->update([
-                'is_active' => $newStatus,
-            ]);
+        $newStatus = $city->is_active == 0 ? 1 : 0;
+        $city->update([
+            'is_active' => $newStatus,
+        ]);
 
-            return redirect()->back()->with([
-                'message' => 'Status Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error updating city status: '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Status Update Failed',
-                'alert-type' => 'error',
-            ]);
-        }
+        return redirect()->back()->with([
+            'message' => 'Status Updated Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 }

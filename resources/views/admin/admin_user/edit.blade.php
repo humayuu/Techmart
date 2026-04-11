@@ -113,7 +113,6 @@
                                 ['key' => 'sliders', 'label' => 'Sliders', 'icon' => 'fa-images'],
                                 ['key' => 'shipping', 'label' => 'Shipping', 'icon' => 'fa-truck'],
                                 ['key' => 'stock', 'label' => 'Stock', 'icon' => 'fa-warehouse'],
-                                ['key' => 'reviews', 'label' => 'Reviews', 'icon' => 'fa-star'],
                                 ['key' => 'return_orders', 'label' => 'Return Orders', 'icon' => 'fa-rotate-left'],
                                 ['key' => 'reports', 'label' => 'Reports', 'icon' => 'fa-chart-bar'],
                                 ['key' => 'settings', 'label' => 'Settings', 'icon' => 'fa-gear'],

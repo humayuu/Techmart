@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Stock\StoreStockRequest;
+use App\Http\Requests\Stock\UpdateStockRequest;
 use App\Models\Product;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class StockController extends Controller
@@ -92,30 +92,15 @@ class StockController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreStockRequest $request)
     {
-        $request->validate([
-            'product_id' => 'required',
-            'stock' => 'required',
+        $product = Product::findOrFail($request->product_id);
+        $product->increment('product_qty', $request->stock);
+
+        return redirect()->route('stock.index')->with([
+            'message' => 'Stock add Successfully',
+            'alert-type' => 'success',
         ]);
-
-        try {
-            $product = Product::findOrFail($request->product_id);
-            $product->increment('product_qty', $request->stock);
-
-            return redirect()->route('stock.index')->with([
-                'message' => 'Stock add Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in add stock '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Failed to add stock',
-                'alert-type' => 'error',
-            ]);
-        }
     }
 
     /**
@@ -132,29 +117,14 @@ class StockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateStockRequest $request, $id)
     {
-        $request->validate([
-            'product_id' => 'required',
-            'stock' => 'required',
+        $product = Product::findOrFail($request->product_id);
+        $product->update(['product_qty' => $request->stock]);
+
+        return redirect()->route('stock.index')->with([
+            'message' => 'Stock Updated Successfully',
+            'alert-type' => 'success',
         ]);
-
-        try {
-            $product = Product::findOrFail($request->product_id);
-            $product->update(['product_qty' => $request->stock]);
-
-            return redirect()->route('stock.index')->with([
-                'message' => 'Stock Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error in update stock '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Failed to update stock',
-                'alert-type' => 'error',
-            ]);
-        }
     }
 }

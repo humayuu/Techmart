@@ -1,5 +1,9 @@
 @php
-    $featuredProducts = \App\Models\Product::where('featured', true)->inRandomOrder()->take(3)->get();
+    $featuredProducts = \App\Models\Product::where('featured', true)
+        ->where('status', 'active')
+        ->inRandomOrder()
+        ->take(3)
+        ->get();
 @endphp
 
 <!-- Feature product area start -->
@@ -18,9 +22,8 @@
                 <div class="col-xl-4 col-lg-4 col-md-6">
                     <div class="card border-0 shadow h-100">
                         <div class="position-relative overflow-hidden">
-                            <img src="{{ asset('images/products/' . $product->product_thumbnail) }}"
-                                class="card-img-top w-100" style="height: 280px; object-fit: cover;"
-                                alt="{{ $product->product_name }}" />
+                            <img src="{{ asset('images/products/thumbnail/' . $product->product_thumbnail) }}"
+                                class="card-img-top w-100" alt="{{ $product->product_name }}" />
                             @if ($product->discount_price > 0)
                                 @php
                                     $discountPercent = round(

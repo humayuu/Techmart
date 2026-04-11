@@ -13,14 +13,15 @@
                                     <th>Product Name</th>
                                     <th>Price</th>
                                     <th>Add To Cart</th>
+                                    <th>Remove</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="wishlist-page-tbody">
                                 @forelse ($wishlist as $key => $list)
-                                    <tr>
+                                    <tr data-wishlist-row data-product-id="{{ $list['product_id'] }}">
                                         <td class="product-thumbnail">
                                             <a href="/product/detail/{{ $list['product_id'] }}">
-                                                <img class="img-responsive ml-15px" src="{{ asset($list['image']) }}"
+                                                <img class="img-responsive ml-15px" src="{{ asset('images/products/thumbnail/' . $list['image']) }}"
                                                     alt="{{ $list['product_name'] }}" />
                                             </a>
                                         </td>
@@ -33,14 +34,20 @@
                                             <span class="amount">Rs. {{ $list['price'] }}</span>
                                         </td>
                                         <td class="product-wishlist-cart">
-                                            <button onclick="AddToCart({{ $list['product_id'] }})">
-                                                Add to Cart
-                                            </button>
+                                            <a href="javascript:void(0)"
+                                                onclick="AddToCart({{ $list['product_id'] }}); return false;">Add to Cart</a>
+                                        </td>
+                                        <td class="product-remove">
+                                            <a href="#"
+                                                class="wishlist-page-remove"
+                                                data-wishlist-page-remove="{{ $list['product_id'] }}"
+                                                title="Remove from wishlist"
+                                                aria-label="Remove from wishlist">×</a>
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center fs-5 text-danger p-4">
+                                    <tr class="wishlist-empty-placeholder">
+                                        <td colspan="5" class="text-center text-danger p-4">
                                             Your wishlist is empty.
                                         </td>
                                     </tr>

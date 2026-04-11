@@ -2,61 +2,117 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Cart\ApplyCouponRequest;
+use App\Http\Requests\Cart\UpdateCartQuantityRequest;
 use App\Models\City;
 use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Province;
-use Exception;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
     /**
-     * For Add To Cart & create Session
+     * Final unit price (matches storefront: selling_price minus discount amount).
      */
-    public function AddToCart($id)
+    protected function cartUnitPrice(Product $product): float
     {
-        try {
+        $selling = (float) ($product->selling_price ?? 0);
+        $discount = (float) ($product->discount_price ?? 0);
 
-            $product = Product::findOrFail($id);
-            $cart = session()->get('cart', []);
+        return max(0.0, $selling - $discount);
+    }
 
-            if (isset($cart[$id])) {
-                $cart[$id]['quantity']++;
-                $cart[$id]['subtotal'] = $cart[$id]['price'] * $cart[$id]['quantity'];
-            } else {
-                // Add new product to cart
-                $price = $product->selling_price - $product->discount_price;
-                $cart[$id] = [
-                    'product_id' => $product->id,
-                    'product_name' => $product->product_name,
-                    'image' => $product->product_thumbnail,
-                    'price' => $price,
-                    'quantity' => 1,
-                    'subtotal' => $price * 1,
-                ];
-            }
-
-            // Save updated cart back to session
-            session()->put('cart', $cart);
-
-            return response()->json([
-                'status' => true,
-                'product_name' => $product->product_name,
-                'product_thumbnail' => $product->product_thumbnail,
-                'cart_count' => count($cart),
-                'quantity' => $cart[$id]['quantity'],
-            ], 200);
-        } catch (Exception $e) {
-            Log::error('Error in Add to Cart '.$e->getMessage());
-
+    /**
+     * For Add To Cart & create Session
+     *
+     * First add puts qty 1. If the line already exists, we return status "confirm"
+     * until the client calls again with ?confirm=1 so the user can cancel without
+     * changing quantity.
+     */
+    public function AddToCart(Request $request, $id)
+    {
+        $id = (int) $id;
+        if ($id < 1) {
             return response()->json([
                 'status' => false,
-                'message' => 'Error in add to cart',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'Invalid product.',
+            ], 422);
         }
+
+        $product = Product::findOrFail($id);
+        $key = (string) $product->id;
+
+        if ($product->status !== 'active') {
+            return response()->json([
+                'status' => false,
+                'message' => 'This product is not available.',
+            ], 422);
+        }
+
+        $cart = session()->get('cart', []);
+        $stock = max(0, (int) $product->product_qty);
+        $price = $this->cartUnitPrice($product);
+        $confirmIncrease = $request->boolean('confirm');
+        $incremented = false;
+
+        if (isset($cart[$key])) {
+            if (! $confirmIncrease) {
+                return response()->json([
+                    'status' => 'confirm',
+                    'already_in_cart' => true,
+                    'quantity' => (int) $cart[$key]['quantity'],
+                    'product_name' => $product->product_name,
+                    'product_thumbnail' => $product->product_thumbnail,
+                    'cart_count' => count($cart),
+                ], 200);
+            }
+
+            $currentQty = (int) $cart[$key]['quantity'];
+            $newQty = $currentQty + 1;
+
+            if ($stock < 1 || $newQty > $stock) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Not enough stock available.',
+                    'cart_count' => count($cart),
+                ], 422);
+            }
+
+            $cart[$key]['quantity'] = $newQty;
+            $cart[$key]['price'] = $price;
+            $cart[$key]['subtotal'] = $price * $newQty;
+            $incremented = true;
+        } else {
+            if ($stock < 1) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Not enough stock available.',
+                    'cart_count' => count($cart),
+                ], 422);
+            }
+
+            $cart[$key] = [
+                'product_id' => $product->id,
+                'product_name' => $product->product_name,
+                'image' => $product->product_thumbnail,
+                'price' => $price,
+                'quantity' => 1,
+                'subtotal' => $price,
+            ];
+        }
+
+        session()->put('cart', $cart);
+
+        return response()->json([
+            'status' => true,
+            'product_name' => $product->product_name,
+            'product_thumbnail' => $product->product_thumbnail,
+            'cart_count' => count($cart),
+            'quantity' => $cart[$key]['quantity'],
+            'incremented' => $incremented,
+        ], 200);
     }
 
     /**
@@ -64,22 +120,12 @@ class CartController extends Controller
      */
     public function ViewAllCart()
     {
-        try {
-            $carts = session()->get('cart', []);
+        $carts = session()->get('cart', []);
 
-            return response()->json([
-                'status' => true,
-                'carts' => $carts,
-            ], 200);
-        } catch (Exception $e) {
-            Log::error('Error in Fetch All Carts '.$e->getMessage());
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Error in Fetch All Carts',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'status' => true,
+            'carts' => $carts,
+        ], 200);
     }
 
     /**
@@ -87,29 +133,25 @@ class CartController extends Controller
      */
     public function CartRemove($id)
     {
-        try {
-            $cart = session()->get('cart', []);
+        $cart = session()->get('cart', []);
+        $id = (string) $id;
 
-            if (isset($cart[$id])) {
-                unset($cart[$id]);
-
-                session()->put('cart', $cart);
-            }
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Successfully Remove From Cart',
-                'cart_count' => count($cart),
-            ], 200);
-        } catch (Exception $e) {
-            Log::error('Error in remove item from cart '.$e->getMessage());
-
+        if (! isset($cart[$id])) {
             return response()->json([
                 'status' => false,
-                'message' => 'Error in remove item from cart',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'Item is not in your cart.',
+                'cart_count' => count($cart),
+            ], 404);
         }
+
+        unset($cart[$id]);
+        session()->put('cart', $cart);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Successfully Remove From Cart',
+            'cart_count' => count($cart),
+        ], 200);
     }
 
     /**
@@ -128,48 +170,69 @@ class CartController extends Controller
      */
     public function AllCartData()
     {
-        try {
-            $carts = session()->get('cart', []);
-            $total = 0;
-            foreach ($carts as $cart) {
-                $total += $cart['subtotal'];
-            }
-
-            $appliedCoupon = session()->get('applied_coupon', null);
-
-            return response()->json([
-                'status' => true,
-                'carts' => $carts,
-                'cartCount' => count($carts),
-                'total' => $total,
-                'applied_coupon' => $appliedCoupon,
-            ], 200);
-
-        } catch (Exception $e) {
-            Log::error('Error in fetch All Cart Data '.$e->getMessage());
-
-            return response()->json(['status' => false, 'message' => 'Error'], 500);
+        $carts = session()->get('cart', []);
+        $total = 0;
+        foreach ($carts as $cart) {
+            $total += $cart['subtotal'];
         }
+
+        $appliedCoupon = session()->get('applied_coupon', null);
+
+        return response()->json([
+            'status' => true,
+            'carts' => $carts,
+            'cartCount' => count($carts),
+            'total' => $total,
+            'applied_coupon' => $appliedCoupon,
+        ], 200);
     }
 
     /**
      * For Cart Quantity
      */
-    public function CartQuantity(Request $request, $id)
+    public function CartQuantity(UpdateCartQuantityRequest $request, $id)
     {
-        $qty = $request->input('quantity');
         $cart = session()->get('cart', []);
+        $id = (string) $id;
 
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] = $qty;
-            session()->put('cart', $cart);
+        if (! isset($cart[$id])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Item is not in your cart.',
+            ], 404);
         }
+
+        $product = Product::find($id);
+        if (! $product || $product->status !== 'active') {
+            return response()->json([
+                'status' => false,
+                'message' => 'This product is not available.',
+            ], 422);
+        }
+
+        $qty = (int) $request->validated('quantity');
+        $stock = max(0, (int) $product->product_qty);
+        if ($qty > $stock) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Not enough stock available.',
+                'max_qty' => $stock,
+            ], 422);
+        }
+
+        $price = $this->cartUnitPrice($product);
+        $cart[$id]['quantity'] = $qty;
+        $cart[$id]['price'] = $price;
+        $cart[$id]['subtotal'] = $price * $qty;
+        session()->put('cart', $cart);
 
         return response()->json([
             'status' => true,
             'message' => 'Successfully Update Cart Quantity',
+            'line_subtotal' => $cart[$id]['subtotal'],
+            'unit_price' => $price,
+            'quantity' => $qty,
         ]);
-
     }
 
     /**
@@ -191,39 +254,25 @@ class CartController extends Controller
      */
     public function AllCities($id)
     {
-        try {
-            $province = Province::with('cities')->findOrFail($id);
+        $province = Province::with('cities')->findOrFail($id);
 
-            $availableCities = $province->cities->where('is_active', 1)->values();
+        $availableCities = $province->cities->where('is_active', 1)->values();
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Successfully Fetch All Cities',
-                'cities' => $availableCities,
-            ], 200);
-
-        } catch (Exception $e) {
-            Log::error('Error in fetch Cities Data '.$e->getMessage());
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Error in fetch Cities Data',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Successfully Fetch All Cities',
+            'cities' => $availableCities,
+        ], 200);
     }
 
     /**
      * For Apply Coupon
      */
-    public function ApplyCoupon(Request $request)
+    public function ApplyCoupon(ApplyCouponRequest $request)
     {
-        $request->validate([
-            'coupon_code' => 'required',
-        ]);
-
         $coupon = Coupon::where('coupon_name', $request->coupon_code)
             ->where('status', 'active')
+            ->whereDate('valid_until', '>=', Carbon::today())
             ->first();
 
         if (! $coupon) {
@@ -234,6 +283,13 @@ class CartController extends Controller
         }
 
         $carts = session()->get('cart', []);
+        if (count($carts) === 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Your cart is empty.',
+            ], 422);
+        }
+
         $total = 0;
         foreach ($carts as $cart) {
             $total += $cart['subtotal'];

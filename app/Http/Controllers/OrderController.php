@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Order\UpdateOrderStatusRequest;
 use App\Models\Order;
 use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -266,16 +267,12 @@ class OrderController extends Controller
         return view('admin.order.order-detail', compact('order'));
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(UpdateOrderStatusRequest $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled,refunded',
-        ]);
-
         $order = Order::with('orderProducts')->findOrFail($id);
 
         $oldStatus = $order->status;
-        $newStatus = $request->status;
+        $newStatus = $request->validated('status');
 
         $updateData = ['status' => $newStatus];
 

@@ -3,9 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
+    use Searchable;
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'product_name' => $this->product_name,
+            'product_slug' => $this->product_slug,
+            'selling_price' => $this->selling_price,
+            'short_description' => $this->short_description,
+        ];
+    }
+
     // Relationship with brand table
     public function brand()
     {
@@ -49,7 +62,7 @@ class Product extends Model
     public function getImageUrlAttribute()
     {
         if ($this->product_thumbnail) {
-            return asset('images/products/'.$this->product_thumbnail);
+            return asset('images/products/thumbnail/'.$this->product_thumbnail);
         }
 
         return asset('frontend/assets/images/product-image/1.webp');
@@ -57,7 +70,10 @@ class Product extends Model
 
     public function getPriceAttribute()
     {
-        return $this->discount_price ?? $this->selling_price;
+        $selling = (float) ($this->selling_price ?? 0);
+        $discount = (float) ($this->discount_price ?? 0);
+
+        return max(0.0, $selling - $discount);
     }
 
     // Add this new accessor
@@ -72,13 +88,13 @@ class Product extends Model
 
         // Add thumbnail
         if ($this->product_thumbnail) {
-            $images[] = asset('images/products/'.$this->product_thumbnail);
+            $images[] = asset('images/products/thumbnail/'.$this->product_thumbnail);
         }
 
         // Add additional images
         if ($this->product_multiple_image && is_array($this->product_multiple_image)) {
             foreach ($this->product_multiple_image as $image) {
-                $images[] = asset('images/products/'.$image);
+                $images[] = asset('images/products/additional_images/'.$image);
             }
         }
 

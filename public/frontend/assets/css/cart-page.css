@@ -1,0 +1,63 @@
+/**
+ * Full cart page — simple + / − quantity controls
+ */
+.cart-main-area .cart-page-qty-stepper {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-dec,
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-inc {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-dec:hover:not(:disabled),
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-inc:hover:not(:disabled) {
+    background: #e8e8e8;
+}
+
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-dec:disabled,
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-inc:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-input {
+    width: 44px;
+    height: 32px;
+    margin: 0;
+    border: none;
+    border-left: 1px solid #e1e1e1;
+    border-right: 1px solid #e1e1e1;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+    background: #fff;
+    -moz-appearance: textfield;
+}
+
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-input::-webkit-outer-spin-button,
+.cart-main-area .cart-page-qty-stepper .cart-page-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.cart-main-area .table-content table tbody > tr td.product-quantity {
+    vertical-align: middle;
+}

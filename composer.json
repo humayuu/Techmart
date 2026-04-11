@@ -11,10 +11,13 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "http-interop/http-factory-guzzle": "^1.2",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
+        "laravel/scout": "^11.1",
         "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.10.1",
+        "meilisearch/meilisearch-php": "^1.16",
         "stripe/stripe-php": "^19.4",
         "yajra/laravel-datatables": "^12.0"
     },

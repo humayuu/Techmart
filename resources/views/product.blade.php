@@ -56,7 +56,7 @@
 </div>
 <!-- Product Area End -->
 <script>
-    const url = "http://127.0.0.1:8000/product";
+    const url = "{{ url('/product') }}";
 
     const newArriveRow = document.querySelector('#newArrivals .row');
     const specialOfferRow = document.querySelector('#specialOffer .row');
@@ -103,20 +103,14 @@
         const categoryName = product.category_display || 'Uncategorized';
 
         return `<div class="col-lg-4 col-xl-3 col-md-6 col-sm-6 col-xs-6 mb-30px">
-        <div class="product h-100 d-flex flex-column">
-            <div class="thumb position-relative overflow-hidden d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+        <div class="product">
+            <div class="thumb">
                 <a href="/product/detail/${product.id}" class="image">
-                    <img src="${imagePath}"
-                         alt="${product.product_name}"
-                         class="img-fluid"
-                         style="max-height: 250px; object-fit: contain;" />
-                    <img class="hover-image img-fluid"
-                         src="${imagePath}"
-                         alt="${product.product_name}"
-                         style="max-height: 250px; object-fit: contain;" />
+                    <img src="${imagePath}" alt="${product.product_name}" />
+                    <img class="hover-image" src="${imagePath}" alt="" />
                 </a>
             </div>
-            <div class="content flex-grow-1 d-flex flex-column">
+            <div class="content">
                 <span class="category">
                     <a href="#">${categoryName}</a>
                 </span>
@@ -133,13 +127,8 @@
                     data-bs-target="#exampleModal-Cart">
                     <i class="pe-7s-shopbag"></i>
                 </button>
-                <button onclick="AddToWishlist(${product.id})"  class="action wishlist btn btn-sm" title="Wishlist" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal-Wishlist">
+                <button type="button" onclick="AddToWishlist(${product.id})" class="action wishlist btn btn-sm" title="Wishlist">
                     <i class="pe-7s-like"></i>
-                </button>
-                <button onclick="QuickView(${product.id})" class="action quickview btn btn-sm" data-link-action="quickview" title="Quick view"
-                    data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    <i class="pe-7s-look"></i>
                 </button>
             </div>
         </div>

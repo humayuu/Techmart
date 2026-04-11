@@ -5,7 +5,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{ asset('backend/assets/images/favicon-32x32.png') }}" type="image/png" />
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.ico') }}">
 
     {{-- Plugins & CSS --}}
     <link href="{{ asset('backend/assets/plugins/metismenu/css/metisMenu.min.css') }}" rel="stylesheet" />
@@ -300,15 +302,6 @@
                         </li>
                     @endif
 
-                    @if ($admin->hasAccess('reviews'))
-                        <li>
-                            <a href="javascript:;">
-                                <div class="parent-icon"><i class="fas fa-star"></i></div>
-                                <div class="menu-title">Reviews</div>
-                            </a>
-                        </li>
-                    @endif
-
                     @if ($admin->hasAccess('settings'))
                         <li>
                             <a href="javascript:;">
@@ -366,7 +359,9 @@
     <script src="{{ asset('backend/assets/plugins/input-tags/js/tagsinput.js') }}"></script>
     <script src="{{ asset('backend/assets/js/pace.min.js') }}"></script>
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
-    <script src="{{ asset('backend/assets/js/index.js') }}"></script>
+    @unless (View::hasSection('skip_index_js'))
+        <script src="{{ asset('backend/assets/js/index.js') }}"></script>
+    @endunless
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>

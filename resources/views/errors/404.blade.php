@@ -1,23 +1,25 @@
 @extends('layout')
 @section('main')
-    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="py-5 my-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6 text-center">
-                    <div class="mb-4">
-                        <h1 class="display-1 fw-bold text-primary">404</h1>
-                        <h2 class="display-6 mb-3">Oops! Page Not Found</h2>
-                        <p class="text-muted fs-5 mb-4">
-                            The page you're looking for doesn't exist or has been moved.
-                        </p>
-                    </div>
-                    <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a href="javascript:history.back()" class="px-4">
-                            <i class="bi bi-arrow-left me-2"></i>Go Back
-                        </a>
-                        <a href="{{ url('/') }}" class="px-4">
-                            <i class="bi bi-house-door me-2"></i>Go to Homepage
-                        </a>
+                    <div class="card border-0 shadow-sm rounded-4 py-5 px-3">
+                        <div class="card-body">
+                            <h1 class="display-1 fw-bold text-primary">404</h1>
+                            <h2 class="h4 fw-bold mb-3">Page not found</h2>
+                            <p class="text-muted mb-4">
+                                The page you’re looking for doesn’t exist or was moved.
+                            </p>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4">
+                                    <i class="fa fa-arrow-left me-2"></i>Go back
+                                </a>
+                                <a href="{{ url('/') }}" class="btn btn-primary rounded-pill px-4">
+                                    <i class="fa fa-house me-2"></i>Home
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

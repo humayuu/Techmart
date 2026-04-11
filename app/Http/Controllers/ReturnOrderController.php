@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReturnOrder\StoreReturnOrderRequest;
 use App\Models\Order;
 use App\Models\ReturnOrder;
 use Illuminate\Http\Request;
@@ -93,32 +94,22 @@ class ReturnOrderController extends Controller
         return view('admin.return-order.index', compact('totalReturnOrders'));
     }
 
-    public function store(Request $request)
+    public function store(StoreReturnOrderRequest $request)
     {
-        $request->validate([
-            'reason' => 'required',
-            'description' => 'required',
-        ]);
-
         $order = Order::findOrFail($request->order_id);
 
-        try {
-            ReturnOrder::create([
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-                'reason' => $request->reason,
-                'description' => $request->description,
-                'refund_amount' => $order->subtotal,
-            ]);
+        ReturnOrder::create([
+            'order_id' => $order->id,
+            'user_id' => Auth::id(),
+            'reason' => $request->reason,
+            'description' => $request->description,
+            'refund_amount' => $order->subtotal,
+        ]);
 
-            $order->update(['status' => 'return_request']);
+        $order->update(['status' => 'return_request']);
 
-            return redirect()->route('profile.edit')
-                ->with('success', 'Return Request Submitted Successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to Submit Return Request: '.$e->getMessage());
-        }
+        return redirect()->route('profile.edit')
+            ->with('success', 'Return Request Submitted Successfully.');
     }
 
     public function show($id)

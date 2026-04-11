@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
@@ -124,39 +126,16 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        // Fields validations
-        $request->validate([
-            'brand' => 'required',
-            'category' => 'required',
-            'product_name' => 'required|unique:products,product_name|min:5|max:100',
-            'product_code' => 'required',
-            'selling_price' => 'required',
-            'discount_price' => 'required',
-            'quantity' => 'required',
-            'weight' => 'required',
-            'tags' => 'required',
-            'short_description' => 'required',
-            'long_description' => 'required',
-            'thumbnail' => 'required|mimes:jpeg,jpg,png|max:2048',
-            'images.*' => 'required|mimes:jpeg,jpg,png|max:2048', // 2MB
-            'other_info' => 'required',
-        ]);
-
-        // Create Product Slug & status
         $slug = Str::slug($request->product_name);
         $status = 'active';
 
-        DB::beginTransaction();
-
-        // Create Directory for Thumbnail
         $thumbnailDestination = public_path('images/products/thumbnail');
         if (! is_dir($thumbnailDestination)) {
             mkdir($thumbnailDestination, 0755, true);
         }
 
-        // Create Directory for Additional Images
         $additionalDestination = public_path('images/products/additional_images');
         if (! is_dir($additionalDestination)) {
             mkdir($additionalDestination, 0755, true);
@@ -165,64 +144,54 @@ class ProductController extends Controller
         $manager = new ImageManager(new Driver);
 
         $fileName = null;
-        $multiFileName = null;
         $additionalImages = [];
 
+        if ($img = $request->file('thumbnail')) {
+            $fileName = uniqid('thumbnail_').'.'.$img->getClientOriginalExtension();
+            $manager->read($img)->resize(300, 300)->save($thumbnailDestination.'/'.$fileName);
+        }
+
+        if ($multipleImages = $request->file('images')) {
+            foreach ($multipleImages as $img) {
+                $multiFileName = uniqid('additional_img_').'.'.$img->getClientOriginalExtension();
+                $manager->read($img)->resize(800, 800)->save($additionalDestination.'/'.$multiFileName);
+                $additionalImages[] = $multiFileName;
+            }
+        }
+
         try {
-            // Upload Product Thumbnail
-            if ($img = $request->file('thumbnail')) {
-                $fileName = uniqid('thumbnail_').'.'.$img->getClientOriginalExtension();
-                $manager->read($img)->resize(300, 300)->save($thumbnailDestination.'/'.$fileName);
+            DB::transaction(function () use ($request, $slug, $status, $fileName, $additionalImages) {
+                Product::create([
+                    'brand_id' => $request->brand,
+                    'category_id' => $request->category,
+                    'product_name' => $request->product_name,
+                    'product_slug' => $slug,
+                    'product_code' => $request->product_code,
+                    'product_qty' => $request->quantity,
+                    'product_tags' => $request->tags,
+                    'short_description' => $request->short_description,
+                    'long_description' => $request->long_description,
+                    'selling_price' => $request->selling_price,
+                    'discount_price' => $request->discount_price,
+                    'product_thumbnail' => $fileName,
+                    'product_multiple_image' => json_encode($additionalImages),
+                    'featured' => $request->is_featured ?? 0,
+                    'special_offer' => $request->special_offer ?? 0,
+                    'product_weight' => $request->weight,
+                    'other_info' => $request->other_info,
+                    'status' => $status,
+                ]);
+            });
+        } catch (Throwable $e) {
+            if ($fileName && file_exists($thumbnailDestination.'/'.$fileName)) {
+                unlink($thumbnailDestination.'/'.$fileName);
             }
-
-            // Upload Additional Images
-            if ($multipleImages = $request->file('images')) {
-                foreach ($multipleImages as $img) {
-                    $multiFileName = uniqid('additional_img_').'.'.$img->getClientOriginalExtension();
-                    $manager->read($img)->resize(800, 800)->save($additionalDestination.'/'.$multiFileName);
-                    $additionalImages[] = $multiFileName;
+            foreach ($additionalImages as $imgName) {
+                $path = $additionalDestination.'/'.$imgName;
+                if (file_exists($path)) {
+                    unlink($path);
                 }
             }
-
-            Product::create([
-                'brand_id' => $request->brand,
-                'category_id' => $request->category,
-                'product_name' => $request->product_name,
-                'product_slug' => $slug,
-                'product_code' => $request->product_code,
-                'product_qty' => $request->quantity,
-                'product_tags' => $request->tags,
-                'short_description' => $request->short_description,
-                'long_description' => $request->long_description,
-                'selling_price' => $request->selling_price,
-                'discount_price' => $request->discount_price,
-                'product_thumbnail' => $fileName,
-                'product_multiple_image' => json_encode($additionalImages),
-                'featured' => $request->is_featured ?? 0,
-                'special_offer' => $request->special_offer ?? 0,
-                'product_weight' => $request->weight,
-                'other_info' => $request->other_info,
-                'status' => $status,
-            ]);
-            DB::commit();
-
-            return redirect()->route('product.index')->with([
-                'message' => 'Product created Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            if ($fileName && file_exists(public_path('images/products/thumbnail/'.$fileName))) {
-                unlink(public_path($fileName));
-            }
-
-            foreach ($additionalImages as $img) {
-                if (file_exists(public_path($img))) {
-                    unlink(public_path($img));
-                }
-            }
-
             Log::error('Product creation failed '.$e->getMessage());
 
             return redirect()->back()->with([
@@ -230,6 +199,11 @@ class ProductController extends Controller
                 'alert-type' => 'error',
             ])->withInput();
         }
+
+        return redirect()->route('product.index')->with([
+            'message' => 'Product created Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -261,26 +235,9 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProductRequest $request, string $id)
     {
         $product = Product::findOrFail($id);
-
-        $request->validate([
-            'brand' => 'required',
-            'category' => 'required',
-            'product_name' => 'required|unique:products,product_name,'.$id.'|min:5|max:100',
-            'product_code' => 'required',
-            'selling_price' => 'required|numeric|min:0',
-            'discount_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'weight' => 'required',
-            'tags' => 'required',
-            'short_description' => 'required',
-            'long_description' => 'required',
-            'thumbnail' => 'nullable|mimes:jpeg,jpg,png|max:2048',
-            'images.*' => 'nullable|mimes:jpeg,jpg,png|max:2048',
-            'other_info' => 'required',
-        ]);
 
         $slug = Str::slug($request->product_name);
 
@@ -296,96 +253,72 @@ class ProductController extends Controller
 
         $manager = new ImageManager(new Driver);
 
-        // urrent DB values
         $fileName = $product->product_thumbnail;
         $oldImages = json_decode($product->product_multiple_image, true) ?? [];
         $additionalImages = $oldImages;
 
-        // Track newly uploaded files for rollback cleanup
         $newThumbnail = null;
         $newAdditionalImages = [];
 
-        // Track old files to delete AFTER successful commit
         $filesToDeleteAfterCommit = [];
 
-        DB::beginTransaction();
+        if ($img = $request->file('thumbnail')) {
+            $newThumbnail = uniqid('thumbnail_').'.'.$img->getClientOriginalExtension();
+            $manager->read($img)->resize(300, 300)->save($thumbnailDestination.'/'.$newThumbnail);
+
+            if ($product->product_thumbnail) {
+                $filesToDeleteAfterCommit[] = $thumbnailDestination.'/'.$product->product_thumbnail;
+            }
+
+            $fileName = $newThumbnail;
+        }
+
+        if ($multipleImg = $request->file('images')) {
+            foreach ($multipleImg as $img) {
+                $multiFileName = uniqid('additional_img_').'.'.$img->getClientOriginalExtension();
+                $manager->read($img)->resize(800, 800)->save($additionalDestination.'/'.$multiFileName);
+                $newAdditionalImages[] = $multiFileName;
+            }
+
+            foreach ($oldImages as $oldImg) {
+                $filesToDeleteAfterCommit[] = $additionalDestination.'/'.$oldImg;
+            }
+
+            $additionalImages = $newAdditionalImages;
+        }
 
         try {
-            // Upload new thumbnail
-            if ($img = $request->file('thumbnail')) {
-                $newThumbnail = uniqid('thumbnail_').'.'.$img->getClientOriginalExtension();
-                $manager->read($img)->resize(300, 300)->save($thumbnailDestination.'/'.$newThumbnail);
-
-                // Schedule old thumbnail for deletion after commit
-                if ($product->product_thumbnail) {
-                    $filesToDeleteAfterCommit[] = $thumbnailDestination.'/'.$product->product_thumbnail;
-                }
-
-                $fileName = $newThumbnail;
-            }
-
-            // Upload new additional images
-            if ($multipleImg = $request->file('images')) {
-                foreach ($multipleImg as $img) {
-                    $multiFileName = uniqid('additional_img_').'.'.$img->getClientOriginalExtension();
-                    $manager->read($img)->resize(800, 800)->save($additionalDestination.'/'.$multiFileName);
-                    $newAdditionalImages[] = $multiFileName;
-                }
-
-                // Schedule old additional images for deletion after commit
-                foreach ($oldImages as $oldImg) {
-                    $filesToDeleteAfterCommit[] = $additionalDestination.'/'.$oldImg;
-                }
-
-                $additionalImages = $newAdditionalImages;
-            }
-
-            $product->update([
-                'brand_id' => $request->brand,
-                'category_id' => $request->category,
-                'product_name' => $request->product_name,
-                'product_slug' => $slug,
-                'product_code' => $request->product_code,
-                'product_qty' => $request->quantity,
-                'product_tags' => $request->tags,
-                'short_description' => $request->short_description,
-                'long_description' => $request->long_description,
-                'selling_price' => $request->selling_price,
-                'discount_price' => $request->discount_price,
-                'product_thumbnail' => $fileName,
-                'product_multiple_image' => json_encode($additionalImages),
-                'featured' => $request->is_featured ?? 0,
-                'special_offer' => $request->special_offer ?? 0,
-                'product_weight' => $request->weight,
-                'other_info' => $request->other_info,
-            ]);
-
-            DB::commit();
-
-            foreach ($filesToDeleteAfterCommit as $path) {
-                if (file_exists($path)) {
-                    unlink($path);
-                }
-            }
-
-            return redirect()->route('product.index')->with([
-                'message' => 'Product Updated Successfully',
-                'alert-type' => 'success',
-            ]);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-
+            DB::transaction(function () use ($request, $product, $slug, $fileName, $additionalImages) {
+                $product->update([
+                    'brand_id' => $request->brand,
+                    'category_id' => $request->category,
+                    'product_name' => $request->product_name,
+                    'product_slug' => $slug,
+                    'product_code' => $request->product_code,
+                    'product_qty' => $request->quantity,
+                    'product_tags' => $request->tags,
+                    'short_description' => $request->short_description,
+                    'long_description' => $request->long_description,
+                    'selling_price' => $request->selling_price,
+                    'discount_price' => $request->discount_price,
+                    'product_thumbnail' => $fileName,
+                    'product_multiple_image' => json_encode($additionalImages),
+                    'featured' => $request->is_featured ?? 0,
+                    'special_offer' => $request->special_offer ?? 0,
+                    'product_weight' => $request->weight,
+                    'other_info' => $request->other_info,
+                ]);
+            });
+        } catch (Throwable $e) {
             if ($newThumbnail && file_exists($thumbnailDestination.'/'.$newThumbnail)) {
                 unlink($thumbnailDestination.'/'.$newThumbnail);
             }
-            foreach ($newAdditionalImages as $img) {
-                $path = $additionalDestination.'/'.$img;
+            foreach ($newAdditionalImages as $imgName) {
+                $path = $additionalDestination.'/'.$imgName;
                 if (file_exists($path)) {
                     unlink($path);
                 }
             }
-
             Log::error('Product Update failed: '.$e->getMessage());
 
             return redirect()->back()->with([
@@ -393,6 +326,17 @@ class ProductController extends Controller
                 'alert-type' => 'error',
             ])->withInput();
         }
+
+        foreach ($filesToDeleteAfterCommit as $path) {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        return redirect()->route('product.index')->with([
+            'message' => 'Product Updated Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -400,45 +344,29 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $product = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
 
-            $thumbnail = $product->product_thumbnail;
-            $additionalImage = json_decode($product->product_multiple_image);
+        $thumbnail = $product->product_thumbnail;
+        $additionalImage = json_decode($product->product_multiple_image);
 
-            DB::beginTransaction();
+        $product->delete();
 
-            $product->delete();
+        if ($thumbnail && file_exists(public_path('images/products/thumbnail/'.$thumbnail))) {
+            unlink(public_path('images/products/thumbnail/'.$thumbnail));
+        }
 
-            DB::commit();
-
-            // Delete old slider image
-            if ($thumbnail && file_exists(public_path('images/products/thumbnail/'.$thumbnail))) {
-                unlink(public_path('images/products/thumbnail/'.$thumbnail));
-            }
-
-            if (! empty($additionalImage)) {
-                foreach ($additionalImage as $img) {
-                    if (! empty($img) && file_exists(public_path('images/products/additional_images/'.$img))) {
-                        unlink(public_path('images/products/additional_images/'.$img));
-                    }
+        if (! empty($additionalImage)) {
+            foreach ($additionalImage as $img) {
+                if (! empty($img) && file_exists(public_path('images/products/additional_images/'.$img))) {
+                    unlink(public_path('images/products/additional_images/'.$img));
                 }
             }
-
-            return redirect()->back()->with([
-                'message' => 'Product Deleted Successfully',
-                'alert-type' => 'success',
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Product Deletion failed '.$e->getMessage());
-
-            return redirect()->back()->with([
-                'message' => 'Product Deletion failed',
-                'alert-type' => 'error',
-            ]);
         }
+
+        return redirect()->back()->with([
+            'message' => 'Product Deleted Successfully',
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -446,29 +374,18 @@ class ProductController extends Controller
      */
     public function ProductStatus($id)
     {
-        try {
-            $product = Product::findOrFail($id);
-            $newStatus = ($product->status == 'active') ? 'inactive' : 'active';
+        $product = Product::findOrFail($id);
+        $newStatus = ($product->status == 'active') ? 'inactive' : 'active';
 
-            $product->update([
-                'status' => $newStatus,
-            ]);
+        $product->update([
+            'status' => $newStatus,
+        ]);
 
-            $notification = [
-                'message' => 'Status Update Successfully',
-                'alert-type' => 'success',
-            ];
+        $notification = [
+            'message' => 'Status Update Successfully',
+            'alert-type' => 'success',
+        ];
 
-            return redirect()->back()->with($notification);
-        } catch (Exception $e) {
-            Log::error('Status Update failed '.$e->getMessage());
-
-            $notification = [
-                'message' => 'Status Update failed',
-                'alert-type' => 'error',
-            ];
-
-            return redirect()->back()->with($notification);
-        }
+        return redirect()->back()->with($notification);
     }
 }

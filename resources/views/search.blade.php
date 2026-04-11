@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('main')
-    <div class="container py-5">
+    <div class="container py-5 search-results-page">
 
         <h5 class="mb-4">
             Results for "<strong>{{ $query }}</strong>"
@@ -13,23 +13,22 @@
         @else
             <div class="row g-3">
                 @foreach ($products as $product)
-                    <div class="col-6 col-md-3">
-                        <a href="/products/{{ $product->id }}" class="text-decoration-none text-dark">
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{{ route('product.detail', $product->id) }}"
+                            class="text-decoration-none text-dark search-product-card d-block h-100">
                             <div class="card border-0 shadow-sm h-100">
-
-                                <img src="{{ asset('storage/' . $product->product_thumbnail) }}"
-                                    alt="{{ $product->product_name }}" style="height:200px; object-fit:cover;"
-                                    class="card-img-top">
-
-                                <div class="card-body p-3">
-                                    <p class="mb-1 fw-semibold text-truncate">
+                                <div class="search-product-thumb rounded-top">
+                                    <img src="{{ asset('images/products/thumbnail/' . $product->product_thumbnail) }}"
+                                        alt="{{ $product->product_name }}">
+                                </div>
+                                <div class="card-body p-3 d-flex flex-column">
+                                    <p class="mb-2 fw-semibold small" style="min-height: 2.6rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                         {{ $product->product_name }}
                                     </p>
-                                    <p class="mb-0 text-primary fw-bold">
-                                        ${{ number_format($product->selling_price, 2) }}
+                                    <p class="mb-0 text-primary fw-bold mt-auto">
+                                        Rs. {{ number_format($product->price, 2) }}
                                     </p>
                                 </div>
-
                             </div>
                         </a>
                     </div>
