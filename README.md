@@ -1,172 +1,105 @@
 # TechMart
 
-E-commerce storefront and admin panel built with **Laravel 12**, **Vite**, and **Tailwind CSS**. It includes product catalog, cart, checkout (cash on delivery and Stripe), wishlist, admin dashboard, and related tooling.
+An e-commerce store with a customer-facing site and an admin panel. This project is built with **Laravel**, **Bootstrap**, and **JavaScript**. Front-end assets are compiled with **Vite** when you develop or build for production.
 
-## Requirements
+## What you need installed
 
-Before you start, install:
+- **PHP** 8.2 or newer  
+- **Composer**  
+- **Node.js** (LTS, e.g. 18 or 20) and **npm**  
+- **MySQL** or **MariaDB**  
 
-| Tool | Notes |
-|------|--------|
-| **PHP** | 8.2 or newer |
-| **Composer** | 2.x |
-| **Node.js** | 18+ or 20+ (LTS recommended) and npm |
-| **MySQL** or **MariaDB** | A running server you can create a database on |
+PHP should include common extensions such as `openssl`, `pdo_mysql`, `mbstring`, `json`, `fileinfo`, and `gd` (for images).
 
-Recommended PHP extensions: `openssl`, `pdo`, `pdo_mysql`, `mbstring`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`, `gd` (used for image handling).
+## Run the project on your computer
 
-## Quick start (local)
-
-### 1. Clone the repository
+**1. Get the code**
 
 ```bash
 git clone <your-repo-url> techmart
 cd techmart
 ```
 
-### 2. Install PHP dependencies
+**2. Install PHP packages**
 
 ```bash
 composer install
 ```
 
-### 3. Environment file
+**3. Set up the environment**
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-Edit `.env` and set at least:
+Open `.env` and set your database details (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and `APP_URL` (for local use, `http://127.0.0.1:8000` is fine).
 
-- `APP_URL` — e.g. `http://127.0.0.1:8000` (must match how you open the app in the browser if you use Vite dev server)
-- `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` — your MySQL database and credentials
-
-Create the empty database in MySQL (example):
+Create an empty database in MySQL, for example:
 
 ```sql
 CREATE DATABASE techmart CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-The sample `.env` expects `DB_CONNECTION=mysql` and database name `techmart`; adjust if you use something else.
-
-### 4. Database migrations and optional seed
+**4. Create the database tables**
 
 ```bash
 php artisan migrate
 ```
 
-Optional — creates a default admin user, site settings, and SEO settings:
+**5. (Optional) Sample admin and settings**
 
 ```bash
 php artisan db:seed
 ```
 
-After seeding, you can sign in to the admin area with:
+After seeding, the admin login is **admin@gmail.com** / **password**. Change this password if the app is not only on your own machine.
 
-- **Email:** `admin@gmail.com`  
-- **Password:** `password`  
-
-Change this password immediately in any shared or production environment.
-
-### 5. Storage link (uploads / public files)
+**6. Public storage link**
 
 ```bash
 php artisan storage:link
 ```
 
-### 6. Front-end assets
+**7. Install and build front-end assets**
 
 ```bash
 npm install
 npm run build
 ```
 
-For development with hot reload, use `npm run dev` in a separate terminal (see below).
-
-### 7. Run the application
+**8. Start Laravel**
 
 ```bash
 php artisan serve
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+Open **http://127.0.0.1:8000** in your browser. Admin area: **http://127.0.0.1:8000/admin**.
 
-**Admin panel:** [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
+## Development mode (Vite + Laravel)
 
-### Development mode (Vite + Laravel)
+While you are changing CSS or JavaScript, run two terminals:
 
-In one terminal:
+**Terminal 1 — Laravel**
 
 ```bash
 php artisan serve
 ```
 
-In another:
+**Terminal 2 — Vite (live reload for assets)**
 
 ```bash
 npm run dev
 ```
 
-Set `APP_URL` in `.env` to the same host and port as `php artisan serve` so asset URLs stay correct.
+Keep `APP_URL` in `.env` the same as the address you use in the browser (for example `http://127.0.0.1:8000`).
 
-## Composer shortcut
+## Optional: Stripe, Google login, email
 
-This project includes a Composer script that installs dependencies, ensures `.env` exists, generates the app key, runs migrations, installs npm packages, and builds front-end assets:
-
-```bash
-composer run setup
-```
-
-You still need to create the MySQL database and configure database credentials in `.env` before this succeeds. It does **not** run `db:seed` by default.
-
-## Optional configuration
-
-### Stripe (card payments)
-
-Checkout supports **COD** without keys. For Stripe, add to `.env`:
-
-```env
-STRIPE_KEY=pk_test_...
-STRIPE_SECRET=sk_test_...
-```
-
-### Google sign-in (Socialite)
-
-If you use Google OAuth, set in `.env`:
-
-```env
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_CALLBACK_REDIRECTS=
-```
-
-Configure the redirect URI in the Google Cloud console to match your `APP_URL` and routes.
-
-### Search (Laravel Scout)
-
-Scout defaults to the `collection` driver, which works locally without a separate search server. To use **Meilisearch**, install and run Meilisearch, then set `SCOUT_DRIVER=meilisearch` and the Meilisearch host/key as required by your `config/scout.php` / `.env` (see Laravel Scout documentation).
-
-### Queue and mail
-
-`.env.example` uses `QUEUE_CONNECTION=database` and `MAIL_MAILER=log`. For real order emails in production, configure mail (SMTP, etc.) and run a queue worker, for example:
-
-```bash
-php artisan queue:work
-```
-
-## Tests
-
-```bash
-composer test
-```
-
-or:
-
-```bash
-php artisan test
-```
+- **Stripe** — Card checkout needs `STRIPE_KEY` and `STRIPE_SECRET` in `.env`. Cash on delivery works without them.  
+- **Google sign-in** — Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_CALLBACK_REDIRECTS` in `.env` if you use it.  
+- **Email / queues** — For real emails (for example order notifications), configure mail in `.env` and run `php artisan queue:work` when using the database queue.
 
 ## License
 
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
