@@ -1,232 +1,135 @@
 # TechMart
 
-An e-commerce store with a customer-facing site and an admin panel. This project is built with **Laravel**, **Bootstrap**, and **JavaScript**. Front-end assets are compiled with **Vite** when you develop or build for production.
+E-commerce storefront plus admin panel, built with **Laravel**, **Bootstrap**, **JavaScript**, and **Vite** for front-end builds.
 
 ## Screenshots
 
-**Storefront** — home page with search, categories, and hero banner.
+**Storefront**
 
 ![TechMart storefront](docs/screenshots/storefront.png)
 
-**Admin dashboard** — stats, order activity, and recent orders.
+**Admin dashboard**
 
 ![TechMart admin dashboard](docs/screenshots/admin-dashboard.png)
 
-## What you need installed
+## What you need
 
-- **PHP** 8.2 or newer  
-- **Composer**  
-- **Node.js** (LTS, e.g. 18 or 20) and **npm**  
-- **MySQL** or **MariaDB**  
+- PHP **8.2+**
+- Composer
+- Node.js (**18+** or **20+**) and npm
+- MySQL or MariaDB
 
-PHP should include common extensions such as `openssl`, `pdo_mysql`, `mbstring`, `json`, `fileinfo`, and `gd` (for images).
+Enable common PHP extensions: `openssl`, `pdo_mysql`, `mbstring`, `json`, `fileinfo`, `gd`.
 
-## Run the project on your computer
+## Run it locally
 
-**1. Get the code**
+1. **Clone and install**
 
-```bash
-git clone <your-repo-url> techmart
-cd techmart
-```
+   ```bash
+   git clone <your-repo-url> techmart
+   cd techmart
+   composer install
+   ```
 
-**2. Install PHP packages**
+2. **Environment**
 
-```bash
-composer install
-```
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-**3. Set up the environment**
+   In `.env`, set `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, and `APP_URL` (e.g. `http://127.0.0.1:8000`).
 
-```bash
-cp .env.example .env
-php artisan key:generate
-```
+   Create the database:
 
-Open `.env` and set your database details (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and `APP_URL` (for local use, `http://127.0.0.1:8000` is fine).
+   ```sql
+   CREATE DATABASE techmart CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
 
-Create an empty database in MySQL, for example:
+3. **Database and storage**
 
-```sql
-CREATE DATABASE techmart CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+   ```bash
+   php artisan migrate
+   php artisan storage:link
+   ```
 
-**4. Create the database tables**
+4. **Optional seed** — sample admin and settings:
 
-```bash
-php artisan migrate
-```
+   ```bash
+   php artisan db:seed
+   ```
 
-**5. (Optional) Sample admin and settings**
+   Default admin: **admin@gmail.com** / **password** (change this outside local dev).
 
-```bash
-php artisan db:seed
-```
+5. **Front end**
 
-After seeding, the admin login is **admin@gmail.com** / **password**. Change this password if the app is not only on your own machine.
+   ```bash
+   npm install
+   npm run build
+   ```
 
-**6. Public storage link**
+6. **Start the app**
 
-```bash
-php artisan storage:link
-```
+   ```bash
+   php artisan serve
+   ```
 
-**7. Install and build front-end assets**
+   - Site: **http://127.0.0.1:8000**  
+   - Admin: **http://127.0.0.1:8000/admin**
 
-```bash
-npm install
-npm run build
-```
+## Development (Vite + Laravel)
 
-**8. Start Laravel**
-
-```bash
-php artisan serve
-```
-
-Open **http://127.0.0.1:8000** in your browser. Admin area: **http://127.0.0.1:8000/admin**.
-
-## Development mode (Vite + Laravel)
-
-While you are changing CSS or JavaScript, run two terminals:
-
-**Terminal 1 — Laravel**
+Run both at once:
 
 ```bash
 php artisan serve
 ```
-
-**Terminal 2 — Vite (live reload for assets)**
 
 ```bash
 npm run dev
 ```
 
-Keep `APP_URL` in `.env` the same as the address you use in the browser (for example `http://127.0.0.1:8000`).
+Keep `APP_URL` in `.env` the same as the URL you open in the browser.
 
----
+## Google login (optional)
 
-## Google login (OAuth)
+Routes: `/auth/google` → Google → `/auth/google-callback`.
 
-The login page links to Google. These routes are used:
+1. In [Google Cloud Console](https://console.cloud.google.com/), create an **OAuth 2.0 Web client**.
+2. **Authorized JavaScript origins:** e.g. `http://127.0.0.1:8000` (no path).
+3. **Authorized redirect URIs:** e.g. `http://127.0.0.1:8000/auth/google-callback` (must match exactly).
 
-- Start login: `/auth/google` (`auth.google`)
-- After Google redirects back: `/auth/google-callback` (`auth.google.callback`)
-
-### 1. Create credentials in Google Cloud
-
-1. Open [Google Cloud Console](https://console.cloud.google.com/) and select or create a project.
-2. Go to **APIs & Services → OAuth consent screen**. Choose **External** (unless you use Google Workspace internally), fill the app name and your contact email, add scopes if prompted (email and profile are enough for Socialite), add test users while the app is in testing.
-3. Go to **APIs & Services → Credentials → Create credentials → OAuth client ID**.
-4. Application type: **Web application**.
-5. **Authorized JavaScript origins** — add your site origin only (no path), for example:
-   - Local: `http://127.0.0.1:8000`
-   - Production: `https://yourdomain.com`
-6. **Authorized redirect URIs** — must match the callback route exactly, for example:
-   - Local: `http://127.0.0.1:8000/auth/google-callback`
-   - Production: `https://yourdomain.com/auth/google-callback`
-7. Save and copy the **Client ID** and **Client secret**.
-
-### 2. Add values to `.env`
-
-Use the **full callback URL** (same string you entered as a redirect URI) for `GOOGLE_CALLBACK_REDIRECTS`:
+Add to `.env`:
 
 ```env
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
 GOOGLE_CALLBACK_REDIRECTS=http://127.0.0.1:8000/auth/google-callback
 ```
 
-On production, change `APP_URL` and these values to your real HTTPS domain.
+Then: `php artisan config:clear`
 
-### 3. Clear config cache (if you use it)
+Google users are marked verified automatically. Email/password users still need email verification for the dashboard.
 
-```bash
-php artisan config:clear
-```
+## Stripe (optional)
 
-Users who sign in with Google get `email_verified_at` set automatically. Users who register with email and password must verify by email before they can open the **dashboard** (see below).
-
----
-
-## Stripe (card payments at checkout)
-
-Checkout supports **cash on delivery** without Stripe. **Card** payments use Stripe test or live keys.
-
-### 1. Stripe account and API keys
-
-1. Sign up or log in at [Stripe Dashboard](https://dashboard.stripe.com/).
-2. Turn on **Test mode** while developing.
-3. Go to **Developers → API keys**.
-4. Copy the **Publishable key** and **Secret key**.
-
-### 2. Add keys to `.env`
+COD works without Stripe. For cards, add test keys from [Stripe Dashboard](https://dashboard.stripe.com/) → Developers → API keys:
 
 ```env
 STRIPE_KEY=pk_test_...
 STRIPE_SECRET=sk_test_...
 ```
 
-For live payments, use `pk_live_...` and `sk_live_...` and deploy only over HTTPS.
+Then: `php artisan config:clear`
 
-### 3. Behaviour in this project
+This app charges in **PKR**. To use another currency, change it in `CheckoutController`. In test mode, use [Stripe test cards](https://docs.stripe.com/testing) (e.g. `4242 4242 4242 4242`).
 
-- Charges are created in **PKR** (Pakistani rupees). Your Stripe account must be able to charge in that currency, or you will need to change the currency in `app/Http/Controllers/CheckoutController.php` to match your Stripe settings.
-- The checkout page loads Stripe.js and creates a **card token** before placing the order. Use Stripe [test cards](https://docs.stripe.com/testing) (for example `4242 4242 4242 4242`) in test mode.
+## Email and verification
 
-### 4. After changing `.env`
+- Registering with **email + password** sends a verification link; **Dashboard** requires a verified email.
+- Set **`APP_URL`** correctly so links in emails work.
+- For local testing, `MAIL_MAILER=log` writes mail to `storage/logs/laravel.log` (you can copy the verify URL from there).
+- For real mail, use **SMTP** in `.env` (`MAIL_MAILER=smtp`, host, port, user, password, `MAIL_FROM_ADDRESS`, etc.).
+- With `QUEUE_CONNECTION=database`, run `php artisan queue:work` so queued mail (e.g. orders) actually sends.
 
-```bash
-php artisan config:clear
-```
-
----
-
-## Email and email verification
-
-### How verification works here
-
-- New accounts created with **email and password** receive a **verification email** after registration. The **dashboard** route uses Laravel’s `verified` middleware, so unverified users are redirected to the verification screen until they click the link in the email.
-- **Google sign-in** sets the email as verified in code, so those users are not asked to verify again.
-- If a user **changes their email** in the profile, the app can clear verification so they must verify the new address (same mail setup must work for the new link).
-
-### 1. Mail settings in `.env`
-
-Set a real mail transport for production. Examples:
-
-**A. Log only (local debugging)** — no inbox; content is written to Laravel’s log (you can copy the verification URL from `storage/logs/laravel.log`):
-
-```env
-MAIL_MAILER=log
-MAIL_FROM_ADDRESS="noreply@yourdomain.com"
-MAIL_FROM_NAME="${APP_NAME}"
-```
-
-**B. SMTP (typical shared host or custom server)**
-
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=mail.yourdomain.com
-MAIL_PORT=587
-MAIL_USERNAME=your_smtp_user
-MAIL_PASSWORD=your_smtp_password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="noreply@yourdomain.com"
-MAIL_FROM_NAME="${APP_NAME}"
-```
-
-**C. Gmail-style SMTP** — often requires an [app password](https://support.google.com/accounts/answer/185833) if 2FA is on; Google may block “less secure” sign-in.
-
-Use the **same** `MAIL_FROM_ADDRESS` domain or reputation that your provider allows, or messages may go to spam.
-
-### 2. `APP_URL` must be correct
-
-Verification links are built using your application URL. Set:
-
-```env
-APP_URL=http://127.0.0.1:8000
-```
-
-(or your production `https://...` URL). Wrong `APP_URL` produces broken links in emails.
-
-
+Unverified users can resend the verification email from the verify page.
