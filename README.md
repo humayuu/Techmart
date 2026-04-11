@@ -229,16 +229,4 @@ APP_URL=http://127.0.0.1:8000
 
 (or your production `https://...` URL). Wrong `APP_URL` produces broken links in emails.
 
-### 3. Queue worker (recommended when mail is queued)
 
-This project’s `.env.example` uses `QUEUE_CONNECTION=database`. If notifications or mail are processed on the queue, run:
-
-```bash
-php artisan queue:work
-```
-
-Keep this running in production (supervisor, systemd, or your host’s queue tool) so order emails and similar messages are sent. If you set `QUEUE_CONNECTION=sync`, jobs run during the web request and you do not need a worker (not ideal under heavy load).
-
-### 4. Resend verification email
-
-Logged-in users who have not verified can use the “resend verification email” action on the verification page (route `verification.send`, throttled).
