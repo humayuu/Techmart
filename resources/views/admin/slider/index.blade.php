@@ -25,8 +25,9 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Slider image</label>
-                                <input type="file" name="slider"
+                                <input type="file" name="slider" accept="image/jpeg,image/png,image/webp"
                                     class="form-control @error('slider') is-invalid @enderror">
+                                <div class="form-text">Recommended wide banner ~1920×600px. Cropped to that ratio on upload (max 2MB).</div>
                                 @error('slider')
                                     <span class="text-danger fs-6">{{ $message }}</span>
                                 @enderror

@@ -48,16 +48,15 @@ class SliderController extends Controller
                     $icon = $row->status == 'active' ? 'thumbs-up' : 'thumbs-down';
 
                     $btn = '<div class="d-flex align-items-center gap-3 fs-5">
-                            <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit info">
+                            <a href="'.$editUrl.'" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
-                            <a href="'.$statusUrl.'"
-                            class="text-'.$class.'" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" title="Edit info">
-                            <i class="bi bi-hand-'.$icon.'-fill"></i>
-                            </a>
-                            
-                            
+                            <form method="POST" action="'.$statusUrl.'" class="d-inline m-0">
+                                '.csrf_field().'
+                                <button type="submit" class="text-'.$class.' border-0 bg-transparent p-0 d-inline-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Toggle status" style="cursor: pointer; line-height: 1;">
+                                    <i class="bi bi-hand-'.$icon.'-fill"></i>
+                                </button>
+                            </form>
                             <form method="POST" action="'.$deleteUrl.'" class="d-inline m-0 delete-form">
                             '.csrf_field().'
                                 '.method_field('DELETE').'
@@ -91,10 +90,19 @@ class SliderController extends Controller
         $img = $request->file('slider');
         $fileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
 
-        $manager = new ImageManager(new Driver);
-        $manager->read($img)
-            ->coverDown(1920, 600)
-            ->save($destinationPath.'/'.$fileName);
+        try {
+            $manager = new ImageManager(new Driver);
+            $manager->read($img)
+                ->coverDown(1920, 600)
+                ->save($destinationPath.'/'.$fileName);
+        } catch (Throwable $e) {
+            Log::error('Slider image processing failed: '.$e->getMessage());
+
+            return redirect()->back()->with([
+                'message' => 'Could not process the image. Use JPG or PNG under 2MB.',
+                'alert-type' => 'error',
+            ])->withInput();
+        }
 
         try {
             Slider::create([
@@ -111,7 +119,7 @@ class SliderController extends Controller
             return redirect()->back()->with([
                 'message' => 'Slider creation failed',
                 'alert-type' => 'error',
-            ]);
+            ])->withInput();
         }
 
         return redirect()->back()->with([
@@ -142,16 +150,27 @@ class SliderController extends Controller
         $fileName = $oldSlider;
 
         if ($img = $request->file('slider')) {
-            $fileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
+            $newFileName = uniqid('slider_').'.'.$img->getClientOriginalExtension();
 
-            $manager = new ImageManager(new Driver);
-            $manager->read($img)
-                ->coverDown(1920, 600)
-                ->save($destinationPath.'/'.$fileName);
+            try {
+                $manager = new ImageManager(new Driver);
+                $manager->read($img)
+                    ->coverDown(1920, 600)
+                    ->save($destinationPath.'/'.$newFileName);
+            } catch (Throwable $e) {
+                Log::error('Slider image processing failed: '.$e->getMessage());
+
+                return redirect()->back()->with([
+                    'message' => 'Could not process the image. Use JPG or PNG under 2MB.',
+                    'alert-type' => 'error',
+                ])->withInput();
+            }
 
             if ($oldSlider && file_exists($destinationPath.'/'.$oldSlider)) {
                 unlink($destinationPath.'/'.$oldSlider);
             }
+
+            $fileName = $newFileName;
         }
 
         try {

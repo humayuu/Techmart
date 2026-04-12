@@ -22,10 +22,16 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\WishlistController;
+use App\Models\Slider;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('index');
+    $homeSliders = Slider::query()
+        ->where('status', 'active')
+        ->latest('id')
+        ->get();
+
+    return view('index', compact('homeSliders'));
 });
 
 Route::prefix('admin')->group(function () {
@@ -83,7 +89,7 @@ Route::prefix('admin')->group(function () {
 
         // Sliders
         Route::middleware('admin.access:sliders')->group(function () {
-            Route::get('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
+            Route::post('slider/status/{id}', [SliderController::class, 'SliderStatus'])->name('slider.status');
             Route::resource('slider', SliderController::class);
         });
 
@@ -204,8 +210,8 @@ Route::controller(ContactUsController::class)->group(function () {
 
 // Google Login
 Route::controller(SocialiteController::class)->group(function () {
-    Route::get('auth/google', 'GoogleLogin')->name('auth.google');
-    Route::get('auth/google-callback', 'GoogleAuthentication')->name('auth.google.callback');
+    Route::get('auth/google', 'googleLogin')->name('auth.google');
+    Route::get('auth/google-callback', 'googleAuthentication')->name('auth.google.callback');
 });
 
 // routes/web.php
@@ -213,7 +219,12 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/search/results', [SearchController::class, 'results'])->name('search.results');
 
 Route::get('/dashboard', function () {
-    return view('index');
+    $homeSliders = Slider::query()
+        ->where('status', 'active')
+        ->latest('id')
+        ->get();
+
+    return view('index', compact('homeSliders'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

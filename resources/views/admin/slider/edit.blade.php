@@ -28,10 +28,12 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Slider image</label>
-                                <input type="file" name="slider"
+                                <input type="file" name="slider" accept="image/jpeg,image/png,image/webp"
                                     class="form-control @error('slider') is-invalid @enderror">
+                                <div class="form-text">Recommended wide banner ~1920×600px. Cropped on upload (max 2MB).</div>
                                 <img class="w-25 mt-3 img-thumbnail"
-                                    src="{{ asset('images/slider/' . $slider->slider_image) }}" alt="">
+                                    src="{{ asset('images/slider/' . $slider->slider_image) }}"
+                                    alt="{{ $slider->title }}">
                                 @error('slider')
                                     <span class="text-danger fs-6">{{ $message }}</span>
                                 @enderror

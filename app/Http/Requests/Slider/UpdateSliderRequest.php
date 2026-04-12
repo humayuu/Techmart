@@ -14,8 +14,8 @@ class UpdateSliderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string'],
-            'slider' => ['nullable', 'mimes:png,jpg,jpeg', 'max:2048'],
+            'title' => ['required', 'string', 'max:255'],
+            'slider' => ['nullable', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ];
     }
 }

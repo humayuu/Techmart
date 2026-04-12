@@ -374,10 +374,10 @@ input {
 }
 
 .slider-height {
-    height: 748px;
-    background-size: cover; /* ADD THIS */
-    background-position: center center; /* ADD THIS */
-    background-repeat: no-repeat; /* ADD THIS */
+    height: clamp(200px, min(31.25vw, 52vh), 560px);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .slider-animated-1 > * {
@@ -1617,40 +1617,6 @@ body.offcanvas-open {
     background-color: #cebdb5;
 }
 
-.slider-height {
-    height: 748px;
-}
-@media only screen and (min-width: 1200px) and (max-width: 1599px) {
-    .slider-height {
-        height: 700px;
-    }
-}
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-    .slider-height {
-        height: 550px;
-    }
-}
-@media only screen and (min-width: 768px) and (max-width: 991px) {
-    .slider-height {
-        height: 500px;
-    }
-}
-@media only screen and (max-width: 767px) {
-    .slider-height {
-        height: 450px;
-    }
-}
-@media only screen and (max-width: 575px) {
-    .slider-height {
-        height: 700px;
-    }
-}
-@media only screen and (max-width: 479px) {
-    .slider-height {
-        height: 700px;
-    }
-}
-
 .ptb-30px {
     padding: 30px 0;
 }
@@ -1663,32 +1629,7 @@ body.offcanvas-open {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    height: 748px;
-}
-@media only screen and (min-width: 1200px) and (max-width: 1599px) {
-    .slider-height-2 {
-        height: 700px;
-    }
-}
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-    .slider-height-2 {
-        height: 550px;
-    }
-}
-@media only screen and (min-width: 768px) and (max-width: 991px) {
-    .slider-height-2 {
-        height: 500px;
-    }
-}
-@media only screen and (max-width: 767px) {
-    .slider-height-2 {
-        height: 400px;
-    }
-}
-@media only screen and (max-width: 575px) {
-    .slider-height-2 {
-        height: 700px;
-    }
+    height: clamp(200px, min(31.25vw, 52vh), 560px);
 }
 .hero-slide-image {
     display: -webkit-box;

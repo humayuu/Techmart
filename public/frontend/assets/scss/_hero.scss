@@ -8,26 +8,12 @@
 	background-color: #cebdb5;
 }
 
+// Matches admin-processed slides (1920×600). clamp avoids oversized heroes and fixes mobile (was 700px).
 .slider-height {
-	height: 748px;
-	@media #{$laptop-device} {
-		height: 700px;
-	}
-	@media #{$desktop-device} {
-		height: 550px;
-	}
-	@media #{$tablet-device} {
-		height: 500px;
-	}
-	@media #{$large-mobile} {
-		height: 450px;
-	}
-	@media #{$small-mobile} {
-		height: 700px;
-	}
-	@media #{$extra-small-mobile} {
-		height: 700px;
-	}
+	height: clamp(200px, min(31.25vw, 52vh), 560px);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center center;
 }
 .ptb-30px{
 	padding: 30px 0;
@@ -39,24 +25,7 @@
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: center;
-	height: 748px;
-	@media #{$laptop-device} {
-		height: 700px;
-	}
-	@media #{$desktop-device} {
-		height: 550px;
-	}
-	@media #{$tablet-device} {
-		height: 500px;
-	}
-	@media #{$large-mobile} {
-		height: 400px;
-	}
-	@media #{$small-mobile} {
-		height: 700px;
-	}
-	@media #{$extra-small-mobile} {
-	}
+	height: clamp(200px, min(31.25vw, 52vh), 560px);
 }
 
 .hero-slide-image {

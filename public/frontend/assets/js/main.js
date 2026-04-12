@@ -105,23 +105,38 @@
     mobileOffCanvasMenu();
 
     /*---------------------
-        Hero Slider
+        Hero Slider (scoped nav/pagination; safe with 0–1 slides)
      ---------------------- */
 
-    var heroSlider = new Swiper('.hero-slider.swiper-container', {
-        loop: true,
-        speed: 2000,
-        effect: "fade",
-        autoplay: {
-            delay: 7000,
-            disableOnInteraction: false,
-        },
-        // Navigation arrows
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
+    var heroSliderEl = document.querySelector('.hero-slider.swiper-container');
+    if (heroSliderEl) {
+        var heroSlideCount = heroSliderEl.querySelectorAll('.swiper-slide').length;
+        if (heroSlideCount > 0) {
+            var heroNext = heroSliderEl.querySelector('.swiper-button-next');
+            var heroPrev = heroSliderEl.querySelector('.swiper-button-prev');
+            var heroPag = heroSliderEl.querySelector('.swiper-pagination');
+            new Swiper(heroSliderEl, {
+                loop: heroSlideCount > 1,
+                speed: 2000,
+                effect: "fade",
+                fadeEffect: {
+                    crossFade: true
+                },
+                autoplay: heroSlideCount > 1 ? {
+                    delay: 7000,
+                    disableOnInteraction: false,
+                } : false,
+                navigation: heroNext && heroPrev ? {
+                    nextEl: heroNext,
+                    prevEl: heroPrev,
+                } : undefined,
+                pagination: heroPag ? {
+                    el: heroPag,
+                    clickable: true,
+                } : undefined,
+            });
         }
-    });
+    }
 
 
 
