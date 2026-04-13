@@ -17,9 +17,7 @@ E-commerce storefront plus admin panel, built with **Laravel**, **Bootstrap**, *
 - PHP **8.2+**
 - Composer
 - Node.js (**18+** or **20+**) and npm
-- MySQL or MariaDB
-
-Enable common PHP extensions: `openssl`, `pdo_mysql`, `mbstring`, `json`, `fileinfo`, `gd`.
+- MySQL 
 
 ## Run it locally
 
@@ -39,12 +37,6 @@ Enable common PHP extensions: `openssl`, `pdo_mysql`, `mbstring`, `json`, `filei
    ```
 
    In `.env`, set `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, and `APP_URL` (e.g. `http://127.0.0.1:8000`).
-
-   Create the database:
-
-   ```sql
-   CREATE DATABASE techmart CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
 
 3. **Database and storage**
 
