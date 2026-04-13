@@ -45,7 +45,7 @@ E-commerce storefront plus admin panel, built with **Laravel**, **Bootstrap**, *
    php artisan storage:link
    ```
 
-4. **Optional seed** — sample admin and settings:
+4. sample admin and settings:
 
    ```bash
    php artisan db:seed
