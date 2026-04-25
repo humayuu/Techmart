@@ -12,6 +12,99 @@ E-commerce storefront plus admin panel, built with **Laravel**, **Bootstrap**, *
 
 ![TechMart admin dashboard](docs/screenshots/admin-dashboard.png)
 
+## Database ER Diagram
+
+The diagram below reflects the core e-commerce schema from the Laravel migrations.
+
+```mermaid
+erDiagram
+    USERS {
+        bigint id PK
+        string name
+        string email
+        string phone
+        string google_id
+    }
+
+    ADMINS {
+        bigint id PK
+        string name
+        string email
+        enum role
+        enum status
+    }
+
+    BRANDS {
+        bigint id PK
+        string brand_name
+    }
+
+    CATEGORIES {
+        bigint id PK
+        string category_name
+        string category_slug
+    }
+
+    PRODUCTS {
+        bigint id PK
+        bigint brand_id FK
+        bigint category_id FK
+        string product_name
+        string product_code
+        decimal selling_price
+        string status
+    }
+
+    ORDERS {
+        bigint id PK
+        bigint user_id FK
+        enum status
+        enum payment_status
+        string payment_method
+        decimal total_amount
+        timestamp delivered_at
+    }
+
+    ORDER_PRODUCTS {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        int quantity
+        decimal unit_price
+        decimal sub_total
+    }
+
+    RETURN_ORDERS {
+        bigint id PK
+        bigint order_id FK
+        bigint user_id FK
+        string return_number
+        enum status
+        decimal refund_amount
+    }
+
+    PROVINCES {
+        bigint id PK
+        string name
+    }
+
+    CITIES {
+        bigint id PK
+        bigint province_id FK
+        string name
+        boolean is_active
+    }
+
+    BRANDS ||--o{ PRODUCTS : has
+    CATEGORIES ||--o{ PRODUCTS : has
+    USERS ||--o{ ORDERS : places
+    ORDERS ||--o{ ORDER_PRODUCTS : contains
+    PRODUCTS ||--o{ ORDER_PRODUCTS : appears_in
+    USERS ||--o{ RETURN_ORDERS : requests
+    ORDERS ||--o{ RETURN_ORDERS : may_have
+    PROVINCES ||--o{ CITIES : contains
+```
+
 ## What you need
 
 - PHP **8.2+**
